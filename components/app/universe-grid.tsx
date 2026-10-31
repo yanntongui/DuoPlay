@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useScroll, useTransform } from "framer-motion";
 import Link from "next/link";
 import { useQuery } from "convex/react";
 import { ArrowRight, Clock } from "lucide-react";
@@ -204,11 +204,9 @@ function UniverseCard({
 }
 
 /**
- * Bento Grid « Les Mondes Complices » : une grille asymétrique équilibrée au
- * ratio d'or, traversée par un projecteur qui suit le pointeur. L'univers mis
- * en avant occupe deux colonnes et deux lignes.
+ * Carousel pour mobile, grid pour desktop
  */
-function Grid({ items, mood }: { items: Universe[]; mood: string | null }) {
+function CarouselGrid({ items, mood }: { items: Universe[]; mood: string | null }) {
   const { t } = useT();
   if (items.length === 0) {
     return (
@@ -230,27 +228,54 @@ function Grid({ items, mood }: { items: Universe[]; mood: string | null }) {
   const featuredSlug = items.find((item) => item.mvp)?.slug;
 
   return (
-    <motion.div
-      className="grid auto-rows-[minmax(11rem,auto)] gap-4 sm:grid-cols-2 lg:grid-cols-3"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
-    >
-      {items.map((universe, index) => (
-        <motion.div
-          key={universe.slug}
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35, delay: index * 0.08 }}
-        >
-          <UniverseCard
-            universe={universe}
-            mood={mood}
-            featured={universe.slug === featuredSlug}
-          />
-        </motion.div>
-      ))}
-    </motion.div>
+    <div className="relative">
+      {/* Carousel pour mobile */}
+      <motion.div
+        className="no-scrollbar flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory md:hidden"
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        {items.map((universe, index) => (
+          <motion.div
+            key={universe.slug}
+            className="snap-center shrink-0 w-[85vw] max-w-[340px]"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.35, delay: index * 0.1 }}
+          >
+            <UniverseCard
+              universe={universe}
+              mood={mood}
+              featured={universe.slug === featuredSlug}
+            />
+          </motion.div>
+        ))}
+      </motion.div>
+
+      {/* Grid pour desktop */}
+      <motion.div
+        className="hidden grid auto-rows-[minmax(11rem,auto)] gap-4 sm:grid-cols-2 lg:grid-cols-3 md:grid"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4 }}
+      >
+        {items.map((universe, index) => (
+          <motion.div
+            key={universe.slug}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, delay: index * 0.08 }}
+          >
+            <UniverseCard
+              universe={universe}
+              mood={mood}
+              featured={universe.slug === featuredSlug}
+            />
+          </motion.div>
+        ))}
+      </motion.div>
+    </div>
   );
 }
 
@@ -299,7 +324,7 @@ function UniverseGridFromConvex({ mood }: { mood: Mood | null }) {
   if (categories === undefined) return <Loading />;
 
   return (
-    <Grid
+    <CarouselGrid
       items={filterByMood(categoriesToUniverses(categories), mood)}
       mood={mood?.slug ?? null}
     />
@@ -325,7 +350,7 @@ export function UniverseGrid({ mood = null }: { mood?: string | null }) {
       {isConvexConfigured ? (
         <UniverseGridFromConvex mood={selected} />
       ) : (
-        <Grid items={filterByMood(UNIVERSES, selected)} mood={selected?.slug ?? null} />
+        <CarouselGrid items={filterByMood(UNIVERSES, selected)} mood={selected?.slug ?? null} />
       )}
     </div>
   );
