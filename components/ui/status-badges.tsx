@@ -24,7 +24,8 @@ export function MoodBadge({
   return (
     <button
       onClick={onClick}
-      className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-0.5 text-xs ring-1 ring-white/20 transition-transform hover:scale-105"
+      aria-label={`Humeur : ${config.label}`}
+      className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-0.5 text-xs ring-1 ring-white/20 transition-transform hover:scale-105 focus:outline-none focus-ring"
       title={config.label}
     >
       <span className="text-sm">{config.emoji}</span>

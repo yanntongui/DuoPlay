@@ -2,34 +2,45 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * Carte premium - ombres prononcées, couleurs plus saturées
+ * Carte premium : élévation douce superposée, hairline chaud, rayon généreux.
+ * `tone` permet de teinter légèrement la surface (lavande, corail, graphite)
+ * sans casser la lisibilité du texte.
  */
 const TONES = {
-  default: "bg-card border-white/10",
-  surface: "bg-surface border-white/5",
-  surfaceLight: "bg-surface-light border-white/8",
-  accent: "bg-bordeaux-600/20 border-bordeaux-500/30",
-  highlight: "bg-surface-lighter border-rose-400/30",
+  default: "bg-card",
+  ivory: "bg-ivory-100",
+  lavender: "bg-lavender-100/70",
+  coral: "bg-coral-100/70",
+  dark: "gradient-night text-white",
 } as const;
 
 function Card({
   className,
   tone = "default",
   interactive,
+  role,
+  tabIndex,
+  ariaLabel,
   ...props
 }: React.ComponentProps<"div"> & {
   tone?: keyof typeof TONES;
   interactive?: boolean;
+  role?: string;
+  tabIndex?: number;
+  ariaLabel?: string;
 }) {
   return (
     <div
       data-slot="card"
+      role={interactive ? (role || "button") : role}
+      tabIndex={interactive ? (tabIndex ?? 0) : undefined}
+      aria-label={ariaLabel}
       className={cn(
-        "relative overflow-hidden rounded-xl border shadow-[var(--shadow-md)] text-card-foreground",
+        "relative overflow-hidden rounded-xl border border-ivory-200/80 shadow-[var(--shadow-soft)] text-card-foreground focus-ring transition-shadow",
         TONES[tone],
+        tone === "dark" && "border-white/10",
         interactive &&
-          "cursor-pointer transition-all duration-250 hover:-translate-y-1 hover:shadow-[var(--shadow-lg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bordeaux-500",
-        interactive && tone === "highlight" && "ring-rose-400/20 hover:ring-rose-400/40",
+          "spotlight press cursor-pointer hover:-translate-y-0.5 hover:border-lavender-300/60 hover:shadow-[var(--shadow-lift)] focus:outline-none",
         className,
       )}
       {...props}
@@ -41,7 +52,7 @@ function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card-header"
-      className={cn("flex flex-col gap-2 p-5", className)}
+      className={cn("flex flex-col gap-1.5 p-5", className)}
       {...props}
     />
   );
@@ -51,7 +62,7 @@ function CardTitle({ className, ...props }: React.ComponentProps<"h3">) {
   return (
     <h3
       data-slot="card-title"
-      className={cn("text-xl font-semibold leading-tight text-cream-100", className)}
+      className={cn("text-lg leading-tight", className)}
       {...props}
     />
   );
@@ -61,7 +72,7 @@ function CardDescription({ className, ...props }: React.ComponentProps<"p">) {
   return (
     <p
       data-slot="card-description"
-      className={cn("text-sm text-cream-200", className)}
+      className={cn("text-sm text-muted-foreground", className)}
       {...props}
     />
   );

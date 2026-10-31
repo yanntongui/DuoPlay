@@ -3,122 +3,218 @@
 
 /* ------------------------------------------------------------------ */
 /*  DuoPlay — Design tokens                                            */
-/*  Direction « Vibrant Intimacy » : une interface profonde mais vive   */
-/*  Contrastes plus marqués, couleurs plus saturées, animations        */
-/*  plus expressives. Le côté "fade" est éliminé.                       */
+/*  Direction « Quiet Sensuality » : une interface nocturne feutrée     */
+/*  pensée pour l'OLED. La toile est un noir obsidienne (#040205) qui   */
+/*  se fond dans un violet nuit abyssal (#0B0710) ; les contenus        */
+/*  émergent comme une bougie dans l'obscurité.                        */
+/*                                                                     */
+/*  Deux accents seulement, réservés aux déclencheurs d'émotion :       */
+/*    · Or Champagne brossé  #E2B887  (tendresse, distinctions)         */
+/*    · Rose Rubis incandescent #E11D48 / #FB7185 (action, désir)       */
+/*                                                                     */
+/*  Matériaux : verre liquide (blur 40px, blanc 3 %, liseré 1px blanc   */
+/*  8 %) et reflet spéculaire supérieur. Titres en Cormorant Garamond,  */
+/*  interface en Inter.                                                 */
 /* ------------------------------------------------------------------ */
 
 @theme {
-  /* Fond principal - plus profond */
-  --color-midnight-950: #0F0A15;
-  --color-midnight-900: #1A1423;
-  --color-midnight-800: #251B2E;
-  --color-midnight-700: #3B2A45;
-  --color-midnight-600: #523A5C;
+  /* Obsidienne / surfaces — ex « ivory ». En clair c'était la crème des
+     fonds ; ici c'est le noir du fond et le verre des surfaces. */
+  --color-ivory-50: #040205;
+  --color-ivory-100: rgb(255 255 255 / 0.045);
+  --color-ivory-200: rgb(255 255 255 / 0.08);
+  --color-ivory-300: rgb(255 255 255 / 0.14);
 
-  /* Prune - plus vibrant */
-  --color-prune-700: #5C3A6A;
-  --color-prune-600: #7B5585;
-  --color-prune-500: #9D70A6;
-  --color-prune-400: #BC92C2;
+  /* Encre — ex « graphite ». Les tons 700-900 restent des surfaces
+     profondes (bandeaux, états désactivés) ; 400-600 deviennent le
+     texte secondaire, clair et lisible sur l'obsidienne. */
+  --color-graphite-900: #040205;
+  --color-graphite-800: #0b0710;
+  --color-graphite-700: #150e1c;
+  --color-graphite-600: #a79ab2;
+  --color-graphite-500: #8b8095;
+  --color-graphite-400: #6d6378;
+  --color-graphite-300: #cbc2d4;
+  --color-graphite-200: #e9e4ee;
 
-  /* Bordeaux - plus intense */
-  --color-bordeaux-700: #52223F;
-  --color-bordeaux-600: #6E3255;
-  --color-bordeaux-500: #8F426E;
-  --color-bordeaux-400: #B8578A;
+  /* Or Champagne — accent tendresse (ex « lavender »). */
+  --color-lavender-100: rgb(226 184 135 / 0.16);
+  --color-lavender-200: rgb(226 184 135 / 0.26);
+  --color-lavender-300: #e2b887;
+  --color-lavender-400: #d8a96f;
+  --color-lavender-500: #e2b887;
+  --color-lavender-600: #ebcb9f;
+  --color-lavender-700: #f0d9b8;
 
-  /* Rose - plus éclatant */
-  --color-rose-400: #E89FA0;
-  --color-rose-500: #DC8083;
+  /* Rose Rubis — action principale (ex « coral »). 600/700 servent de
+     texte d'accent : ils sont volontairement clairs pour rester lisibles. */
+  --color-coral-100: rgb(225 29 72 / 0.18);
+  --color-coral-200: rgb(225 29 72 / 0.28);
+  --color-coral-300: #fb7185;
+  --color-coral-400: #f43f5e;
+  --color-coral-500: #e11d48;
+  --color-coral-600: #fb7185;
+  --color-coral-700: #fda4af;
 
-  /* Or/Chaleur - pour les accents chauds */
-  --color-gold-400: #D4A373;
-  --color-gold-500: #B8915E;
+  /* Blush — fondus chauds (or ↔ rubis). */
+  --color-blush-200: rgb(226 184 135 / 0.14);
+  --color-blush-300: #d8a96f;
+  --color-blush-500: #e2b887;
 
-  /* Crème - plus lumineux */
-  --color-cream-100: #F7EFE6;
-  --color-cream-200: #EDE1C7;
+  /* Or — accents lumineux (étoiles, distinctions). */
+  --color-gold-400: #e2b887;
+  --color-gold-500: #c99a5b;
 
-  /* Surcharges */
-  --color-surface: #1F1728;
-  --color-surface-light: #2B2038;
-  --color-surface-lighter: #3D2D4F;
-
-  /* Typographie */
+  /* Typographie — display sérif éditorial + Inter pour l'interface.
+     Variables fournies par next/font (auto-hébergées, aucune requête
+     réseau vers Google : invariant de perf du PRD §16). */
   --font-sans: var(--font-inter, ui-sans-serif), system-ui, -apple-system,
-    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-display: var(--font-cormorant, ui-serif), Georgia, serif;
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  --font-display: var(--font-cormorant, ui-serif), Georgia, "Times New Roman",
+    serif;
 
-  /* Rayons */
-  --radius: 1rem;
-  --radius-sm: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1.25rem;
+  /* Rayons — cartes généreuses, pilules pour les actions. */
+  --radius: 1.25rem;
 
-  /* Ombres plus prononcées */
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.6);
-  --shadow-glow: 0 0 30px rgba(134, 66, 110, 0.5);
-  --shadow-glow-prune: 0 0 30px rgba(123, 85, 133, 0.5);
-
-  /* Animations */
-  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* Élévations : sur l'obsidienne, la profondeur se creuse dans le noir. */
+  --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.5), 0 10px 30px -18px rgb(0 0 0 / 0.7);
+  --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.5), 0 26px 60px -26px rgb(0 0 0 / 0.85);
+  --shadow-glow: 0 10px 30px rgb(225 29 72 / 0.42);
+  --shadow-glow-lavender: 0 12px 34px -14px rgb(226 184 135 / 0.4);
 }
 
 /* ------------------------------------------------------------------ */
-/*  Variables sémantiques                                              */
+/*  Variables sémantiques (compatibles shadcn/ui)                      */
 /* ------------------------------------------------------------------ */
 
 :root {
   color-scheme: dark;
 
-  --background: var(--color-midnight-950);
-  --foreground: var(--color-cream-100);
+  --background: var(--color-ivory-50);
+  --foreground: #f4eff3;
 
-  --card: var(--color-surface);
-  --card-foreground: var(--color-cream-100);
+  --card: #0b0710;
+  --card-foreground: #f4eff3;
 
-  --popover: var(--color-surface-light);
-  --popover-foreground: var(--color-cream-100);
+  --popover: #0b0710;
+  --popover-foreground: #f4eff3;
 
-  --primary: var(--color-bordeaux-600);
+  --primary: var(--color-coral-500);
   --primary-foreground: #ffffff;
 
-  --secondary: var(--color-prune-600);
-  --secondary-foreground: var(--color-cream-100);
+  --secondary: var(--color-lavender-100);
+  --secondary-foreground: var(--color-lavender-700);
 
-  --muted: var(--color-surface-lighter);
-  --muted-foreground: var(--color-cream-200);
+  --muted: var(--color-ivory-100);
+  /* Texte secondaire : gris-violet clair, contraste AA garanti sur
+     l'obsidienne, y compris sur écran bas de gamme (PRD §16 et §18). */
+  --muted-foreground: var(--color-graphite-600);
 
-  --accent: var(--color-rose-400);
-  --accent-foreground: #52223F;
+  --accent: var(--color-lavender-300);
+  --accent-foreground: #1a1015;
 
-  --destructive: #F25C54;
+  --destructive: #f43f5e;
   --destructive-foreground: #ffffff;
 
-  --border: var(--color-midnight-700);
-  --input: var(--color-midnight-700);
-  --ring: var(--color-bordeaux-500);
+  --border: var(--color-ivory-200);
+  --input: var(--color-ivory-200);
+  --ring: var(--color-coral-500);
 
-  --radius-sm: var(--radius-sm);
-  --radius-md: var(--radius-md);
-  --radius-lg: var(--radius-lg);
+  --radius-sm: calc(var(--radius) - 0.5rem);
+  --radius-md: calc(var(--radius) - 0.25rem);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 0.5rem);
 
-  /* Dégradés plus riches */
-  --gradient-primary: linear-gradient(135deg, #B8578A 0%, #6E3255 50%, #52223F 100%);
-  --gradient-accent: linear-gradient(135deg, #BC92C2 0%, #7B5585 100%);
-  --gradient-gold: linear-gradient(135deg, #D4A373 0%, #B8915E 100%);
+  /* Dégradés — un seul endroit à changer pour faire évoluer le climat. */
+  --gradient-primary: linear-gradient(
+    135deg,
+    var(--color-coral-400) 0%,
+    var(--color-coral-500) 55%,
+    #be123c 100%
+  );
+  --gradient-tendresse: linear-gradient(
+    135deg,
+    #be123c 0%,
+    #9f1239 48%,
+    #4c0519 100%
+  );
+  --gradient-dawn: radial-gradient(
+      120% 90% at 12% 0%,
+      rgb(225 29 72 / 0.18) 0%,
+      transparent 55%
+    ),
+    radial-gradient(110% 80% at 100% 8%, rgb(226 184 135 / 0.14) 0%, transparent
+          50%);
+  --gradient-night: radial-gradient(
+    120% 120% at 80% 0%,
+    #0b0710 0%,
+    #040205 55%,
+    #040205 100%
+  );
+  --gradient-hairline: linear-gradient(
+    90deg,
+    transparent,
+    rgb(255 255 255 / 0.1),
+    transparent
+  );
+
+  --gradient-aura: radial-gradient(
+    60% 50% at 50% 0%,
+    rgb(226 184 135 / 0.22) 0%,
+    transparent 70%
+  );
 }
 
+/* ------------------------------------------------------------------ */
+/*  Ambiances — deux climats, une seule nuit                           */
+/*  · « chandelles » (défaut) : obsidienne froide, bougie rubis.       */
+/*  · « douceur » : la même nuit, réchauffée d'ambre — une aube qui     */
+/*    gagne le fond sans jamais devenir claire.                        */
+/* ------------------------------------------------------------------ */
+
 :root[data-ambiance="douceur"] {
-  --background: #1F1728;
-  --card: #2B2038;
-  --foreground: #F7EFE6;
-  --muted-foreground: #EDE1C7;
+  --background: #0d0a06;
+  --card: #17120b;
+  --popover: #17120b;
+  --foreground: #f7f1e8;
+  --muted-foreground: #b3a690;
+
+  --gradient-night: radial-gradient(
+    125% 125% at 78% 0%,
+    #1d150c 0%,
+    #0e0a06 55%,
+    #0b0805 100%
+  );
+  --gradient-dawn: radial-gradient(
+      120% 90% at 12% 0%,
+      rgb(226 184 135 / 0.2) 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      110% 80% at 100% 8%,
+      rgb(225 29 72 / 0.12) 0%,
+      transparent 50%
+    );
+  --gradient-aura: radial-gradient(
+    60% 50% at 50% 0%,
+    rgb(226 184 135 / 0.34) 0%,
+    transparent 70%
+  );
+}
+
+/* La page entière baigne dans l'ambre quand l'ambiance est « douceur ». */
+:root[data-ambiance="douceur"] body {
+  background-image: radial-gradient(
+      120% 90% at 50% -18%,
+      #2a1e11 0%,
+      #17110a 45%,
+      transparent 100%
+    ),
+    radial-gradient(
+      90% 70% at 90% 6%,
+      rgb(225 29 72 / 0.1) 0%,
+      transparent 55%
+    );
 }
 
 @theme inline {
@@ -141,6 +237,11 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius);
+  --radius-xl: var(--radius-xl);
 }
 
 /* ------------------------------------------------------------------ */
@@ -160,33 +261,41 @@
 
   body {
     background-color: var(--color-background);
+    background-image: radial-gradient(
+      140% 100% at 50% -20%,
+      #0b0710 0%,
+      #040205 60%
+    );
+    background-attachment: fixed;
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    overscroll-behavior-y: none;
   }
 
-  h1 { font-size: 2rem; }
-  h2 { font-size: 1.5rem; }
-  h3 { font-size: 1.25rem; }
-
-  h1, h2, h3 {
+  h1,
+  h2,
+  h3 {
     font-family: var(--font-display);
-    font-weight: 600;
-    line-height: 1.2;
+    font-weight: 500;
+    font-optical-sizing: auto;
+    letter-spacing: -0.01em;
+    line-height: 1.08;
   }
 
+  /* Cible de saut clavier, visible seulement au focus (cf. PRD §18). */
   .skip-link {
     position: absolute;
     left: 0.75rem;
     top: -100%;
     z-index: 100;
     border-radius: 9999px;
-    background: var(--gradient-primary);
+    background-color: var(--color-coral-500);
     color: #fff;
     padding: 0.625rem 1rem;
     font-size: 0.875rem;
-    font-weight: 600;
+    font-weight: 500;
     transition: top 150ms ease-out;
   }
 
@@ -194,11 +303,13 @@
     top: 0.75rem;
   }
 
+  /* Focus homogène sur les éléments interactifs natifs. */
   :focus-visible {
     outline: 2px solid var(--color-ring);
     outline-offset: 2px;
   }
 
+  /* Signale une zone dont le contenu vient de changer (lecteurs d'écran). */
   .announce {
     position: absolute;
     width: 1px;
@@ -208,62 +319,156 @@
     overflow: hidden;
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
+    border-width: 0;
+  }
+
+  ::selection {
+    background-color: rgb(225 29 72 / 0.32);
+    color: #fff;
   }
 }
 
 /* ------------------------------------------------------------------ */
-/*  Surfaces premium - plus vivantes                                    */
+/*  Surfaces premium                                                   */
 /* ------------------------------------------------------------------ */
 
 @layer components {
+  /* Verre dépoli historique — surfaces flottantes, en-têtes. */
   .glass {
-    background-color: color-mix(in oklab, var(--card) 70%, transparent);
-    backdrop-filter: blur(32px) saturate(1.8);
-    -webkit-backdrop-filter: blur(32px) saturate(1.8);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    background-color: color-mix(in oklab, var(--card) 62%, transparent);
+    backdrop-filter: saturate(1.5) blur(24px);
+    -webkit-backdrop-filter: saturate(1.5) blur(24px);
   }
 
+  /* Verre liquide — le matériau signature de l'interface : un blanc à
+     3 %, un flou profond, un liseré interne de 1px blanc 8 %, et un
+     reflet spéculaire au sommet. */
   .liquid-glass {
     position: relative;
-    background-color: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background-color: rgb(255 255 255 / 0.03);
+    border: 1px solid rgb(255 255 255 / 0.08);
     backdrop-filter: blur(40px) saturate(1.6);
     -webkit-backdrop-filter: blur(40px) saturate(1.6);
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.15),
-      0 24px 60px -34px rgba(0, 0, 0, 0.9);
+      inset 0 1px 0 rgb(255 255 255 / 0.1),
+      0 24px 60px -34px rgb(0 0 0 / 0.9);
   }
 
+  /* Grain fin : enlève l'aspect « plat » des grands aplats sombres. */
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.4;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Onde lumineuse derrière un bloc : donne de l'épaisseur sans image. */
+  .aura {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(64px);
+    pointer-events: none;
+  }
+
+  /* Étiquette de section : petite capitale espacée, sourde et discrète. */
   .eyebrow {
     font-size: 0.6875rem;
-    font-weight: 700;
+    font-weight: 600;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--color-cream-200);
+    color: color-mix(in oklab, var(--foreground) 62%, transparent);
   }
 
+  /* Filet dégradé : sépare sans tracer de trait dur. */
+  .hairline {
+    height: 1px;
+    width: 100%;
+    background-image: var(--gradient-hairline);
+  }
+
+  .gradient-primary {
+    background-image: var(--gradient-primary);
+  }
+
+  .gradient-tendresse {
+    background-image: var(--gradient-tendresse);
+  }
+
+  .gradient-dawn {
+    background-image: var(--gradient-dawn);
+  }
+
+  .gradient-night {
+    background-image: var(--gradient-night);
+  }
+
+  /* Texte en dégradé pour les accents typographiques. */
+  .text-tendresse {
+    background-image: var(--gradient-tendresse);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Reflet spéculaire supérieur, sur les cartes clés et le verre. */
+  .top-light {
+    position: relative;
+  }
+
+  .top-light::before {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+    height: 1px;
+    background-image: linear-gradient(
+      90deg,
+      transparent,
+      rgb(255 255 255 / 0.28),
+      transparent
+    );
+  }
+
+  /* Réaction tactile : l'appui « répond » à l'utilisateur. */
   .press {
     transition:
-      transform 200ms var(--ease-bounce),
-      box-shadow 250ms ease-out,
-      background-color 200ms ease-out;
+      transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 220ms ease-out,
+      background-color 180ms ease-out,
+      color 180ms ease-out,
+      border-color 180ms ease-out;
   }
 
   .press:active {
-    transform: scale(0.96);
+    transform: scale(0.975);
   }
 
+  .skel {
+    background-image: linear-gradient(
+      90deg,
+      rgb(255 255 255 / 0.04) 25%,
+      rgb(255 255 255 / 0.09) 37%,
+      rgb(255 255 255 / 0.04) 63%
+    );
+    background-size: 400% 100%;
+    animation: duoplay-shimmer 1.6s ease-in-out infinite;
+  }
+
+  /* Projecteur directionnel : une lueur ambrée qui suit le pointeur
+     (variable --mx / --my posée en JS). Opacité ~10 %, jamais criarde. */
   .spotlight::before {
     content: "";
     position: absolute;
     inset: 0;
     pointer-events: none;
     opacity: 0;
-    transition: opacity 300ms ease-out;
+    transition: opacity 400ms ease-out;
     background-image: radial-gradient(
-      20rem 20rem at var(--mx, 50%) var(--my, 50%),
-      rgb(134 66 110 / 0.15) 0%,
+      22rem 22rem at var(--mx, 50%) var(--my, 50%),
+      rgb(226 184 135 / 0.1) 0%,
       transparent 60%
     );
   }
@@ -272,81 +477,231 @@
   .spotlight:focus-within::before {
     opacity: 1;
   }
+}
 
-  .grain::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    opacity: 0.3;
-    mix-blend-mode: overlay;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+/* ------------------------------------------------------------------ */
+/*  Animations — discrètes, uniquement quand le système les autorise   */
+/* ------------------------------------------------------------------ */
+
+@keyframes duoplay-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
   }
 }
 
-/* ------------------------------------------------------------------ */
-/*  Animations - plus expressives                                       */
-/* ------------------------------------------------------------------ */
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes duoplay-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
 }
 
-@keyframes popIn {
-  0% { opacity: 0; transform: scale(0.9); }
-  100% { opacity: 1; transform: scale(1); }
+@keyframes duoplay-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(0, -14px, 0) scale(1.06);
+  }
 }
 
-@keyframes pulseDot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(0.85); }
+@keyframes duoplay-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.72;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
 }
 
-@keyframes shimmer {
-  from { background-position: 100% 0; }
-  to { background-position: 0 0; }
+@keyframes duoplay-presence {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.82);
+  }
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+@keyframes duoplay-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
+@keyframes duoplay-sheen {
+  from {
+    transform: translateX(-120%);
+  }
+  to {
+    transform: translateX(220%);
+  }
+}
+
+@keyframes duoplay-reveal {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: scale(2.6);
+  }
+}
+
+@keyframes duoplay-veil {
+  from {
+    filter: blur(14px);
+    opacity: 0.4;
+  }
+  to {
+    filter: blur(0);
+    opacity: 1;
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .fade-in {
-    animation: fadeIn 400ms var(--ease-out);
+  .rise {
+    animation: duoplay-rise 260ms ease-out both;
   }
 
-  .pop-in {
-    animation: popIn 350ms var(--ease-bounce);
+  .pop {
+    animation: duoplay-pop 200ms ease-out both;
   }
 
-  .float {
-    animation: float 6s ease-in-out infinite;
+  .float-slow {
+    animation: duoplay-float 11s ease-in-out infinite;
   }
 
-  .pulse-dot {
-    animation: pulseDot 2s ease-in-out infinite;
+  .float-slower {
+    animation: duoplay-float 14s ease-in-out infinite;
   }
 
-  .skel {
+  /* Aura de connexion : respiration organique. */
+  .breathe {
+    animation: duoplay-breathe 6s ease-in-out infinite;
+  }
+
+  .presence-dot {
+    animation: duoplay-presence 2.6s ease-in-out infinite;
+  }
+
+  .reveal-halo {
+    animation: duoplay-reveal 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  /* Révélation synchrone : le voile givré se lève, une lueur diffuse. */
+  .reveal-veil {
+    animation: duoplay-veil 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  /* Reflet qui traverse les boutons principaux au survol. */
+  .sheen {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .sheen::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 40%;
     background-image: linear-gradient(
       90deg,
-      rgb(255 255 255 / 0.05) 25%,
-      rgb(255 255 255 / 0.1) 37%,
-      rgb(255 255 255 / 0.05) 63%
+      transparent,
+      rgb(255 255 255 / 0.22),
+      transparent
     );
-    background-size: 400% 100%;
-    animation: shimmer 1.6s ease-in-out infinite;
+    transform: translateX(-120%);
+    pointer-events: none;
+  }
+
+  .sheen:hover::after {
+    animation: duoplay-sheen 900ms ease-out;
   }
 }
 
+/* Utility animations for interactive states */
+.flip-card {
+  perspective: 1000px;
+}
+
+.flip-card-inner {
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+}
+
+.flip-card.flipped .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-card-front,
+.flip-card-back {
+  backface-visibility: hidden;
+}
+
+.flip-card-back {
+  transform: rotateY(180deg);
+}
+
+.roll-dice {
+  animation: duoplay-shake 0.6s ease-out;
+}
+
+@keyframes duoplay-shake {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-10deg); }
+  75% { transform: rotate(10deg); }
+}
+
+/* Focus ring utilities for accessibility */
+.focus-ring {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 2px;
+}
+
+.focus-ring:focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 2px;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* La texture et le flou peuvent être neutralisés par le système. */
+@media (prefers-reduced-transparency: reduce) {
+  .glass,
+  .liquid-glass {
+    background-color: var(--card);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
 }
