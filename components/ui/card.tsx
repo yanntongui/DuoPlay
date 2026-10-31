@@ -2,16 +2,14 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * Carte premium : élévation douce superposée, hairline chaud, rayon généreux.
- * `tone` permet de teinter légèrement la surface (lavande, corail, graphite)
- * sans casser la lisibilité du texte.
+ * Carte premium : ombres hiérarchisées retenues, angles doux.
+ * `interactive` ajoute des micro-interactions accessibles.
  */
 const TONES = {
   default: "bg-card",
-  ivory: "bg-ivory-100",
-  lavender: "bg-lavender-100/70",
-  coral: "bg-coral-100/70",
-  dark: "gradient-night text-white",
+  surface: "bg-surface",
+  surfaceLight: "bg-surface-light",
+  accent: "bg-bordeaux-600/10 border-bordeaux-600/20",
 } as const;
 
 function Card({
@@ -27,11 +25,10 @@ function Card({
     <div
       data-slot="card"
       className={cn(
-        "relative overflow-hidden rounded-xl border border-ivory-200/80 shadow-[var(--shadow-soft)] text-card-foreground",
+        "relative overflow-hidden rounded-xl border border-white/10 shadow-[var(--shadow-md)] text-card-foreground",
         TONES[tone],
-        tone === "dark" && "border-white/10",
         interactive &&
-          "spotlight press cursor-pointer hover:-translate-y-0.5 hover:border-lavender-300/60 hover:shadow-[var(--shadow-lift)]",
+          "cursor-pointer transition-transform duration-200 hover:translate-y-[-2px] hover:shadow-[var(--shadow-lg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bordeaux-500",
         className,
       )}
       {...props}
@@ -53,7 +50,7 @@ function CardTitle({ className, ...props }: React.ComponentProps<"h3">) {
   return (
     <h3
       data-slot="card-title"
-      className={cn("text-lg leading-tight", className)}
+      className={cn("text-lg font-medium leading-tight", className)}
       {...props}
     />
   );
