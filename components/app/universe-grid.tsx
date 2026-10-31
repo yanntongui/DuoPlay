@@ -124,8 +124,8 @@ function UniverseCard({
       interactive={universe.mvp}
       onPointerMove={track}
       className={cn(
-        "spotlight top-light flex h-full flex-col p-5",
-        featured && "justify-between gap-8 sm:p-7",
+        "spotlight top-light flex flex-col p-5 h-full",
+        featured && "justify-between",
         !universe.mvp && "opacity-70",
       )}
     >
@@ -143,7 +143,7 @@ function UniverseCard({
         )}
       </div>
 
-      <div className={cn(featured ? "mt-auto" : "mt-4")}>
+      <div className="mt-auto">
         <h3
           className={cn(
             "mb-1 leading-tight",
@@ -240,6 +240,7 @@ function CarouselGrid({ items, mood }: { items: Universe[]; mood: string | null 
           <motion.div
             key={universe.slug}
             className="snap-center shrink-0 w-[85vw] max-w-[340px]"
+            style={{ height: "320px" }}
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.35, delay: index * 0.1 }}
