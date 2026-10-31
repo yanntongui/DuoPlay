@@ -25,6 +25,7 @@ import {
   type StoredAccount,
 } from "@/lib/game/storage";
 import { useDeviceToken } from "@/lib/game/use-device";
+import { AccountCreation } from "@/components/app/account-creation";
 
 /**
  * Mon profil (§12 — Phase 6). Un compte **léger** qui ne demande ni mot de
@@ -123,143 +124,7 @@ function AccountSetup({ deviceToken }: { deviceToken: string }) {
 }
 
 function CreateForm({ deviceToken }: { deviceToken: string }) {
-  const consents = useQuery(api.consents.get, { deviceToken });
-  const create = useMutation(api.accounts.create);
-
-  const [name, setName] = useState("");
-  const [kind, setKind] = useState<"none" | "email" | "phone">("none");
-  const [contact, setContact] = useState("");
-  const [analytics, setAnalytics] = useState(true);
-  const [notifications, setNotifications] = useState(true);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!consents) return;
-    setAnalytics(consents.analytics);
-    setNotifications(consents.notifications);
-  }, [consents]);
-
-  async function submit(event: React.FormEvent) {
-    event.preventDefault();
-    setBusy(true);
-    setError(null);
-    try {
-      const result = await create({
-        deviceToken,
-        displayName: name,
-        contactKind: kind,
-        contact: kind === "none" ? undefined : contact,
-        analyticsConsent: analytics,
-        notificationsConsent: notifications,
-      });
-      setAccount({
-        accountId: result.accountId,
-        displayName: result.displayName,
-        primaryDeviceToken: result.primaryDeviceToken,
-        recoveryCode: result.recoveryCode,
-      });
-    } catch (cause) {
-      setError(
-        cause instanceof Error ? cause.message : "Impossible de créer le compte.",
-      );
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  return (
-    <Card className="p-5">
-      <form onSubmit={submit} className="flex flex-col gap-5">
-        <label className="flex flex-col gap-2 text-sm">
-          <span className="font-medium">Votre prénom</span>
-          <input
-            data-testid="account-name"
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            maxLength={24}
-            autoComplete="given-name"
-            placeholder="Ex. Awa"
-            className={fieldClass}
-          />
-        </label>
-
-        <label className="flex flex-col gap-2 text-sm">
-          <span className="font-medium">Un contact (facultatif)</span>
-          <select
-            data-testid="account-contact-kind"
-            value={kind}
-            onChange={(event) =>
-              setKind(event.target.value as "none" | "email" | "phone")
-            }
-            className={fieldClass}
-          >
-            <option value="none">Aucun pour l&apos;instant</option>
-            <option value="email">Adresse e-mail</option>
-            <option value="phone">Numéro de téléphone</option>
-          </select>
-          {kind !== "none" && (
-            <input
-              data-testid="account-contact"
-              value={contact}
-              onChange={(event) => setContact(event.target.value)}
-              inputMode={kind === "phone" ? "tel" : "email"}
-              autoComplete={kind === "phone" ? "tel" : "email"}
-              placeholder={kind === "phone" ? "Ex. +229 90 00 00 00" : "vous@exemple.com"}
-              className={fieldClass}
-            />
-          )}
-          <span className="text-xs text-muted-foreground">
-            Sert uniquement à vous rappeler vos parties. Il n&apos;est pas encore
-            vérifié.
-          </span>
-        </label>
-
-        <fieldset className="flex flex-col gap-3">
-          <legend className="text-sm font-medium">Préférences</legend>
-          <label className="flex items-start gap-3 text-sm">
-            <input
-              type="checkbox"
-              data-testid="account-consent-analytics"
-              checked={analytics}
-              onChange={(event) => setAnalytics(event.target.checked)}
-              className="mt-1 size-4 accent-lavender-500"
-            />
-            <span className="text-muted-foreground">
-              Mesures anonymes pour améliorer DuoPlay.
-            </span>
-          </label>
-          <label className="flex items-start gap-3 text-sm">
-            <input
-              type="checkbox"
-              data-testid="account-consent-notifications"
-              checked={notifications}
-              onChange={(event) => setNotifications(event.target.checked)}
-              className="mt-1 size-4 accent-lavender-500"
-            />
-            <span className="text-muted-foreground">
-              Rappels doux quand une partie attend votre partenaire.
-            </span>
-          </label>
-        </fieldset>
-
-        {error && (
-          <p
-            data-testid="account-error"
-            className="flex items-center gap-2 rounded-xl bg-coral-500/10 px-3 py-2 text-xs text-coral-200"
-          >
-            <TriangleAlert className="size-3.5 shrink-0" />
-            {error}
-          </p>
-        )}
-
-        <Button type="submit" data-testid="account-create" disabled={busy}>
-          <Sparkles />
-          {busy ? "Création…" : "Créer mon compte"}
-        </Button>
-      </form>
-    </Card>
-  );
+  return <AccountCreation />;
 }
 
 function SignInForm({ deviceToken }: { deviceToken: string }) {

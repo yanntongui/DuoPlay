@@ -479,13 +479,15 @@ export default defineSchema({
 
   accounts: defineTable({
     displayName: v.string(),
-    contact: v.string(),
+    contact: v.optional(v.string()),
     contactKind: v.union(
       v.literal("email"),
       v.literal("phone"),
       v.literal("none"),
     ),
     recoveryCode: v.string(),
+    verificationCode: v.optional(v.string()),
+    verificationCodeSentAt: v.optional(v.number()),
     primaryDeviceToken: v.string(),
     plan: v.union(v.literal("free"), v.literal("premium")),
     analyticsConsent: v.boolean(),

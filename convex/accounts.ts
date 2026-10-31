@@ -26,6 +26,10 @@ const contactKind = v.union(
   v.literal("none"),
 );
 
+const generateVerificationCode = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
 const ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
 function makeRecoveryCode(): string {
@@ -122,6 +126,7 @@ export const create = mutation({
     contactKind: v.optional(contactKind),
     analyticsConsent: v.boolean(),
     notificationsConsent: v.boolean(),
+    verified: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     const deviceToken = cleanDeviceToken(args.deviceToken);
@@ -150,11 +155,14 @@ export const create = mutation({
 
     const now = Date.now();
     const recoveryCode = makeRecoveryCode();
+    const verificationCode = kind !== "none" ? generateVerificationCode() : undefined;
     const accountId = await ctx.db.insert("accounts", {
       displayName: name,
       contact,
       contactKind: kind,
       recoveryCode,
+      verificationCode,
+      verificationCodeSentAt: kind !== "none" ? now : undefined,
       primaryDeviceToken: deviceToken,
       plan: "free",
       analyticsConsent: args.analyticsConsent,
@@ -201,6 +209,8 @@ export const create = mutation({
       recoveryCode,
       displayName: name,
       primaryDeviceToken: deviceToken,
+      verificationCode: args.verified ? undefined : verificationCode,
+      verified: args.verified ?? false,
     };
   },
 });
@@ -243,6 +253,77 @@ export const signIn = mutation({
       recoveryCode: account.recoveryCode,
       analyticsConsent: account.analyticsConsent,
       notificationsConsent: account.notificationsConsent,
+    };
+  },
+});
+
+/** Verify contact email/phone */
+export const verifyContact = mutation({
+  args: { deviceToken: v.string(), code: v.string() },
+  handler: async (ctx, args) => {
+    const deviceToken = cleanDeviceToken(args.deviceToken);
+    const code = args.code.trim();
+
+    const account = await ctx.db
+      .query("accounts")
+      .withIndex("by_device", (q) => q.eq("primaryDeviceToken", deviceToken))
+      .unique();
+
+    if (!account) throw new Error("Aucun compte trouvé.");
+    if (account.contactKind === "none") throw new Error("Aucun contact à vérifier.");
+
+    if (account.verificationCode !== code) {
+      throw new Error("Code de vérification invalide.");
+    }
+
+    if (!account.verificationCodeSentAt) {
+      throw new Error("Code expiré. Demande une nouvelle vérification.");
+    }
+
+    const sentAt = account.verificationCodeSentAt;
+    const now = Date.now();
+    if (now - sentAt > 15 * 60 * 1000) {
+      await ctx.db.patch(account._id, {
+        verificationCode: undefined,
+        verificationCodeSentAt: undefined,
+      });
+      throw new Error("Code expiré. Demande une nouvelle vérification.");
+    }
+
+    await ctx.db.patch(account._id, {
+      verificationCode: undefined,
+      verificationCodeSentAt: undefined,
+      updatedAt: now,
+    });
+
+    return { success: true };
+  },
+});
+
+export const resendVerificationCode = mutation({
+  args: { deviceToken: v.string() },
+  handler: async (ctx, args) => {
+    const deviceToken = cleanDeviceToken(args.deviceToken);
+    const account = await ctx.db
+      .query("accounts")
+      .withIndex("by_device", (q) => q.eq("primaryDeviceToken", deviceToken))
+      .unique();
+
+    if (!account) throw new Error("Aucun compte trouvé.");
+    if (account.contactKind === "none") throw new Error("Aucun contact à vérifier.");
+    if (!account.contact) throw new Error("Aucun contact enregistré.");
+
+    const verificationCode = generateVerificationCode();
+    const now = Date.now();
+    await ctx.db.patch(account._id, {
+      verificationCode,
+      verificationCodeSentAt: now,
+      updatedAt: now,
+    });
+
+    return {
+      code: verificationCode,
+      contact: account.contact,
     };
   },
 });
