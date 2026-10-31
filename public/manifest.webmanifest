@@ -1,0 +1,28 @@
+{
+  "name": "DuoPlay — Retrouvez-vous autrement",
+  "short_name": "DuoPlay",
+  "description": "Des jeux, des défis et des expériences à vivre à deux, où que vous soyez.",
+  "lang": "fr",
+  "dir": "ltr",
+  "start_url": "/accueil",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#040205",
+  "theme_color": "#040205",
+  "categories": ["lifestyle", "social", "entertainment"],
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
