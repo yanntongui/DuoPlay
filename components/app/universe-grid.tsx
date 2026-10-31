@@ -125,7 +125,6 @@ function UniverseCard({
       onPointerMove={track}
       className={cn(
         "spotlight top-light flex flex-col p-5 h-full",
-        featured && "justify-between",
         !universe.mvp && "opacity-70",
       )}
     >
