@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { query } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import type { MutationCtx, QueryCtx } from "./_generated/server";
 import { cleanDeviceToken } from "./lib/identity";
 
@@ -107,6 +107,22 @@ export async function linkCouplePair(
     lastActivityAt: now,
   });
 }
+
+export const updateSharedMood = mutation({
+  args: { 
+    coupleId: v.id("couples"),
+    mood: v.union(
+      v.literal("joyeux"),
+      v.literal("curieux"),
+      v.literal("calme"),
+      v.literal("fatigué"),
+      v.literal("romantique")
+    )
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.coupleId, { sharedMood: args.mood });
+  },
+});
 
 export const mine = query({
   args: { deviceToken: v.string() },

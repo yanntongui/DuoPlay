@@ -52,3 +52,29 @@ export const touchActivity = mutation({
     }
   },
 });
+
+export const updateMood = mutation({
+  args: { 
+    userId: v.id("users"),
+    mood: v.union(
+      v.literal("joyeux"),
+      v.literal("curieux"),
+      v.literal("calme"),
+      v.literal("fatigué"),
+      v.literal("romantique")
+    )
+  },
+  handler: async (ctx, args) => {
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .first();
+    if (!profile) return;
+    
+    const now = Date.now();
+    await ctx.db.patch(profile._id, { 
+      mood: args.mood, 
+      moodUpdatedAt: now 
+    });
+  },
+});

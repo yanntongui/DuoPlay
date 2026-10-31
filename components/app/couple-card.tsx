@@ -15,16 +15,25 @@ type CoupleData = {
     answered: number;
   };
   id: string;
+  sharedMood?: string;
 };
 
 type ProfileData = {
   _id: string;
-  mood?: string;
+  name?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  image?: string | null;
+  isAnonymous?: boolean;
 };
 
 type HistoryData = {
   summary: {
+    sessions: number;
     completed: number;
+    inProgress: number;
+    answered: number;
+    revealed: number;
   };
 };
 
