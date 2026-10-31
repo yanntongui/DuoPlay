@@ -337,10 +337,10 @@ export const seedAllQuestions = mutation({
       if (!expId) continue;
       await ctx.db.insert("questions", {
         experienceId: expId,
-        kind: q.k,
+        kind: q.k as "choice" | "open" | "challenge",
         prompt: q.p,
         options: q.o,
-        depth: q.d,
+        depth: q.d as "leger" | "moyen" | "profond",
         themes: q.t,
         order: q.ord,
         status: "published" as const,

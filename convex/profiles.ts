@@ -41,7 +41,14 @@ export const touchActivity = mutation({
     
     const activeCouple = couple || coupleB;
     if (activeCouple && activeCouple.userIdA) {
-      await ctx.db.patch(activeCouple.userIdA, { lastActiveAt: Date.now() });
+      const userIdA = activeCouple.userIdA;
+      const profile = await ctx.db
+        .query("profiles")
+        .withIndex("by_user", (q) => q.eq("userId", userIdA))
+        .first();
+      if (profile) {
+        await ctx.db.patch(profile._id, { lastActiveAt: Date.now() });
+      }
     }
   },
 });
