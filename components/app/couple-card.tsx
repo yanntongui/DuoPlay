@@ -6,14 +6,36 @@ import { MoodBadge } from "@/components/ui/status-badges";
 import { RelationshipStats } from "@/components/ui/stats-cards";
 import { Card } from "@/components/ui/card";
 
+type CoupleData = {
+  relationshipDays?: number;
+  streakCurrent?: number;
+  streakBest?: number;
+  stats: {
+    sessions: number;
+    answered: number;
+  };
+  id: string;
+};
+
+type ProfileData = {
+  _id: string;
+  mood?: string;
+};
+
+type HistoryData = {
+  summary: {
+    completed: number;
+  };
+};
+
 export function CoupleCard({
   couple,
   profile,
   history,
 }: {
-  couple: any;
-  profile: any;
-  history: any;
+  couple: CoupleData;
+  profile?: ProfileData;
+  history?: HistoryData;
 }) {
   const updateMood = useMutation(api.profiles.updateMood);
   const updateSharedMood = useMutation(api.couples.updateSharedMood);
