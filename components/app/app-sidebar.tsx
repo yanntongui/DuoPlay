@@ -10,12 +10,6 @@ import { useT } from "@/lib/i18n";
 import type { MessageKey } from "@/lib/i18n/messages";
 import { cn } from "@/lib/utils";
 
-/**
- * Sidebar desktop — design premium, accessible, responsive.
- * - Desktop (≥ lg) : colonne complète avec libellés
- * - Tablette (md → lg) : rail compact icônes uniquement
- * - Navigation clavier + focus visible + aria-current
- */
 export function AppSidebar() {
   const pathname = usePathname();
   const { t } = useT();
@@ -24,7 +18,7 @@ export function AppSidebar() {
     <aside
       data-testid="app-sidebar"
       aria-label={t("nav.mainLabel")}
-      className="fixed inset-y-0 left-0 z-40 hidden w-[4.75rem] flex-col gap-5 border-r border-white/10 bg-midnight-800/95 px-2 py-5 backdrop-blur-xl md:flex lg:w-64 lg:px-4"
+      className="fixed inset-y-0 left-0 z-40 hidden w-[4.75rem] flex-col gap-5 border-r border-white/10 bg-midnight-900/98 px-2 py-5 backdrop-blur-2xl md:flex lg:w-64 lg:px-4"
     >
       <Link
         href="/accueil"
@@ -39,10 +33,10 @@ export function AppSidebar() {
         href="/explorer"
         data-testid="sidebar-cta"
         aria-label={t("action.createGame")}
-        className="press gradient-primary top-light mx-auto inline-flex size-11 shrink-0 items-center justify-center rounded-full text-white shadow-[var(--shadow-glow)] lg:mx-0 lg:h-12 lg:w-full lg:gap-2 lg:px-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+        className="press gradient-primary top-light mx-auto inline-flex size-11 shrink-0 items-center justify-center rounded-full text-white shadow-[var(--shadow-glow)] hover:brightness-110 lg:mx-0 lg:h-12 lg:w-full lg:gap-2 lg:px-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
       >
         <Plus className="size-5" />
-        <span className="hidden text-sm font-medium lg:inline">
+        <span className="hidden text-sm font-semibold lg:inline">
           {t("action.createGame")}
         </span>
       </Link>
@@ -92,7 +86,7 @@ function NavEntry({ item, pathname }: { item: NavItem; pathname: string }) {
   const active = !item.soon && isActive(pathname, item.href);
 
   const base =
-    "relative flex min-h-[44px] items-center gap-3 rounded-xl px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bordeaux-500";
+    "relative flex min-h-[44px] items-center gap-3 rounded-xl px-3 text-sm font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bordeaux-500";
   const centered = "justify-center lg:justify-start";
 
   if (item.soon) {
@@ -104,7 +98,7 @@ function NavEntry({ item, pathname }: { item: NavItem; pathname: string }) {
         className={cn(
           base,
           centered,
-          "cursor-not-allowed text-muted-foreground opacity-60",
+          "cursor-not-allowed text-muted-foreground opacity-50",
         )}
       >
         <Icon className="size-5 shrink-0" aria-hidden="true" />
@@ -125,19 +119,19 @@ function NavEntry({ item, pathname }: { item: NavItem; pathname: string }) {
         base,
         centered,
         active
-          ? "bg-bordeaux-600/20 text-cream-100 border border-bordeaux-500/30"
-          : "text-muted-foreground hover:bg-white/5 hover:text-cream-100",
+          ? "bg-gradient-primary/20 text-cream-100 border-2 border-bordeaux-500/50 shadow-[var(--shadow-glow-prune)]"
+          : "text-muted-foreground hover:bg-white/8 hover:text-cream-100 hover:-translate-x-0.5",
       )}
     >
       {active && (
         <span
           aria-hidden="true"
-          className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r-full bg-bordeaux-500 lg:left-0"
+          className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-bordeaux-400 shadow-[var(--shadow-glow-prune)] lg:left-0"
         />
       )}
       <Icon
-        className="size-5 shrink-0"
-        strokeWidth={active ? 2.3 : 1.9}
+        className="size-5 shrink-0 transition-transform duration-200"
+        strokeWidth={active ? 2.5 : 2}
         aria-hidden="true"
       />
       <span className="hidden lg:inline">{label}</span>

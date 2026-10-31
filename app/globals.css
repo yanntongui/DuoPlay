@@ -3,50 +3,47 @@
 
 /* ------------------------------------------------------------------ */
 /*  DuoPlay — Design tokens                                            */
-/*  Direction « Premium Intimacy » : une interface nocturne élégante   */
-/*  pensée pour les couples. La toile est un bleu nuit profond (#1A1423) */
-/*  avec des touches prune, bordeaux, crème chaud et rose poudré.       */
-/*                                                                     */
-/*  Palette principale :                                                */
-/*    · Prune (Prune)  #6B4C7A  (navigation, accents)                    */
-/*    · Bordeaux  #5E2846  (actions primaires, énergie)                 */
-/*    · Crème Chaud  #F5E6D3  (textes, contrastes)                       */
-/*    · Rose Poudré  #E8B8B8  (émotion, douceur)                         */
-/*    · Bleu Nuit (Midnight) #1A1423 (fond principal)                    */
-/*                                                                     */
-/*  Matériaux : verre subtil (blur 24px, opacité contrôlée), ombres    */
-/*  hiérarchiques retenues. Titres en Cormorant Garamond, interface en Inter. */
+/*  Direction « Vibrant Intimacy » : une interface profonde mais vive   */
+/*  Contrastes plus marqués, couleurs plus saturées, animations        */
+/*  plus expressives. Le côté "fade" est éliminé.                       */
 /* ------------------------------------------------------------------ */
 
 @theme {
-  /* Bleu Nuit — fond principal */
+  /* Fond principal - plus profond */
+  --color-midnight-950: #0F0A15;
   --color-midnight-900: #1A1423;
   --color-midnight-800: #251B2E;
   --color-midnight-700: #3B2A45;
   --color-midnight-600: #523A5C;
 
-  /* Prune — navigation, accents */
-  --color-prune-600: #6B4C7A;
-  --color-prune-500: #7D5A8F;
-  --color-prune-400: #9A6FA8;
+  /* Prune - plus vibrant */
+  --color-prune-700: #5C3A6A;
+  --color-prune-600: #7B5585;
+  --color-prune-500: #9D70A6;
+  --color-prune-400: #BC92C2;
 
-  /* Bordeaux — actions primaires */
-  --color-bordeaux-600: #5E2846;
-  --color-bordeaux-500: #7A365B;
-  --color-bordeaux-400: #A14776;
+  /* Bordeaux - plus intense */
+  --color-bordeaux-700: #52223F;
+  --color-bordeaux-600: #6E3255;
+  --color-bordeaux-500: #8F426E;
+  --color-bordeaux-400: #B8578A;
 
-  /* Crème Chaud — texte, contrastes */
-  --color-cream-100: #F5E6D3;
-  --color-cream-200: #EAD5BA;
-  --color-cream-300: #DAC19D;
+  /* Rose - plus éclatant */
+  --color-rose-400: #E89FA0;
+  --color-rose-500: #DC8083;
 
-  /* Rose Poudré — émotion, douceur */
-  --color-rose-300: #E8B8B8;
-  --color-rose-400: #D89E9E;
+  /* Or/Chaleur - pour les accents chauds */
+  --color-gold-400: #D4A373;
+  --color-gold-500: #B8915E;
 
-  /* Surcharges neutres */
-  --color-surface: #251B2E;
-  --color-surface-light: #3B2A45;
+  /* Crème - plus lumineux */
+  --color-cream-100: #F7EFE6;
+  --color-cream-200: #EDE1C7;
+
+  /* Surcharges */
+  --color-surface: #1F1728;
+  --color-surface-light: #2B2038;
+  --color-surface-lighter: #3D2D4F;
 
   /* Typographie */
   --font-sans: var(--font-inter, ui-sans-serif), system-ui, -apple-system,
@@ -59,31 +56,33 @@
   --radius-md: 0.75rem;
   --radius-lg: 1.25rem;
 
-  /* Ombres hiérarchisées — retenues */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
-  --shadow-glow: 0 0 20px rgba(119, 76, 122, 0.3);
+  /* Ombres plus prononcées */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.6);
+  --shadow-glow: 0 0 30px rgba(134, 66, 110, 0.5);
+  --shadow-glow-prune: 0 0 30px rgba(123, 85, 133, 0.5);
 
   /* Animations */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* ------------------------------------------------------------------ */
-/*  Variables sémantiques (compatibles shadcn/ui)                      */
+/*  Variables sémantiques                                              */
 /* ------------------------------------------------------------------ */
 
 :root {
   color-scheme: dark;
 
-  --background: var(--color-midnight-900);
+  --background: var(--color-midnight-950);
   --foreground: var(--color-cream-100);
 
   --card: var(--color-surface);
   --card-foreground: var(--color-cream-100);
 
-  --popover: var(--color-surface);
+  --popover: var(--color-surface-light);
   --popover-foreground: var(--color-cream-100);
 
   --primary: var(--color-bordeaux-600);
@@ -92,13 +91,13 @@
   --secondary: var(--color-prune-600);
   --secondary-foreground: var(--color-cream-100);
 
-  --muted: var(--color-midnight-700);
+  --muted: var(--color-surface-lighter);
   --muted-foreground: var(--color-cream-200);
 
-  --accent: var(--color-rose-300);
-  --accent-foreground: #5E2846;
+  --accent: var(--color-rose-400);
+  --accent-foreground: #52223F;
 
-  --destructive: #E63946;
+  --destructive: #F25C54;
   --destructive-foreground: #ffffff;
 
   --border: var(--color-midnight-700);
@@ -109,16 +108,17 @@
   --radius-md: var(--radius-md);
   --radius-lg: var(--radius-lg);
 
-  /* Dégradés */
-  --gradient-primary: linear-gradient(135deg, #7A365B 0%, #5E2846 100%);
-  --gradient-accent: linear-gradient(135deg, #7D5A8F 0%, #6B4C7A 100%);
+  /* Dégradés plus riches */
+  --gradient-primary: linear-gradient(135deg, #B8578A 0%, #6E3255 50%, #52223F 100%);
+  --gradient-accent: linear-gradient(135deg, #BC92C2 0%, #7B5585 100%);
+  --gradient-gold: linear-gradient(135deg, #D4A373 0%, #B8915E 100%);
 }
 
 :root[data-ambiance="douceur"] {
-  --background: #2D2333;
-  --card: #3B2A45;
-  --foreground: #F5E6D3;
-  --muted-foreground: #DAC19D;
+  --background: #1F1728;
+  --card: #2B2038;
+  --foreground: #F7EFE6;
+  --muted-foreground: #EDE1C7;
 }
 
 @theme inline {
@@ -166,9 +166,13 @@
     text-rendering: optimizeLegibility;
   }
 
+  h1 { font-size: 2rem; }
+  h2 { font-size: 1.5rem; }
+  h3 { font-size: 1.25rem; }
+
   h1, h2, h3 {
     font-family: var(--font-display);
-    font-weight: 500;
+    font-weight: 600;
     line-height: 1.2;
   }
 
@@ -178,11 +182,11 @@
     top: -100%;
     z-index: 100;
     border-radius: 9999px;
-    background-color: var(--color-bordeaux-600);
+    background: var(--gradient-primary);
     color: #fff;
     padding: 0.625rem 1rem;
     font-size: 0.875rem;
-    font-weight: 500;
+    font-weight: 600;
     transition: top 150ms ease-out;
   }
 
@@ -204,25 +208,36 @@
     overflow: hidden;
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
-    border-width: 0;
   }
 }
 
 /* ------------------------------------------------------------------ */
-/*  Surfaces premium                                                   */
+/*  Surfaces premium - plus vivantes                                    */
 /* ------------------------------------------------------------------ */
 
 @layer components {
   .glass {
-    background-color: color-mix(in oklab, var(--card) 62%, transparent);
-    backdrop-filter: blur(24px) saturate(1.5);
-    -webkit-backdrop-filter: blur(24px) saturate(1.5);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background-color: color-mix(in oklab, var(--card) 70%, transparent);
+    backdrop-filter: blur(32px) saturate(1.8);
+    -webkit-backdrop-filter: blur(32px) saturate(1.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  }
+
+  .liquid-glass {
+    position: relative;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(40px) saturate(1.6);
+    -webkit-backdrop-filter: blur(40px) saturate(1.6);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.15),
+      0 24px 60px -34px rgba(0, 0, 0, 0.9);
   }
 
   .eyebrow {
     font-size: 0.6875rem;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--color-cream-200);
@@ -230,58 +245,100 @@
 
   .press {
     transition:
-      transform 180ms var(--ease-out),
-      box-shadow 220ms ease-out,
-      background-color 180ms ease-out;
+      transform 200ms var(--ease-bounce),
+      box-shadow 250ms ease-out,
+      background-color 200ms ease-out;
   }
 
   .press:active {
-    transform: scale(0.975);
+    transform: scale(0.96);
+  }
+
+  .spotlight::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 300ms ease-out;
+    background-image: radial-gradient(
+      20rem 20rem at var(--mx, 50%) var(--my, 50%),
+      rgb(134 66 110 / 0.15) 0%,
+      transparent 60%
+    );
+  }
+
+  .spotlight:hover::before,
+  .spotlight:focus-within::before {
+    opacity: 1;
+  }
+
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.3;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 }
 
 /* ------------------------------------------------------------------ */
-/*  Animations — respect prefers-reduced-motion                        */
+/*  Animations - plus expressives                                       */
 /* ------------------------------------------------------------------ */
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes slideUp {
-  from { 
-    opacity: 0; 
-    transform: translateY(8px); 
-  }
-  to { 
-    opacity: 1; 
-    transform: translateY(0); 
-  }
+@keyframes popIn {
+  0% { opacity: 0; transform: scale(0.9); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
 @keyframes pulseDot {
-  0%, 100% { 
-    opacity: 1; 
-    transform: scale(1); 
-  }
-  50% { 
-    opacity: 0.5; 
-    transform: scale(0.9); 
-  }
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+
+@keyframes shimmer {
+  from { background-position: 100% 0; }
+  to { background-position: 0 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .fade-in {
-    animation: fadeIn 300ms var(--ease-out);
+    animation: fadeIn 400ms var(--ease-out);
   }
 
-  .slide-up {
-    animation: slideUp 300ms var(--ease-out);
+  .pop-in {
+    animation: popIn 350ms var(--ease-bounce);
+  }
+
+  .float {
+    animation: float 6s ease-in-out infinite;
   }
 
   .pulse-dot {
     animation: pulseDot 2s ease-in-out infinite;
+  }
+
+  .skel {
+    background-image: linear-gradient(
+      90deg,
+      rgb(255 255 255 / 0.05) 25%,
+      rgb(255 255 255 / 0.1) 37%,
+      rgb(255 255 255 / 0.05) 63%
+    );
+    background-size: 400% 100%;
+    animation: shimmer 1.6s ease-in-out infinite;
   }
 }
 

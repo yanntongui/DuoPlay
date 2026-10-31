@@ -1,28 +1,24 @@
 "use client";
 
 import { motion, HTMLMotionProps } from "framer-motion";
-
-/**
- * Animation utilities for cards, transitions, and interactions.
- * All animations respect prefers-reduced-motion.
- */
+import { cn } from "@/lib/utils";
 
 export const fadeIn = {
-  initial: { opacity: 0, y: 8 },
+  initial: { opacity: 0, y: 12 },
   animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -8 },
+  exit: { opacity: 0, y: -12 },
 };
 
-export const scaleIn = {
-  initial: { opacity: 0, scale: 0.96 },
+export const popIn = {
+  initial: { opacity: 0, scale: 0.9 },
   animate: { opacity: 1, scale: 1 },
-  exit: { opacity: 0, scale: 0.96 },
+  exit: { opacity: 0, scale: 0.9 },
 };
 
 export const staggerContainer = {
   animate: {
     transition: {
-      staggerChildren: 0.08,
+      staggerChildren: 0.1,
     },
   },
 };
@@ -30,12 +26,7 @@ export const staggerContainer = {
 export const Card = motion.div;
 export const List = motion.ul;
 export const ListItem = motion.li;
-export const Button = motion.button;
-export const Link = motion.a;
 
-/**
- * Animated button with press feedback
- */
 export function AnimatedButton({
   children,
   className,
@@ -44,11 +35,11 @@ export function AnimatedButton({
   return (
     <Button
       className={cn(
-        "press cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bordeaux-500 disabled:cursor-not-allowed disabled:opacity-50",
+        "press cursor-pointer rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bordeaux-500 disabled:cursor-not-allowed disabled:opacity-50",
         className,
       )}
-      whileTap={{ scale: 0.97 }}
-      transition={{ type: "spring", stiffness: 400, damping: 17 }}
+      whileTap={{ scale: 0.95 }}
+      transition={{ type: "spring", stiffness: 500, damping: 20 }}
       {...props}
     >
       {children}
@@ -56,22 +47,21 @@ export function AnimatedButton({
   );
 }
 
-/**
- * Animated card with hover lift
- */
 export function AnimatedCard({
   children,
   className,
+  highlight,
   ...props
-}: HTMLMotionProps<"div">) {
+}: HTMLMotionProps<"div"> & { highlight?: boolean }) {
   return (
     <Card
       className={cn(
-        "rounded-xl border border-white/10 bg-card p-4 shadow-md transition-shadow",
+        "rounded-xl border border-white/10 bg-card p-5 shadow-md transition-shadow",
+        highlight && "border-rose-400/30 hover:border-rose-400/50 shadow-[var(--shadow-glow-prune)]",
         className,
       )}
-      whileHover={{ y: -4, transition: { duration: 0.2 } }}
-      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      whileHover={{ y: -6, scale: 1.02, transition: { duration: 0.2 } }}
+      transition={{ type: "spring", stiffness: 350, damping: 25 }}
       {...props}
     >
       {children}
@@ -79,9 +69,6 @@ export function AnimatedCard({
   );
 }
 
-/**
- * Animated progress indicator
- */
 export function AnimatedProgress({
   value,
   max = 100,
@@ -96,7 +83,7 @@ export function AnimatedProgress({
   return (
     <div
       className={cn(
-        "h-2 overflow-hidden rounded-full bg-white/10",
+        "h-2.5 overflow-hidden rounded-full bg-white/10",
         className,
       )}
       role="progressbar"
@@ -105,35 +92,32 @@ export function AnimatedProgress({
       aria-valuemax={max}
     >
       <motion.div
-        className="h-full bg-bordeaux-500"
+        className="h-full bg-gradient-primary"
         initial={{ width: 0 }}
         animate={{ width: `${percentage}%` }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
       />
     </div>
   );
 }
 
-/**
- * Animated presence indicator
- */
 export function AnimatedPresenceDot({ online = false, className }: { online?: boolean; className?: string }) {
   return (
     <span
       className={cn(
-        "relative flex h-3 w-3",
+        "relative flex h-3.5 w-3.5",
         className,
       )}
       aria-label={online ? "En ligne" : "Hors ligne"}
     >
       {online && (
         <motion.span
-          className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"
-          animate={{ scale: [1, 1.2, 1], opacity: [0.75, 1, 0.75] }}
+          className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-80"
+          animate={{ scale: [1, 1.3, 1], opacity: [0.8, 1, 0.8] }}
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
         />
       )}
-      <span className="relative inline-flex h-3 w-3 rounded-full bg-emerald-500" />
+      <span className="relative inline-flex h-3.5 w-3.5 rounded-full bg-emerald-500" />
     </span>
   );
 }
