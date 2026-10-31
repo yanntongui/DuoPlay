@@ -18,29 +18,21 @@ function Card({
   className,
   tone = "default",
   interactive,
-  role,
-  tabIndex,
-  ariaLabel,
   ...props
 }: React.ComponentProps<"div"> & {
   tone?: keyof typeof TONES;
   interactive?: boolean;
-  role?: string;
-  tabIndex?: number;
-  ariaLabel?: string;
 }) {
+  const isInteractive = interactive !== false;
   return (
     <div
       data-slot="card"
-      role={interactive ? (role || "button") : role}
-      tabIndex={interactive ? (tabIndex ?? 0) : undefined}
-      aria-label={ariaLabel}
       className={cn(
-        "relative overflow-hidden rounded-xl border border-ivory-200/80 shadow-[var(--shadow-soft)] text-card-foreground focus-ring transition-shadow",
+        "relative overflow-hidden rounded-2xl border border-ivory-200/80 shadow-[var(--shadow-soft)] text-card-foreground transition-transform duration-300 ease-out",
         TONES[tone],
         tone === "dark" && "border-white/10",
-        interactive &&
-          "spotlight press cursor-pointer hover:-translate-y-0.5 hover:border-lavender-300/60 hover:shadow-[var(--shadow-lift)] focus:outline-none",
+        isInteractive &&
+          "spotlight press cursor-pointer hover:-translate-y-1 hover:border-lavender-300/60 hover:shadow-[var(--shadow-lift)] active:scale-[0.98]",
         className,
       )}
       {...props}

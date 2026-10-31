@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import Link from "next/link";
 import { useQuery } from "convex/react";
 import { ArrowRight, Clock } from "lucide-react";
@@ -38,10 +39,10 @@ function MoodFilter({ mood }: { mood: string | null }) {
   const { t, locale } = useT();
   const chip = (active: boolean) =>
     cn(
-      "press inline-flex min-h-10 items-center gap-1.5 rounded-full border px-3.5 py-2 text-sm font-medium",
+      "press inline-flex min-h-[44px] items-center gap-1.5 rounded-full border px-3.5 py-2 text-sm font-medium transition-all duration-200 active:scale-95",
       active
-        ? "gradient-primary top-light border-transparent text-white shadow-[var(--shadow-glow)]"
-        : "border-ivory-200/90 bg-card/80 text-graphite-600 shadow-[var(--shadow-soft)] hover:border-lavender-300 hover:text-foreground",
+        ? "gradient-primary top-light border-transparent text-white shadow-[var(--shadow-glow)] scale-105"
+        : "border-ivory-200/90 bg-card/80 text-graphite-600 shadow-[var(--shadow-soft)] hover:border-lavender-300 hover:text-foreground hover:bg-card",
     );
 
   return (
@@ -50,26 +51,39 @@ function MoodFilter({ mood }: { mood: string | null }) {
       role="group"
       aria-label={t("explorer.filterLabel")}
     >
-      <Link
-        href="/explorer"
-        data-testid="mood-all"
-        aria-pressed={mood === null}
-        className={chip(mood === null)}
+      <motion.div
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.2 }}
       >
-        {t("explorer.allUniverses")}
-      </Link>
-      {MOODS.map((item) => (
         <Link
-          key={item.slug}
-          href={`/explorer?ambiance=${item.slug}`}
-          data-testid={`mood-${item.slug}`}
-          aria-pressed={mood === item.slug}
-          title={localize(locale, item.description, item.descriptionEn)}
-          className={chip(mood === item.slug)}
+          href="/explorer"
+          data-testid="mood-all"
+          aria-pressed={mood === null}
+          className={chip(mood === null)}
         >
-          <span aria-hidden="true">{item.emoji}</span>
-          {localize(locale, item.title, item.titleEn)}
+          {t("explorer.allUniverses")}
         </Link>
+      </motion.div>
+      {MOODS.map((item, index) => (
+        <motion.div
+          key={item.slug}
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2, delay: 0.05 + index * 0.05 }}
+        >
+          <Link
+            href={`/explorer?ambiance=${item.slug}`}
+            data-testid={`mood-${item.slug}`}
+            aria-pressed={mood === item.slug}
+            aria-label={localize(locale, item.title, item.titleEn)}
+            title={localize(locale, item.description, item.descriptionEn)}
+            className={chip(mood === item.slug)}
+          >
+            <span aria-hidden="true">{item.emoji}</span>
+            {localize(locale, item.title, item.titleEn)}
+          </Link>
+        </motion.div>
       ))}
     </div>
   );
@@ -198,28 +212,45 @@ function Grid({ items, mood }: { items: Universe[]; mood: string | null }) {
   const { t } = useT();
   if (items.length === 0) {
     return (
-      <Card tone="lavender" className="p-6 text-center">
-        <p className="text-sm font-medium">{t("universe.none")}</p>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {t("universe.noneHint")}
-        </p>
-      </Card>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+      >
+        <Card tone="lavender" className="p-6 text-center">
+          <p className="text-sm font-medium">{t("universe.none")}</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {t("universe.noneHint")}
+          </p>
+        </Card>
+      </motion.div>
     );
   }
 
   const featuredSlug = items.find((item) => item.mvp)?.slug;
 
   return (
-    <div className="grid auto-rows-[minmax(11rem,auto)] gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {items.map((universe) => (
-        <UniverseCard
+    <motion.div
+      className="grid auto-rows-[minmax(11rem,auto)] gap-4 sm:grid-cols-2 lg:grid-cols-3"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
+    >
+      {items.map((universe, index) => (
+        <motion.div
           key={universe.slug}
-          universe={universe}
-          mood={mood}
-          featured={universe.slug === featuredSlug}
-        />
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, delay: index * 0.08 }}
+        >
+          <UniverseCard
+            universe={universe}
+            mood={mood}
+            featured={universe.slug === featuredSlug}
+          />
+        </motion.div>
       ))}
-    </div>
+    </motion.div>
   );
 }
 

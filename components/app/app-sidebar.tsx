@@ -95,7 +95,7 @@ function NavEntry({ item, pathname }: { item: NavItem; pathname: string }) {
   const active = !item.soon && isActive(pathname, item.href);
 
   const base =
-    "relative flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium transition-colors";
+    "relative flex min-h-[44px] items-center gap-3 rounded-xl px-3 text-sm font-medium transition-all duration-200 ease-out";
   const centered = "justify-center lg:justify-start";
 
   if (item.soon) {
@@ -103,6 +103,7 @@ function NavEntry({ item, pathname }: { item: NavItem; pathname: string }) {
       <span
         data-testid="nav-soon"
         aria-disabled="true"
+        aria-label={`${label}, bientôt disponible`}
         title={t("nav.soonTitle", { label })}
         className={cn(
           base,
@@ -123,24 +124,24 @@ function NavEntry({ item, pathname }: { item: NavItem; pathname: string }) {
     <Link
       href={item.href}
       aria-current={active ? "page" : undefined}
-      title={label}
       className={cn(
         base,
         centered,
-        "focus:outline-none focus-ring",
         active
-          ? "bg-white/[0.08] text-lavender-300 shadow-[inset_0_1px_0_rgb(255_255_255_/_0.06)]"
-          : "text-graphite-500 hover:bg-white/[0.04] hover:text-foreground",
+          ? "bg-white/[0.08] text-lavender-300 shadow-[inset_0_1px_0_rgb(255_255_255_/_0.06)] scale-[1.02]"
+          : "text-graphite-500 hover:bg-white/[0.04] hover:text-foreground hover:scale-[1.02]",
       )}
     >
       {active && (
-        <span
+        <motion.span
+          layoutId="nav-active-indicator"
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
           aria-hidden="true"
           className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r-full bg-lavender-300 lg:left-0"
         />
       )}
       <Icon
-        className="size-5 shrink-0"
+        className={cn("size-5 shrink-0 transition-transform duration-200", active ? "scale-110" : "scale-100")}
         strokeWidth={active ? 2.3 : 1.9}
         aria-hidden="true"
       />

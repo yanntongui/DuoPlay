@@ -59,22 +59,28 @@ export function SectionTitle({
 /** Pastille d'information : un ton, une icône optionnelle, jamais colorée seule. */export function Pill({
   className,
   tone = "neutral",
+  interactive,
   ...props
 }: React.ComponentProps<"span"> & {
   tone?: "neutral" | "primary" | "lavender" | "dark" | "glass";
+  interactive?: boolean;
 }) {
+  const base = "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium transition-all duration-200";
+  const interactiveStyles = interactive
+    ? "cursor-pointer hover:scale-105 active:scale-95"
+    : "";
+
   const tones = {
-    neutral: "bg-ivory-100 text-graphite-300",
-    primary: "bg-coral-100 text-coral-700",
-    lavender: "bg-lavender-100 text-lavender-700",
-    dark: "bg-graphite-900/90 text-white",
-    glass: "border border-white/10 bg-white/10 text-white backdrop-blur-md",
+    neutral: `${base} ${interactiveStyles} bg-ivory-100 text-graphite-300 hover:bg-ivory-200/60`,
+    primary: `${base} ${interactiveStyles} bg-coral-100 text-coral-700 hover:bg-coral-200/60`,
+    lavender: `${base} ${interactiveStyles} bg-lavender-100 text-lavender-700 hover:bg-lavender-200/60`,
+    dark: `${base} ${interactiveStyles} bg-graphite-900/90 text-white`,
+    glass: `${base} ${interactiveStyles} border border-white/10 bg-white/10 text-white backdrop-blur-md`,
   } as const;
 
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium",
         tones[tone],
         className,
       )}

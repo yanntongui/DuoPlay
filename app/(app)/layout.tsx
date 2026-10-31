@@ -23,9 +23,11 @@ export default function AppLayout({
 
           <main
             id="contenu"
-            className="mx-auto w-full max-w-2xl px-4 pt-6 sm:px-6 lg:max-w-5xl lg:px-8"
+            className="mx-auto w-full px-4 pt-6 sm:px-6 lg:px-8"
           >
-            {children}
+            <div className="max-w-5xl">
+              {children}
+            </div>
           </main>
 
           <AppFooter />

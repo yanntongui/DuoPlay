@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import Link from "next/link";
 import { useQuery, useMutation } from "convex/react";
 import { ArrowRight, Heart, Sparkles, Star, Users } from "lucide-react";
@@ -93,10 +94,14 @@ export function OurSpace() {
   }
 
   return (
-    <div className="flex flex-col gap-8 animate-in fade-in duration-500">
+    <div className="flex flex-col gap-6 sm:gap-8">
       {/* Le couple ------------------------------------------------- */}
       {couple ? (
-        <>
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
           <CoupleCard
             couple={couple}
             profile={profile}
@@ -104,29 +109,7 @@ export function OurSpace() {
             locale={locale}
             t={t}
           />
-          <div className="relative z-10 flex flex-col gap-5">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center -space-2">
-                <Avatar photo={mePhoto} name={couple.me.name ?? t("space.you")} size="lg" />
-                <div className="flex -space-1.5">
-                  <Avatar photo={partnerPhoto} name={partnerName ?? t("space.partner")} size="md" />
-                </div>
-              </div>
-              <div className="min-w-0">
-                <h2 className="truncate text-lg text-white animate-in slide-in-from-left-4 duration-300">
-                  {couple.me.name ?? t("space.you")}
-                  {partnerName ? ` & ${partnerName}` : ""}
-                </h2>
-                <p className="text-xs text-white/70 animate-in slide-in-from-left-4 duration-500">
-                  {t("space.togetherSince", {
-                    date: shortDate(couple.since, locale),
-                  })}
-                  {partnerName ? "" : t("space.partnerNotLinked")}
-                </p>
-              </div>
-            </div>
-          </div>
-        </>
+        </motion.div>
       ) : (
         <Card tone="lavender" className="flex flex-col items-center gap-3 p-7 text-center">
           <div className="flex size-12 items-center justify-center rounded-2xl bg-white/[0.08] text-lavender-700 ring-1 ring-inset ring-white/[0.10]">
@@ -142,24 +125,44 @@ export function OurSpace() {
         </Card>
       )}
 
-      <ContextualSuggestions />
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3, delay: 0.1 }}
+      >
+        <ContextualSuggestions />
+      </motion.div>
 
-      <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
-        <div className="flex min-w-0 flex-1 flex-col gap-8">
+      <div className="flex flex-col gap-6 sm:gap-8 lg:grid lg:grid-cols-2">
+        <div className="flex min-w-0 flex-1 flex-col gap-6 sm:gap-8">
       {/* Rappels doux ---------------------------------------------- */}
-      <NotificationsSection id="relances" />
+      <motion.div
+        initial={{ opacity: 0, y: 4 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <NotificationsSection id="relances" />
+      </motion.div>
 
       {/* Défi du jour ---------------------------------------------- */}
-      <section>
+      <motion.section
+        initial={{ opacity: 0, y: 4 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.05 }}
+      >
         <SectionTitle
           eyebrow={t("space.dailyEyebrow")}
           title={t("space.dailyTitle")}
         />
         <DailyChallengeCard />
-      </section>
+      </motion.section>
 
       {/* Favoris --------------------------------------------------- */}
-      <section>
+      <motion.section
+        initial={{ opacity: 0, y: 4 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.1 }}
+      >
         <SectionTitle
           eyebrow={t("space.favoritesEyebrow")}
           title={t("space.favoritesTitle")}
@@ -180,46 +183,56 @@ export function OurSpace() {
           />
         ) : (
           <div className="flex flex-col gap-3">
-            {favorites?.map((item) => (
-              <Card
+            {favorites?.map((item, index) => (
+              <motion.div
                 key={item.favoriteId}
-                className="flex items-center gap-3 p-4 transition-transform hover:scale-[1.02]"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.25, delay: 0.15 + index * 0.05 }}
               >
-                <EmojiTile tone="coral" size="sm">
-                  {item.category?.emoji ?? "💞"}
-                </EmojiTile>
-                <div className="min-w-0 flex-1">
-                  <p className="eyebrow truncate">
-                    {item.category?.title ?? t("space.favoriteFallback")}
-                  </p>
-                  <p className="truncate font-medium">
-                    {item.experience.title}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {item.experience.estimatedMinutes} min ·{" "}
-                    {item.experience.modes
-                      .map((mode) => modeTitle(mode, locale))
-                      .join(", ")}
-                  </p>
-                </div>
-                <FavoriteButton experienceId={item.experience._id} />
-                <Link
-                  href={`/nouvelle/${item.experience.slug}`}
-                  className="press gradient-primary top-light inline-flex h-10 shrink-0 items-center rounded-full px-4 text-[13px] font-medium text-white shadow-[var(--shadow-glow)] hover:brightness-[1.06]"
+                <Card
+                  className="flex items-center gap-3 p-4"
                 >
-                  {t("space.launch")}
-                </Link>
-              </Card>
+                  <EmojiTile tone="coral" size="sm">
+                    {item.category?.emoji ?? "💞"}
+                  </EmojiTile>
+                  <div className="min-w-0 flex-1">
+                    <p className="eyebrow truncate">
+                      {item.category?.title ?? t("space.favoriteFallback")}
+                    </p>
+                    <p className="truncate font-medium">
+                      {item.experience.title}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {item.experience.estimatedMinutes} min ·{" "}
+                      {item.experience.modes
+                        .map((mode) => modeTitle(mode, locale))
+                        .join(", ")}
+                    </p>
+                  </div>
+                  <FavoriteButton experienceId={item.experience._id} />
+                  <Link
+                    href={`/nouvelle/${item.experience.slug}`}
+                    className="press gradient-primary top-light inline-flex h-10 shrink-0 items-center rounded-full px-4 text-[13px] font-medium text-white shadow-[var(--shadow-glow)] hover:brightness-[1.06]"
+                  >
+                    {t("space.launch")}
+                  </Link>
+                </Card>
+              </motion.div>
             ))}
           </div>
         )}
-      </section>
+      </motion.section>
 
         </div>
 
-        <div className="flex min-w-0 flex-1 flex-col gap-8">
+        <div className="flex min-w-0 flex-1 flex-col gap-6 sm:gap-8">
       {/* Historique ------------------------------------------------ */}
-      <section>
+      <motion.section
+        initial={{ opacity: 0, y: 4 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
         <SectionTitle
           eyebrow={t("space.historyEyebrow")}
           title={t("space.historyTitle")}
@@ -235,8 +248,14 @@ export function OurSpace() {
           />
         ) : (
           <div className="flex flex-col gap-2">
-            {history?.items.slice(0, 8).map((item) => (
-              <Card key={item.sessionId} className="flex flex-col gap-2 p-4 transition-transform hover:scale-[1.02]">
+            {history?.items.slice(0, 8).map((item, index) => (
+              <motion.div
+                key={item.sessionId}
+                initial={{ opacity: 0, x: -8 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.2, delay: index * 0.03 }}
+              >
+                <Card key={item.sessionId} className="flex flex-col gap-2 p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="truncate font-medium">
@@ -289,6 +308,7 @@ export function OurSpace() {
                   )}
                 </div>
               </Card>
+              </motion.div>
             ))}
 
             {history && history.items.length > 8 && (
@@ -298,7 +318,7 @@ export function OurSpace() {
             )}
           </div>
         )}
-      </section>
+      </motion.section>
 
       {/* Journal du couple ----------------------------------------- */}
       <Journal />
@@ -307,13 +327,17 @@ export function OurSpace() {
       <Calendar />
 
       {/* Parcours guidés ------------------------------------------- */}
-      <section>
+      <motion.section
+        initial={{ opacity: 0, y: 4 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
         <SectionTitle
           eyebrow={t("space.journeysEyebrow")}
           title={t("space.journeysTitle")}
         />
         <JourneyTracker />
-      </section>
+      </motion.section>
         </div>
       </div>
     </div>

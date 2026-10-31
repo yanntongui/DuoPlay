@@ -257,6 +257,24 @@
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
     scroll-behavior: smooth;
+    text-size-adjust: 100%;
+  }
+
+  /* Skip link for keyboard navigation */
+  .skip-link {
+    position: absolute;
+    top: -100%;
+    left: 0;
+    z-index: 1000;
+    background: var(--color-coral-500);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0 0 8px 0;
+    font-size: 0.875rem;
+  }
+
+  .skip-link:focus {
+    top: 0;
   }
 
   body {
@@ -307,6 +325,18 @@
   :focus-visible {
     outline: 2px solid var(--color-ring);
     outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* Ensure minimum touch targets are accessible */
+  button,
+  [role="button"],
+  a,
+  input,
+  select,
+  textarea {
+    min-height: 44px;
+    min-width: 44px;
   }
 
   /* Signale une zone dont le contenu vient de changer (lecteurs d'écran). */
@@ -579,6 +609,48 @@
   }
 }
 
+@keyframes duoplay-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes duoplay-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes duoplay-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes duoplay-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+
+@keyframes duoplay-bounce-small {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .rise {
     animation: duoplay-rise 260ms ease-out both;
@@ -641,48 +713,68 @@
   }
 }
 
-/* Utility animations for interactive states */
-.flip-card {
-  perspective: 1000px;
+@keyframes duoplay-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
-.flip-card-inner {
-  transition: transform 0.6s;
-  transform-style: preserve-3d;
+@keyframes duoplay-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
-.flip-card.flipped .flip-card-inner {
-  transform: rotateY(180deg);
-}
-
-.flip-card-front,
-.flip-card-back {
-  backface-visibility: hidden;
-}
-
-.flip-card-back {
-  transform: rotateY(180deg);
-}
-
-.roll-dice {
-  animation: duoplay-shake 0.6s ease-out;
+@keyframes duoplay-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @keyframes duoplay-shake {
-  0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(-10deg); }
-  75% { transform: rotate(10deg); }
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
 }
 
-/* Focus ring utilities for accessibility */
-.focus-ring {
-  outline: 2px solid var(--color-ring);
-  outline-offset: 2px;
+@keyframes duoplay-bounce-small {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
 }
 
-.focus-ring:focus-visible {
-  outline: 2px solid var(--color-ring);
-  outline-offset: 2px;
+@media (prefers-reduced-motion: no-preference) {
+  .slide-in {
+    animation: duoplay-slide-in 200ms ease-out both;
+  }
+
+  .fade-in {
+    animation: duoplay-fade-in 150ms ease-out both;
+  }
+
+  .scale-in {
+    animation: duoplay-scale-in 200ms ease-out both;
+  }
+
+  .shake {
+    animation: duoplay-shake 300ms ease-in-out;
+  }
+
+  .bounce {
+    animation: duoplay-bounce-small 600ms ease-in-out;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

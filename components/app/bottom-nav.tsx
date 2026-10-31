@@ -28,27 +28,28 @@ export function BottomNav() {
                 <Link
                   href={item.href}
                   aria-current={active ? "page" : undefined}
-                  className="press relative flex min-h-12 flex-col items-center justify-center gap-1 rounded-lg text-[11px] font-medium focus-ring focus:outline-none"
+                  aria-label={t(item.labelKey)}
+                  className="press relative flex min-h-[44px] flex-col items-center justify-center gap-1 rounded-xl px-2 text-[11px] font-medium active:scale-95"
                 >
                   <span
                     aria-hidden="true"
                     className={cn(
-                      "absolute inset-x-1.5 inset-y-0.5 -z-10 rounded-2xl transition-opacity duration-300",
+                      "absolute inset-x-1 inset-y-1.5 -z-10 rounded-2xl transition-all duration-300",
                       active
-                        ? "gradient-tendresse opacity-100 shadow-[var(--shadow-glow)]"
-                        : "opacity-0",
+                        ? "gradient-tendresse opacity-100 shadow-[var(--shadow-glow)] scale-100"
+                        : "opacity-0 scale-90",
                     )}
                   />
                   <Icon
                     className={cn(
-                      "size-5 transition-colors",
-                      active ? "text-white" : "text-graphite-500",
+                      "size-5 transition-all duration-300",
+                      active ? "text-white scale-110" : "text-graphite-500 scale-100",
                     )}
                     strokeWidth={active ? 2.3 : 1.9}
                   />
                   <span
                     className={cn(
-                      "transition-colors",
+                      "transition-all duration-300",
                       active ? "text-white" : "text-graphite-500",
                     )}
                   >

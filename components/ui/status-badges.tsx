@@ -2,12 +2,12 @@
 
 import { motion } from "framer-motion";
 
-const MOOD_CONFIG: Record<string, { emoji: string; label: string; color: string }> = {
-  joyeux: { emoji: "😊", label: "Joyeux", color: "text-yellow-400" },
-  curieux: { emoji: "🤔", label: "Curieux", color: "text-purple-400" },
-  calme: { emoji: "😌", label: "Calme", color: "text-blue-400" },
-  fatigué: { emoji: "🥱", label: "Fatigué", color: "text-gray-400" },
-  romantique: { emoji: "💕", label: "Romantique", color: "text-pink-400" },
+const MOOD_CONFIG: Record<string, { emoji: string; label: string; color: string; bg: string }> = {
+  joyeux: { emoji: "😊", label: "Joyeux", color: "text-yellow-400", bg: "bg-yellow-400/10" },
+  curieux: { emoji: "🤔", label: "Curieux", color: "text-purple-400", bg: "bg-purple-400/10" },
+  calme: { emoji: "😌", label: "Calme", color: "text-blue-400", bg: "bg-blue-400/10" },
+  fatigué: { emoji: "🥱", label: "Fatigué", color: "text-gray-400", bg: "bg-gray-400/10" },
+  romantique: { emoji: "💕", label: "Romantique", color: "text-pink-400", bg: "bg-pink-400/10" },
 };
 
 export function MoodBadge({ 
@@ -22,15 +22,16 @@ export function MoodBadge({
   const config = MOOD_CONFIG[mood];
   
   return (
-    <button
+    <motion.button
       onClick={onClick}
-      aria-label={`Humeur : ${config.label}`}
-      className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-0.5 text-xs ring-1 ring-white/20 transition-transform hover:scale-105 focus:outline-none focus-ring"
-      title={config.label}
+      aria-label={`Humeur : ${config.label}. Cliquez pour changer.`}
+      className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ring-1 ring-white/20 transition-colors hover:ring-white/30 active:scale-95"
+      whileTap={{ scale: 0.95 }}
+      transition={{ duration: 0.15 }}
     >
-      <span className="text-sm">{config.emoji}</span>
-      <span className={config.color}>{config.label}</span>
-    </button>
+      <span className="text-base" aria-hidden="true">{config.emoji}</span>
+      <span className={`${config.color} ${config.bg} px-1.5 rounded-full`}>{config.label}</span>
+    </motion.button>
   );
 }
 
