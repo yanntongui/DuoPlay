@@ -1,5 +1,5 @@
 [build]
-  command = "next build"
+  command = "npx convex codegen && next build"
   publish = ".next"
 
 [build.environment]
