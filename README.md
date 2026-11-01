@@ -804,3 +804,4 @@ Reste à faire : déploiement réel (Netlify + Convex Cloud, hors périmètre po
 l'instant), fournisseur e-mail/SMS pour les relances hors application, CRUD
 « Utilisateurs et sessions » et quotas freemium dans le back-office, et un
 premier commit versionné (le dépôt n'en compte aucun à ce stade).
+
