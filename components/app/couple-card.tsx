@@ -15,7 +15,7 @@ type CoupleData = {
     sessions: number;
     answered: number;
   };
-  id: Id<"couples">;
+  id: string;
   sharedMood?: string;
 };
 
