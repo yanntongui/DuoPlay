@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useMutation } from "convex/react";
-import { api } from "../../../convex/_generated/api";
 
 export default function AdminLogin() {
   const router = useRouter();
@@ -12,21 +10,18 @@ export default function AdminLogin() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const login = useMutation(api.admin.login);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
 
     try {
-      // Connexion pour la démo - accepte n'importe quel email/mot de passe
-      await login({ email, password });
+      // Pour la démo - accepte n'importe quel email/mot de passe
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       localStorage.setItem("admin_token", "demo_token");
-      localStorage.setItem("admin_email", email);
       router.push("/admin");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur de connexion");
+      setError("Erreur de connexion");
     } finally {
       setIsLoading(false);
     }
