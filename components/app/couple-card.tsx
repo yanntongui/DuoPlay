@@ -1,5 +1,6 @@
 "use client";
 
+import { Id } from "@/convex/_generated/dataModel";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { MoodBadge } from "@/components/ui/status-badges";
@@ -19,7 +20,7 @@ type CoupleData = {
 };
 
 type ProfileData = {
-  _id: string;
+  _id: Id<"users">;
   name?: string | null;
   email?: string | null;
   phone?: string | null;
