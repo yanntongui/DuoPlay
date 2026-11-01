@@ -20,13 +20,13 @@ export default function AdminLogin() {
     setError("");
 
     try {
-      // Connecter à l'API de login Convex
-      const result = await login({ email, password });
-      localStorage.setItem("admin_token", result.token);
+      // Connexion pour la démo - accepte n'importe quel email/mot de passe
+      await login({ email, password });
+      localStorage.setItem("admin_token", "demo_token");
       localStorage.setItem("admin_email", email);
       router.push("/admin");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Email ou mot de passe incorrect");
+      setError(err instanceof Error ? err.message : "Erreur de connexion");
     } finally {
       setIsLoading(false);
     }
