@@ -86,6 +86,25 @@ export default defineSchema({
     createdAt: v.number(),
   }).index("by_user", ["userId"]),
 
+  adminAccess: defineTable({
+    userId: v.id("users"),
+    role: v.union(
+      v.literal("super_admin"),
+      v.literal("admin_produit"),
+      v.literal("admin_support"),
+      v.literal("admin_finance"),
+      v.literal("admin_moderateur"),
+      v.literal("admin_analyste"),
+    ),
+    permissions: v.array(v.string()),
+    canViewSensitive: v.boolean(),
+    twoFactorEnabled: v.boolean(),
+    lastLoginAt: v.optional(v.number()),
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_role", ["role"]),
+
   couples: defineTable({
     deviceA: v.string(),
     deviceB: v.optional(v.string()),

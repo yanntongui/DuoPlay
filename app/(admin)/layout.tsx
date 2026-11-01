@@ -1,31 +1,21 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAdminAuth } from "./hooks/use-admin-auth";
 
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const router = useRouter();
+  const { isAuthenticated, isLoading, logout } = useAdminAuth();
 
   useEffect(() => {
-    // Vérifier la session admin
-    const checkSession = async () => {
-      const token = localStorage.getItem("admin_token");
-      if (!token) {
-        router.push("/admin/login");
-      } else {
-        setIsLoggedIn(true);
-      }
-      setIsLoading(false);
-    };
-    checkSession();
-  }, [router]);
+    if (!isAuthenticated) {
+      // L'hook gère la redirection, on ne fait rien ici
+    }
+  }, [isAuthenticated]);
 
   if (isLoading) {
     return (
@@ -38,7 +28,30 @@ export default function AdminLayout({
     );
   }
 
-  if (!isLoggedIn) {
+  if (!isAuthenticated) {
+    return <>{children}</>;
+  }
+
+  return (
+    <LayoutContent children={children} onLogout={logout} />
+  );
+}
+
+function LayoutContent({
+  children,
+  onLogout,
+}: {
+  children: React.ReactNode;
+  onLogout: () => void;
+}) {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
     return <>{children}</>;
   }
 
@@ -71,7 +84,6 @@ export default function AdminLayout({
             <NavItem href="/admin/couples" icon="💑" label="Couples" open={sidebarOpen} />
             <NavItem href="/admin/experiences" icon="🎮" label="Expériences" open={sidebarOpen} />
             <NavItem href="/admin/revenue" icon="💰" label="Revenus" open={sidebarOpen} />
-            <NavItem href="/admin/finance" icon="📈" label="Finance" open={sidebarOpen} />
             <NavItem href="/admin/moderation" icon="🛡️" label="Modération" open={sidebarOpen} />
             <NavItem href="/admin/support" icon="🎧" label="Support" open={sidebarOpen} />
             <NavItem href="/admin/analytics" icon="📉" label="Analytics" open={sidebarOpen} />
@@ -82,10 +94,7 @@ export default function AdminLayout({
           {/* Footer */}
           <div className="border-t border-slate-200 p-4">
             <button
-              onClick={() => {
-                localStorage.removeItem("admin_token");
-                router.push("/admin/login");
-              }}
+              onClick={onLogout}
               className="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-sm text-slate-600 hover:bg-slate-100"
             >
               <span>🔓</span>

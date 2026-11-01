@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useMutation } from "convex/react";
+import { api } from "../../../convex/_generated/api";
 
 export default function AdminLogin() {
   const router = useRouter();
@@ -10,33 +12,21 @@ export default function AdminLogin() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const login = useMutation(api.admin.login);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
 
     try {
-      // Simuler l'authentification admin
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Dans une vraie implémentation, appeler Convex Auth
-      const validAdmins = {
-        "admin@duoplay.com": "password123",
-        "support@duoplay.com": "password123",
-      };
-
-      if (validAdmins[email] !== password) {
-        throw new Error("Email ou mot de passe incorrect");
-      }
-
-      // Stocker le token (dans un cas réel, utiliser un cookie sécurisé)
-      localStorage.setItem("admin_token", "dummy_token_for_demo");
+      // Connecter à l'API de login Convex
+      const result = await login({ email, password });
+      localStorage.setItem("admin_token", result.token);
       localStorage.setItem("admin_email", email);
-      localStorage.setItem("admin_role", "super_admin");
-
       router.push("/admin");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur de connexion");
+      setError(err instanceof Error ? err.message : "Email ou mot de passe incorrect");
     } finally {
       setIsLoading(false);
     }
