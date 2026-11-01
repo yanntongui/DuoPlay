@@ -1,96 +1,67 @@
-import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
+"use client";
 
-export default async function AdminLayout({
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
+export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const token = (await cookies()).get("admin_token")?.value;
+  const router = useRouter();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  if (!token) {
-    redirect("/admin/login");
+  useEffect(() => {
+    const token = localStorage.getItem("admin_token");
+    setIsAuthenticated(!!token);
+    setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.replace("/admin/login");
+    }
+  }, [isAuthenticated, router]);
+
+  const logout = () => {
+    localStorage.removeItem("admin_token");
+    setIsAuthenticated(false);
+    router.push("/admin/login");
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-50">
+        <div className="text-slate-600">Chargement...</div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null;
   }
 
   return (
     <div className="flex min-h-screen bg-slate-50">
-      {/* Sidebar */}
-      <aside className="w-64 fixed left-0 top-0 z-30 h-screen border-r border-slate-200 bg-white">
-        <div className="flex h-full flex-col">
-          {/* Logo */}
-          <div className="flex items-center border-b border-slate-200 px-4 py-4">
-            <div className="flex items-center gap-2">
-              <div className="size-8 rounded-lg bg-indigo-600" />
-              <div>
-                <h1 className="text-sm font-bold text-slate-900">DuoPlay</h1>
-                <p className="text-xs text-slate-500">Administration</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Navigation */}
-          <nav className="flex-1 overflow-y-auto px-2 py-4">
-            <a href="/admin" className="flex items-center gap-3 rounded-lg px-2 py-2 text-sm text-slate-600 hover:bg-slate-100">
-              <span>📊</span>
-              <span>Tableau de bord</span>
-            </a>
-            <a href="/admin/users" className="flex items-center gap-3 rounded-lg px-2 py-2 text-sm text-slate-600 hover:bg-slate-100">
-              <span>👥</span>
-              <span>Utilisateurs</span>
-            </a>
-            <a href="/admin/couples" className="flex items-center gap-3 rounded-lg px-2 py-2 text-sm text-slate-600 hover:bg-slate-100">
-              <span>💑</span>
-              <span>Couples</span>
-            </a>
-            <a href="/admin/experiences" className="flex items-center gap-3 rounded-lg px-2 py-2 text-sm text-slate-600 hover:bg-slate-100">
-              <span>🎮</span>
-              <span>Expériences</span>
-            </a>
-            <a href="/admin/revenue" className="flex items-center gap-3 rounded-lg px-2 py-2 text-sm text-slate-600 hover:bg-slate-100">
-              <span>💰</span>
-              <span>Revenus</span>
-            </a>
-            <a href="/admin/moderation" className="flex items-center gap-3 rounded-lg px-2 py-2 text-sm text-slate-600 hover:bg-slate-100">
-              <span>🛡️</span>
-              <span>Modération</span>
-            </a>
-            <a href="/admin/support" className="flex items-center gap-3 rounded-lg px-2 py-2 text-sm text-slate-600 hover:bg-slate-100">
-              <span>🎧</span>
-              <span>Support</span>
-            </a>
-            <a href="/admin/analytics" className="flex items-center gap-3 rounded-lg px-2 py-2 text-sm text-slate-600 hover:bg-slate-100">
-              <span>📉</span>
-              <span>Analytics</span>
-            </a>
-            <a href="/admin/settings" className="flex items-center gap-3 rounded-lg px-2 py-2 text-sm text-slate-600 hover:bg-slate-100">
-              <span>⚙️</span>
-              <span>Paramètres</span>
-            </a>
-            <a href="/admin/audit" className="flex items-center gap-3 rounded-lg px-2 py-2 text-sm text-slate-600 hover:bg-slate-100">
-              <span>📋</span>
-              <span>Audit</span>
-            </a>
-          </nav>
-        </div>
+      <aside className="w-64 fixed left-0 top-0 h-screen border-r border-slate-200 bg-white p-4">
+        <h2 className="font-bold text-slate-900">DuoPlay Admin</h2>
+        <nav className="mt-4 space-y-2">
+          <a href="/admin" className="block p-2 rounded hover:bg-slate-100">Tableau de bord</a>
+          <a href="/admin/users" className="block p-2 rounded hover:bg-slate-100">Utilisateurs</a>
+          <a href="/admin/couples" className="block p-2 rounded hover:bg-slate-100">Couples</a>
+          <a href="/admin/experiences" className="block p-2 rounded hover:bg-slate-100">Expériences</a>
+          <a href="/admin/revenue" className="block p-2 rounded hover:bg-slate-100">Revenus</a>
+          <a href="/admin/moderation" className="block p-2 rounded hover:bg-slate-100">Modération</a>
+          <a href="/admin/analytics" className="block p-2 rounded hover:bg-slate-100">Analytics</a>
+          <a href="/admin/settings" className="block p-2 rounded hover:bg-slate-100">Paramètres</a>
+        </nav>
       </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 ml-64">
-        {/* Top Bar */}
-        <header className="border-b border-slate-200 bg-white px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="text-right">
-                <p className="text-sm font-medium text-slate-900">Admin</p>
-                <p className="text-xs text-slate-500">Super Admin</p>
-              </div>
-              <div className="size-10 rounded-full bg-indigo-600" />
-            </div>
-          </div>
+      <main className="flex-1 ml-64 p-6">
+        <header className="flex justify-end mb-6">
+          <button onClick={logout} className="p-2 rounded hover:bg-slate-100">Déconnexion</button>
         </header>
-
-        {/* Page Content */}
-        <div className="p-6">{children}</div>
+        {children}
       </main>
     </div>
   );

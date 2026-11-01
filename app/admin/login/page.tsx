@@ -1,33 +1,35 @@
-import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
+"use client";
 
-export const metadata = { title: "Administration" };
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-export default async function AdminLoginPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ error?: string }>;
-}) {
-  const { error } = await searchParams;
+export default function AdminLogin() {
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  async function login(formData: FormData) {
-    "use server";
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
 
-    if (email && password) {
-      (await cookies()).set("admin_token", "demo_token", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 60 * 60 * 24,
-      });
-      redirect("/admin");
+    try {
+      // Pour la démo - accepte n'importe quel email/mot de passe
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      localStorage.setItem("admin_token", "demo_token");
+      localStorage.setItem("admin_email", email);
+      router.push("/admin");
+    } catch (err) {
+      setError("Erreur de connexion");
+    } finally {
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-center bg-gradient-to-br from-indigo-100 via-slate-100 to-indigo-100">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-indigo-100 via-slate-100 to-indigo-100">
       <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-xl">
         <div className="text-center">
           <div className="mx-auto mb-6 size-16 rounded-xl bg-indigo-600 flex items-center justify-center">
@@ -41,10 +43,10 @@ export default async function AdminLoginPage({
           </p>
         </div>
 
-        <form action={login} className="mt-8 space-y-6">
+        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           {error && (
             <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700">
-              Mot de passe incorrect
+              {error}
             </div>
           )}
 
@@ -57,11 +59,12 @@ export default async function AdminLoginPage({
             </label>
             <input
               id="email"
-              name="email"
               type="email"
               required
-              defaultValue="admin@duoplay.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              placeholder="admin@duoplay.com"
             />
           </div>
 
@@ -74,18 +77,21 @@ export default async function AdminLoginPage({
             </label>
             <input
               id="password"
-              name="password"
               type="password"
               required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              placeholder="••••••••"
             />
           </div>
 
           <button
             type="submit"
-            className="w-full rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+            disabled={isLoading}
+            className="w-full rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:bg-indigo-300"
           >
-            Se connecter
+            {isLoading ? "Connexion..." : "Se connecter"}
           </button>
         </form>
 
