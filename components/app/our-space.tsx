@@ -104,7 +104,7 @@ export function OurSpace() {
         >
           <CoupleCard
             couple={couple}
-            profile={profile}
+            profile={profile ?? undefined}
             history={history}
             locale={locale}
             t={t}
