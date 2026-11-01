@@ -26,6 +26,7 @@ type ProfileData = {
   phone?: string | null;
   image?: string | null;
   isAnonymous?: boolean;
+  mood?: "joyeux" | "curieux" | "calme" | "fatigué" | "romantique" | null;
 };
 
 type HistoryData = {
