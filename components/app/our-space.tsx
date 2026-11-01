@@ -106,8 +106,6 @@ export function OurSpace() {
             couple={couple}
             profile={profile ?? undefined}
             history={history}
-            locale={locale}
-            t={t}
           />
         </motion.div>
       ) : (
