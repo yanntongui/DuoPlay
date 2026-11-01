@@ -1,6 +1,5 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
-import { authTables } from "@convex-dev/auth/server";
 
 /**
  * DuoPlay — modèle de données (cf. docs/PRD.md §10)
@@ -66,8 +65,6 @@ export const sessionStatus = v.union(
 );
 
 export default defineSchema({
-  ...authTables,
-
   /* ---------------------------------------------------------------- */
   /* Comptes & couples                                                 */
   /* ---------------------------------------------------------------- */
