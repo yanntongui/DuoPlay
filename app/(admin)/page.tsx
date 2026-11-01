@@ -1,24 +1,39 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useQuery, useMutation } from "convex/react";
+import { api } from "../../../convex/_generated/api";
 
 export default function Dashboard() {
-  const [stats, setStats] = useState({
-    usersTotal: 12453,
-    usersToday: 234,
-    usersLast7Days: 1876,
-    usersLast30Days: 7234,
-    couplesCreated: 4567,
-    sessionsStarted: 8934,
-    sessionsCompleted: 6721,
-    subscriptionsActive: 1234,
-    revenueToday: 1567.89,
-    revenueMonth: 45678.90,
-    revenueYear: 456789.12,
-    ticketsOpen: 23,
-    reportsPending: 5,
-    errorsToday: 12,
-  });
+  const stats = useQuery(api.admin.getStats);
+  const [recentActivity, setRecentActivity] = useState<Array<{
+    action: string;
+    time: string;
+    type: "success" | "warning" | "error";
+  }>>([]);
+
+  const auditLogs = useQuery(api.admin.getAuditLogs, { limit: 5 });
+
+  useEffect(() => {
+    if (auditLogs) {
+      const activities = auditLogs.logs.slice(0, 5).map((log) => {
+        const time = new Date(log.createdAt).toLocaleTimeString("fr-FR", {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        let type: "success" | "warning" | "error" = "success";
+        if (log.action.includes("suspend") || log.action.includes("delete")) {
+          type = "error";
+        } else if (log.action.includes("publish")) {
+          type = "success";
+        } else if (log.action.includes("export")) {
+          type = "warning";
+        }
+        return { action: log.action, time, type };
+      });
+      setRecentActivity(activities);
+    }
+  }, [auditLogs]);
 
   return (
     <div className="space-y-6">
@@ -32,25 +47,25 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <KPICard
           title="Utilisateurs totaux"
-          value={stats.usersTotal.toLocaleString()}
+          value={stats?.usersTotal?.toLocaleString() ?? "0"}
           change="+12%"
           trend="up"
         />
         <KPICard
-          title="Utilisateurs actifs (7j)"
-          value={stats.usersLast7Days.toLocaleString()}
+          title="Couples créés"
+          value={stats?.couplesTotal?.toLocaleString() ?? "0"}
           change="+8%"
           trend="up"
         />
         <KPICard
-          title="Sessions complétées"
-          value={stats.sessionsCompleted.toLocaleString()}
+          title="Sessions totales"
+          value={stats?.sessionsTotal?.toLocaleString() ?? "0"}
           change="+15%"
           trend="up"
         />
         <KPICard
           title="Abonnements actifs"
-          value={stats.subscriptionsActive.toLocaleString()}
+          value="1,234"
           change="+5%"
           trend="up"
         />
@@ -63,21 +78,15 @@ export default function Dashboard() {
           <div className="mt-4 space-y-3">
             <div className="flex justify-between">
               <span className="text-slate-600">Aujourd&apos;hui</span>
-              <span className="font-medium text-slate-900">
-                {stats.revenueToday.toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}
-              </span>
+              <span className="font-medium text-slate-900">€1,567.89</span>
             </div>
             <div className="flex justify-between">
               <span className="text-slate-600">Ce mois</span>
-              <span className="font-medium text-slate-900">
-                {stats.revenueMonth.toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}
-              </span>
+              <span className="font-medium text-slate-900">€45,678.90</span>
             </div>
             <div className="flex justify-between">
               <span className="text-slate-600">Cette année</span>
-              <span className="font-medium text-slate-900">
-                {stats.revenueYear.toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}
-              </span>
+              <span className="font-medium text-slate-900">€456,789.12</span>
             </div>
           </div>
         </div>
@@ -87,21 +96,15 @@ export default function Dashboard() {
           <div className="mt-4 space-y-3">
             <div className="flex justify-between">
               <span className="text-slate-600">Tickets ouverts</span>
-              <span className="rounded-full bg-yellow-100 px-3 py-1 text-sm font-medium text-yellow-800">
-                {stats.ticketsOpen}
-              </span>
+              <span className="rounded-full bg-yellow-100 px-3 py-1 text-sm font-medium text-yellow-800">23</span>
             </div>
             <div className="flex justify-between">
               <span className="text-slate-600">Signalements en attente</span>
-              <span className="rounded-full bg-red-100 px-3 py-1 text-sm font-medium text-red-800">
-                {stats.reportsPending}
-              </span>
+              <span className="rounded-full bg-red-100 px-3 py-1 text-sm font-medium text-red-800">5</span>
             </div>
             <div className="flex justify-between">
               <span className="text-slate-600">Erreurs aujourd&apos;hui</span>
-              <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-800">
-                {stats.errorsToday}
-              </span>
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-800">12</span>
             </div>
           </div>
         </div>
@@ -111,26 +114,9 @@ export default function Dashboard() {
       <div className="rounded-xl border border-slate-200 bg-white p-6">
         <h3 className="text-lg font-semibold text-slate-900">Activité récente</h3>
         <div className="mt-4 space-y-3">
-          <ActivityItem
-            action="Nouveau couple créé"
-            time="Il y a 2 minutes"
-            type="success"
-          />
-          <ActivityItem
-            action="Abonnement premium souscrit"
-            time="Il y a 5 minutes"
-            type="success"
-          />
-          <ActivityItem
-            action="Ticket support créé"
-            time="Il y a 12 minutes"
-            type="warning"
-          />
-          <ActivityItem
-            action="Signalement reçu"
-            time="Il y a 23 minutes"
-            type="error"
-          />
+          {recentActivity.map((item, index) => (
+            <ActivityItem key={index} action={item.action} time={item.time} type={item.type} />
+          ))}
         </div>
       </div>
     </div>

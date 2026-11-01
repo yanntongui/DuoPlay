@@ -77,6 +77,7 @@ export default defineSchema({
     displayName: v.string(),
     role: v.union(v.literal("member"), v.literal("admin")),
     plan: v.union(v.literal("free"), v.literal("premium")),
+    status: v.union(v.literal("active"), v.literal("suspended"), v.literal("deleted")),
     mood: v.optional(v.union(v.literal("joyeux"), v.literal("curieux"), v.literal("calme"), v.literal("fatigué"), v.literal("romantique"))),
     moodUpdatedAt: v.optional(v.number()),
     analyticsConsent: v.optional(v.boolean()),
@@ -567,4 +568,20 @@ export default defineSchema({
   })
     .index("by_name", ["name"])
     .index("by_session", ["sessionId"]),
+
+  /* ---------------------------------------------------------------- */
+  /* Audit Logs pour la console d'administration                      */
+  /* ---------------------------------------------------------------- */
+
+  auditLogs: defineTable({
+    action: v.string(),
+    target: v.optional(v.any()),
+    adminId: v.optional(v.string()),
+    reason: v.optional(v.string()),
+    metadata: v.optional(v.any()),
+    createdAt: v.number(),
+  })
+    .index("by_action", ["action"])
+    .index("by_admin", ["adminId"])
+    .index("by_createdAt", ["createdAt"]),
 });

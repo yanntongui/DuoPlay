@@ -1,79 +1,52 @@
 "use client";
 
 import { useState } from "react";
+import { useQuery, useMutation } from "convex/react";
+import { api } from "../../../convex/_generated/api";
+import { id } from "../../../convex/_generated/dataModel";
 
 export default function UsersPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [subscriptionFilter, setSubscriptionFilter] = useState("");
-  const [users] = useState([
-    {
-      id: "usr_001",
-      email: "marie.dupont@example.com",
-      displayName: "Marie",
-      status: "active",
-      subscription: "premium",
-      createdAt: "2026-10-15",
-      lastActivity: "2026-10-30",
-      country: "FR",
-      couples: 1,
-    },
-    {
-      id: "usr_002",
-      email: "jean.leroy@example.com",
-      displayName: "Jean",
-      status: "active",
-      subscription: "free",
-      createdAt: "2026-10-20",
-      lastActivity: "2026-10-31",
-      country: "FR",
-      couples: 1,
-    },
-    {
-      id: "usr_003",
-      email: "sophie.martin@example.com",
-      displayName: "Sophie",
-      status: "suspended",
-      subscription: "premium",
-      createdAt: "2026-09-10",
-      lastActivity: "2026-10-25",
-      country: "CA",
-      couples: 1,
-    },
-    {
-      id: "usr_004",
-      email: "pierre.bernard@example.com",
-      displayName: "Pierre",
-      status: "active",
-      subscription: "annual",
-      createdAt: "2026-08-05",
-      lastActivity: "2026-10-31",
-      country: "FR",
-      couples: 1,
-    },
-    {
-      id: "usr_005",
-      email: "claire.romain@example.com",
-      displayName: "Claire",
-      status: "active",
-      subscription: "free",
-      createdAt: "2026-10-28",
-      lastActivity: "2026-10-29",
-      country: "BE",
-      couples: 0,
-    },
-  ]);
+  
+  const usersQuery = useQuery(api.admin.listUsers);
+  const users = usersQuery?.users ?? [];
+  const nextPage = usersQuery?.nextPage;
+  const loadMore = useMutation(api.admin.listUsers); // This would be a proper fetch
+
+  const suspendUser = useMutation(api.admin.suspendUser);
+  const activateUser = useMutation(api.admin.activateUser);
+
+  const [suspendTarget, setSuspendTarget] = useState<string | null>(null);
+  const [suspendReason, setSuspendReason] = useState("");
 
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
-      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.displayName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.id.toLowerCase().includes(searchTerm.toLowerCase());
+      user.userId.toString().includes(searchTerm.toLowerCase());
     const matchesStatus = !statusFilter || user.status === statusFilter;
-    const matchesSubscription =
-      !subscriptionFilter || user.subscription === subscriptionFilter;
+    const matchesSubscription = !subscriptionFilter || user.plan === subscriptionFilter;
     return matchesSearch && matchesStatus && matchesSubscription;
   });
+
+  const handleSuspend = async (userId: string) => {
+    if (!suspendReason) {
+      alert("Veuillez fournir une raison pour la suspension");
+      return;
+    }
+    try {
+      await suspendUser({
+        userId: id(userId),
+        reason: suspendReason,
+        adminId: "admin_001",
+      });
+      setSuspendTarget(null);
+      setSuspendReason("");
+    } catch (error) {
+      alert("Erreur lors de la suspension");
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -93,7 +66,7 @@ export default function UsersPage() {
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Email, nom, ID..."
+              placeholder="Nom, ID..."
               className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
             />
           </div>
@@ -124,7 +97,6 @@ export default function UsersPage() {
               <option value="">Tous</option>
               <option value="free">Gratuit</option>
               <option value="premium">Premium</option>
-              <option value="annual">Annuel</option>
             </select>
           </div>
           <div className="flex items-end">
@@ -151,10 +123,7 @@ export default function UsersPage() {
                   Abonnement
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-slate-600">
-                  Pays
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-600">
-                  Inscription
+                  Inscrit
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-slate-600">
                   Dernière activité
@@ -166,12 +135,11 @@ export default function UsersPage() {
             </thead>
             <tbody>
               {filteredUsers.map((user) => (
-                <tr key={user.id} className="border-b border-slate-100">
+                <tr key={user._id.toString()} className="border-b border-slate-100">
                   <td className="px-4 py-3">
                     <div>
                       <p className="font-medium text-slate-900">{user.displayName}</p>
-                      <p className="text-sm text-slate-500">{user.email}</p>
-                      <p className="text-xs text-slate-400">{user.id}</p>
+                      <p className="text-xs text-slate-400">{user.userId.toString()}</p>
                     </div>
                   </td>
                   <td className="px-4 py-3">
@@ -188,26 +156,41 @@ export default function UsersPage() {
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    <span className="text-sm text-slate-900">{user.subscription}</span>
+                    <span className="text-sm text-slate-900 capitalize">{user.plan}</span>
                   </td>
                   <td className="px-4 py-3">
-                    <span className="text-sm text-slate-900">{user.country}</span>
+                    <span className="text-sm text-slate-900">
+                      {new Date(user.createdAt).toLocaleDateString("fr-FR")}
+                    </span>
                   </td>
                   <td className="px-4 py-3">
-                    <span className="text-sm text-slate-900">{user.createdAt}</span>
+                    <span className="text-sm text-slate-900">
+                      {new Date(user.lastActiveAt).toLocaleDateString("fr-FR")}
+                    </span>
                   </td>
                   <td className="px-4 py-3">
-                    <span className="text-sm text-slate-900">{user.lastActivity}</span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex gap-2">
-                      <button className="rounded bg-slate-100 px-3 py-1 text-sm text-slate-700 hover:bg-slate-200">
-                        Voir
-                      </button>
-                      <button className="rounded bg-yellow-100 px-3 py-1 text-sm text-yellow-800 hover:bg-yellow-200">
+                    {user.status === "active" ? (
+                      <button
+                        onClick={() => setSuspendTarget(user._id.toString())}
+                        className="rounded bg-red-100 px-3 py-1 text-sm text-red-800 hover:bg-red-200"
+                      >
                         Suspendre
                       </button>
-                    </div>
+                    ) : user.status === "suspended" ? (
+                      <button
+                        onClick={async () => {
+                          await activateUser({
+                            userId: user._id,
+                            adminId: "admin_001",
+                          });
+                        }}
+                        className="rounded bg-green-100 px-3 py-1 text-sm text-green-800 hover:bg-green-200"
+                      >
+                        Réactiver
+                      </button>
+                    ) : (
+                      <span className="text-sm text-slate-500">-</span>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -215,6 +198,44 @@ export default function UsersPage() {
           </table>
         </div>
       </div>
+
+      {/* Suspension Modal */}
+      {suspendTarget && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md mx-4">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4">
+              Suspension du compte
+            </h3>
+            <p className="text-sm text-slate-600 mb-4">
+              Veuillez fournir une raison obligatoire pour cette action :
+            </p>
+            <textarea
+              value={suspendReason}
+              onChange={(e) => setSuspendReason(e.target.value)}
+              placeholder="Raison de la suspension..."
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm mb-4"
+              rows={3}
+            />
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => {
+                  setSuspendTarget(null);
+                  setSuspendReason("");
+                }}
+                className="rounded bg-slate-100 px-4 py-2 text-sm text-slate-700 hover:bg-slate-200"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={() => handleSuspend(suspendTarget)}
+                className="rounded bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700"
+              >
+                Confirmer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

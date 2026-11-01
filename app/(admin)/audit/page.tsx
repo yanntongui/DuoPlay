@@ -1,57 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useQuery } from "convex/react";
+import { api } from "../../../convex/_generated/api";
 
 export default function AuditPage() {
-  const [logs] = useState([
-    {
-      id: "log_001",
-      timestamp: "2026-10-31T14:23:45Z",
-      admin: "admin@duoplay.com",
-      role: "super_admin",
-      action: "user_suspended",
-      target: "usr_003",
-      ip: "192.168.1.100",
-      reason: "Violation des CGU",
-    },
-    {
-      id: "log_002",
-      timestamp: "2026-10-31T13:45:22Z",
-      admin: "support@duoplay.com",
-      role: "support",
-      action: "ticket_resolved",
-      target: "tkt_045",
-      ip: "192.168.1.101",
-      reason: "",
-    },
-    {
-      id: "log_003",
-      timestamp: "2026-10-31T12:30:11Z",
-      admin: "admin@duoplay.com",
-      role: "super_admin",
-      action: "export_users",
-      target: "all_users",
-      ip: "192.168.1.100",
-      reason: "Audit trimestriel",
-    },
-    {
-      id: "log_004",
-      timestamp: "2026-10-31T11:15:33Z",
-      admin: "content@duoplay.com",
-      role: "content",
-      action: "experience_published",
-      target: "exp_004",
-      ip: "192.168.1.102",
-      reason: "",
-    },
-  ]);
+  const auditLogs = useQuery(api.admin.getAuditLogs, { limit: 20 });
+  const logs = auditLogs?.logs ?? [];
 
   const actions = {
     user_suspended: "bg-red-100 text-red-800",
+    user_activated: "bg-green-100 text-green-800",
     user_deleted: "bg-red-100 text-red-800",
     export_users: "bg-yellow-100 text-yellow-800",
     ticket_resolved: "bg-green-100 text-green-800",
     experience_published: "bg-indigo-100 text-indigo-800",
+    experience_archived: "bg-slate-100 text-slate-800",
     permission_changed: "bg-orange-100 text-orange-800",
   };
 
@@ -72,8 +35,8 @@ export default function AuditPage() {
             <select className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
               <option>Toutes</option>
               <option>user_suspended</option>
-              <option>export_users</option>
-              <option>permission_changed</option>
+              <option>user_activated</option>
+              <option>experience_published</option>
             </select>
           </div>
           <div>
@@ -114,16 +77,10 @@ export default function AuditPage() {
                   Admin
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-slate-600">
-                  Rôle
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-600">
                   Action
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-slate-600">
                   Cible
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-600">
-                  IP
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-slate-600">
                   Justification
@@ -132,12 +89,11 @@ export default function AuditPage() {
             </thead>
             <tbody>
               {logs.map((log) => (
-                <tr key={log.id} className="border-b border-slate-100">
+                <tr key={log._id.toString()} className="border-b border-slate-100">
                   <td className="px-4 py-3 text-sm text-slate-900">
-                    {new Date(log.timestamp).toLocaleString()}
+                    {new Date(log.createdAt).toLocaleString("fr-FR")}
                   </td>
-                  <td className="px-4 py-3 text-sm text-slate-900">{log.admin}</td>
-                  <td className="px-4 py-3 text-sm text-slate-900">{log.role}</td>
+                  <td className="px-4 py-3 text-sm text-slate-900">{log.adminId || "-"}</td>
                   <td className="px-4 py-3">
                     <span
                       className={`rounded-full px-2 py-1 text-xs font-medium ${
@@ -148,9 +104,12 @@ export default function AuditPage() {
                       {log.action}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm text-slate-900">{log.target}</td>
-                  <td className="px-4 py-3 text-sm text-slate-900">{log.ip}</td>
-                  <td className="px-4 py-3 text-sm text-slate-900">{log.reason || "-"}</td>
+                  <td className="px-4 py-3 text-sm text-slate-900">
+                    {typeof log.target === "string" ? log.target : "-"}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-slate-900">
+                    {log.reason || "-"}
+                  </td>
                 </tr>
               ))}
             </tbody>

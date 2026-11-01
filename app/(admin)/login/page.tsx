@@ -19,7 +19,7 @@ export default function AdminLogin() {
       // Simuler l'authentification admin
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Dans une vraie implémentation, appeler l'API d'authentification
+      // Dans une vraie implémentation, appeler Convex Auth
       const validAdmins = {
         "admin@duoplay.com": "password123",
         "support@duoplay.com": "password123",
