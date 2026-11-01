@@ -55,7 +55,7 @@ export function CoupleCard({
   const streakBest = couple.streakBest ?? 0;
 
   const moodHandler = () => {
-    const moods = ["joyeux", "curieux", "calme", "fatigué", "romantique"];
+    const moods = ["joyeux", "curieux", "calme", "fatigué", "romantique"] as const;
     const next = moods[Math.floor(Math.random() * moods.length)];
     if (profile) updateMood({ userId: profile._id, mood: next });
     updateSharedMood({ coupleId: couple.id, mood: next });
