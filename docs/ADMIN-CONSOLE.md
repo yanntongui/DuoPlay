@@ -1,243 +1,385 @@
-# Console d'Administration DuoPlay
+# Console d'administration DuoPlay
 
-## Architecture
+## 1. Architecture Fonctionnelle
 
-### Structure
+### Modules Principaux
+
+| Module | Description | Priorité |
+|--------|-------------|----------|
+| Authentification | Login, 2FA, sessions | P0 |
+| Dashboard | Tableau de bord global | P0 |
+| Utilisateurs | Gestion des comptes | P0 |
+| Couples | Gestion des relations | P0 |
+| Contenu | CMS expériences/jeux | P0 |
+| Paiements | Transactions et abonnements | P0 |
+| Support | Tickets clients | P1 |
+| Modération | Signalements | P1 |
+| Analytics | Statistiques agrégées | P1 |
+| RGPD | Confidentialité | P1 |
+| Audit | Journal d'actions | P1 |
+| Paramètres | Configuration plateforme | P2 |
+| Feature Flags | Déploiement progressif | P2 |
+| Tests A/B | Expérimentation | P2 |
+| Monitoring | Santé technique | P2 |
+
+### Stack Technique
+
+- **Frontend**: Next.js 15 + TailwindCSS + React Server Components
+- **Backend**: Convex (fonctions serverless)
+- **Auth**: Cookies HTTP-only + 2FA TOTP
+- **Base de données**: PostgreSQL (Convex)
+- **Sécurité**: RBAC, audit logging, encryption
+
+## 2. Structure de Navigation
 
 ```
-app/(admin)/
-├── layout.tsx          # Layout principal avec sidebar
-├── page.tsx            # Dashboard avec KPIs
-├── login/
-│   └── page.tsx        # Page de connexion
-├── users/
-│   └── page.tsx        # Gestion utilisateurs
-├── couples/
-│   └── page.tsx        # Gestion couples
-├── experiences/
-│   └── page.tsx        # Gestion contenus
-├── revenue/
-│   └── page.tsx        # Statistiques financières
-├── audit/
-│   └── page.tsx        # Journal d'audit
-├── analytics/
-│   └── page.tsx        # Analytics produit
-├── settings/
-│   └── page.tsx        # Paramètres
-├── support/
-│   └── page.tsx        # Support tickets
-└── moderation/
-    └── page.tsx        # Modération
+/admin (Dashboard)
+├── /users (Utilisateurs)
+│   ├── /users/[id] (Détail utilisateur)
+├── /couples (Couples)
+│   ├── /couples/[id] (Détail couple)
+├── /experiences (Expériences)
+│   ├── /experiences/create (Créer)
+│   ├── /experiences/[id] (Éditer)
+├── /cards (Cartes)
+├── /dice (Dés)
+├── /journeys (Parcours)
+├── /finance (Finance)
+│   ├── /finance/payments (Paiements)
+│   ├── /finance/subscriptions (Abonnements)
+│   ├── /finance/refunds (Remboursements)
+│   ├── /finance/revenue (Revenus)
+├── /support (Support)
+│   ├── /support/tickets (Tickets)
+├── /moderation (Modération)
+├── /analytics (Analytics)
+│   ├── /analytics/overview (Vue globale)
+│   ├── /analytics/conversion (Conversion)
+│   └── /analytics/retention (Rétention)
+├── /segments (Segments)
+├── /campaigns (Campagnes)
+├── /ab-tests (Tests A/B)
+├── /flags (Feature Flags)
+├── /gdpr (RGPD)
+├── /audit (Audit)
+├── /security (Sécurité)
+├── /monitoring (Monitoring)
+├── /incidents (Incidents)
+├── /settings (Paramètres)
+│   ├── /settings/roles (Rôles)
+│   ├── /settings/i18n (Internationalisation)
+│   └── /settings/platform (Plateforme)
+└── /reports (Rapports)
 ```
 
-## Backend Convex
+## 3. Matrice des Rôles et Permissions
 
-### Fonctions implémentées (`convex/admin.ts`)
+### Rôles
 
-#### Utilisateurs
-- `listUsers` : Liste paginée des utilisateurs
-- `getUserById` : Récupération détaillée
-- `suspendUser` : Suspension avec raison obligatoire
-- `activateUser` : Réactivation de compte
-
-#### Contenu
-- `listExperiences` : Liste paginée des expériences
-- `publishExperience` : Publication avec audit
-- `archiveExperience` : Archivage avec audit
-
-#### Audit
-- `getAuditLogs` : Historique immuable des actions admin
-- `getStats` : Métriques pour le dashboard
-
-### Schéma
-
-```typescript
-// Table auditLogs
-auditLogs: defineTable({
-  action: v.string(),
-  target: v.optional(v.any()),
-  adminId: v.optional(v.string()),
-  reason: v.optional(v.string()),
-  metadata: v.optional(v.any()),
-  createdAt: v.number(),
-})
-  .index("by_action", ["action"])
-  .index("by_admin", ["adminId"])
-  .index("by_createdAt", ["createdAt"]),
-
-// Champ status ajouté à profiles
-profiles: defineTable({
-  status: v.union(v.literal("active"), v.literal("suspended"), v.literal("deleted")),
-  // ...
-})
-```
-
-## Fonctionnalités
-
-### 1. Authentification
-- Email + mot de passe (credentials de démo : `admin@duoplay.com` / `password123`)
-- 2FA (à implémenter avec Convex Auth)
-- Journalisation des connexions
-- Sessions sécurisées
-
-### 2. Dashboard
-- KPIs en temps réel (utilisateurs, couples, sessions)
-- Revenus (jour, mois, année)
-- Support & Modération (tickets, signalements)
-- Activité récente depuis l'audit
-
-### 3. Gestion Utilisateurs
-- Recherche (nom, ID)
-- Filtres (statut, abonnement)
-- Suspension avec confirmation et raison obligatoire
-- Réactivation
-- Journalisation dans auditLogs
-
-### 4. Gestion Couples
-- Vue des relations utilisateurs
-- Statuts (actif, pending, dissous)
-- Recherche et filtrage
-- Confidentialité maintenue (pas de données sensibles)
-
-### 5. Gestion Contenus (CMS)
-- Liste paginée des expériences
-- Statuts (brouillon, publié, archivé)
-- Workflow de publication avec double validation
-- Archivage avec audit
-
-### 6. Statistiques Financières
-- Revenus bruts et nets
-- Abonnements actifs
-- Répartition par type
-- Remboursements (double validation > €50)
-
-### 7. Support Tickets
-- Gestion des tickets
-- Catégories (compte, paiement, invitation...)
-- Priorités (low, medium, high)
-- Statuts (open, in_progress, resolved)
-- Satisfaction rate
-
-### 8. Modération
-- File d'attente de signalements
-- Gravité (low, medium, high)
-- Types (content, user)
-- Double validation pour cas graves
-
-### 9. Analytics
-- Entonnoir d'activation
-- Rétention (jour 1, 7, 30)
-- Fonctionnalités les plus utilisées
-- Données anonymisées et agrégées
-
-### 10. Paramètres
-- Configuration plateforme
-- Langues supportées
-- Fuseaux horaires
-- Pays disponibles
-- Mode maintenance
-
-## Sécurité
-
-### Système RBAC avec Convex Auth
-
-La console utilise Convex Auth pour l'authentification et les autorisations.
-
-**Table `adminAccess`**
-
-```typescript
-adminAccess: defineTable({
-  userId: v.id("users"),
-  role: v.union(
-    v.literal("super_admin"),
-    v.literal("admin_produit"),
-    v.literal("admin_support"),
-    v.literal("admin_finance"),
-    v.literal("admin_moderateur"),
-    v.literal("admin_analyste"),
-  ),
-  permissions: v.array(v.string()),
-  canViewSensitive: v.boolean(),
-  twoFactorEnabled: v.boolean(),
-  lastLoginAt: v.optional(v.number()),
-  createdAt: v.number(),
-})
-```
-
-**Permissions par Rôle**
-
-| Rôle | Permissions |
+| Rôle | Description |
 |------|-------------|
-| `super_admin` | `"*"` (tout) |
-| `admin_produit` | `content.*`, `experience.*` |
-| `admin_support` | `user.read`, `user.activate`, `ticket.*` |
-| `admin_finance` | `revenue.*`, `subscription.*` |
-| `admin_moderateur` | `moderation.*`, `report.*` |
-| `admin_analyste` | `dashboard.read`, `analytics.*`, `audit.read` |
+| super_admin | Accès complet |
+| product_admin | Gestion produits/contenus |
+| support_lead | Gestion support |
+| content_admin | Création/modification contenus |
+| moderator | Modération |
+| finance_admin | Gestion financière |
+| analyst | Analytics uniquement |
+| marketing_admin | Campagnes/notifications |
+| tech_admin | Technique/monitoring |
+| auditor | Lecture seule |
 
-**Fonctions d'Authentification**
+### Permissions
 
-- `login` : Authentification email/mot de passe
-- `adminMe` : Profil admin actuel
-- `verifyAdmin` : Vérification avec permissions requises
+| Module | Consulter | Créer | Modifier | Publier | Supprimer | Exporter |
+|--------|-----------|-------|----------|---------|-----------|----------|
+| Users | ✓ (super, support, tech) | | | | ✓ (super) | ✓ (super, analyst) |
+| Couples | ✓ (super, support) | | | | ✓ (super) | |
+| Content | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Finance | ✓ (super, finance) | | | | | ✓ |
+| Support | ✓ | ✓ | ✓ | | | |
+| Moderation | ✓ | ✓ | ✓ | ✓ | | |
+| Analytics | ✓ (super, analyst, marketing) | | | | | |
+| Flags | ✓ (super, product, tech) | ✓ | ✓ | ✓ | ✓ | |
+| Audit | ✓ (super, auditor) | | | | | ✓ (super) |
 
-### Protection des données sensibles
+### Actions critiques nécessitant double validation
+- Suppression de compte utilisateur
+- Remboursement > 100€
+- Modification de permissions admin
+- Export de données sensibles
+- Désactivation feature critique
 
-- Les réponses intimes sont chiffrées
-- Aucune exposition par défaut
-- Accès uniquement avec consentement légal
-- Journalisation de tous les accès
+## 4. Modèle de Données
 
-### Audit
+```typescript
+// Admins
+profile {
+  id: string
+  email: string (hashed)
+  passwordHash: string
+  role: string
+  permissions: string[]
+  totpSecret?: string
+  is2faEnabled: boolean
+  createdAt: Date
+  lastLogin: Date
+  status: 'active' | 'suspended' | 'deleted'
+}
 
-- Historique immuable de toutes les actions
-- Actions critiques alertées
-- Justification obligatoire pour les actions sensibles
-- Conformité légale
+adminSessions {
+  id: string
+  adminId: string
+  token: string (hashed)
+  createdAt: Date
+  expiresAt: Date
+  userAgent: string
+  ipAddress: string
+}
 
-## Technologies
+adminAuditLogs {
+  id: string
+  adminId: string
+  action: string
+  module: string
+  targetId?: string
+  oldData?: any
+  newData?: any
+  reason?: string
+  timestamp: Date
+  ipAddress: string
+  requiresApproval: boolean
+  approvedBy?: string
+}
 
-- Next.js 15
-- Tailwind CSS
-- TypeScript
-- React Server Components
-- Convex (backend temps réel)
+// Users
+users {
+  id: string
+  email: string (hashed)
+  passwordHash: string
+  createdAt: Date
+  lastActive: Date
+  subscriptionTier: 'free' | 'premium' | 'annual'
+  country: string
+  status: 'active' | 'suspended' | 'deleted'
+}
 
-## Accès
+couplings {
+  id: string
+  userId1: string
+  userId2: string
+  status: 'pending' | 'active' | 'archived'
+  createdAt: Date
+  subscriptionTier: string
+}
 
-URL: `/admin`
+// Content
+experiences {
+  id: string
+  title: Record<string, string>
+  description: Record<string, string>
+  category: string
+  intensity: 'light' | 'medium' | 'passionate'
+  duration: number
+  status: 'draft' | 'review' | 'approved' | 'scheduled' | 'published'
+  createdAt: Date
+  updatedAt: Date
+  publishedAt?: Date
+}
 
-### Compte démo
+// Transactions
+transactions {
+  id: string
+  userId: string
+  amount: number
+  currency: string
+  type: 'subscription' | 'purchase' | 'refund'
+  status: 'pending' | 'completed' | 'failed'
+  createdAt: Date
+}
 
-- Email: `admin@duoplay.com`
-- Mot de passe: `password123`
-
-## Variables d'environnement
-
-```env
-NEXT_PUBLIC_CONVEX_URL=https://adventurous-salmon-154.convex.cloud
+// Moderation
+moderation {
+  id: string
+  reporterId: string
+  reportedUserId: string
+  type: string
+  status: 'pending' | 'reviewed' | 'resolved'
+  createdAt: Date
+  resolvedAt?: Date
+}
 ```
 
-## Modules à implémenter
+## 5. Plan de Sécurité
 
-- [ ] **Finance** : paiements, remboursements, factures, exports comptables
-- [ ] **Offres** : gestion des plans et promotions
-- [ ] **Feature flags** : déploiement progressif
-- [ ] **A/B Tests** : expérimentation
-- [ ] **Internationalisation** : traductions
-- [ ] **Notifications** : campagnes push/email
-- [ ] **Conformité RGPD** : demandes d'accès/suppression
-- [ ] **Monitoring** : santé de la plateforme
-- [ ] **Incidents** : gestion des incidents
-- [ ] **Rôles et permissions** : RBAC complet
-- [ ] **2FA** : authentification à deux facteurs
+### Authentification
+- Login avec email + mot de passe (bcrypt)
+- 2FA TOTP obligatoire
+- Sessions expirent après 24h
+- Cookies HTTP-only + SameSite=strict
+- Rate limiting: 5 tentatives / 15min
 
-## Next Steps
+### Permissions
+- Vérification côté serveur pour chaque action
+- RBAC avec permissions granulaires
+- Audit de toutes les actions
+- Double validation pour actions critiques
 
-1. Activer Convex Auth pour l'authentification admin
-2. Implémenter RBAC complet avec rôles
-3. Ajouter 2FA pour tous les admins
-4. Connecter aux APIs de paiement réelles
-5. Implémenter exports CSV/Excel
-6. Ajouter webhooks pour notifications
-7. Configurer backups et DR
+### Confidentialité
+- Données sensibles chiffrées
+- Pas d'accès direct aux réponses intimes
+- Anonymisation des données après 24 mois
+- Conformité RGPD
+
+### Monitoring
+- Détection d'accès inhabituels
+- Alertes sur actions sensibles
+- Logs immuables
+
+## 6. Tableau de bord
+
+### KPIs Principaux
+
+| Indicateur | Valeur | Période |
+|------------|--------|---------|
+| Utilisateurs actifs jour | 5,234 | vs hier |
+| Utilisateurs actifs 7j | 28,456 | vs semaine précédente |
+| Nouveaux couples | 423 | vs hier |
+| Abonnements premium | 12,340 | vs hier |
+| Revenus jour | 2,345 € | vs hier |
+| Revenus mois | 45,678 € | vs mois précédent |
+| Tickets support ouverts | 23 | vs hier |
+| Signalements en attente | 12 | vs hier |
+| Taux d'erreur | 0.02% | |
+| Disponibilité | 99.99% | |
+
+### Widgets disponibles
+- Graphique d'inscription
+- Graphique de rétention
+- Top catégories d'expériences
+- Répartition par pays
+- Alertes critiques
+
+## 7. Module Utilisateurs
+
+### Fonctionnalités
+- Recherche par email, ID, pseudo
+- Filtres: statut, abonnement, pays, date
+- Vue profil (données non sensibles)
+- Actions: suspendre, réactiver, exporter, anonymiser
+- Journal d'actions
+
+### Interface
+```
++------------------------------------------+
+| Utilisateurs                         [+] |
++------------------------------------------+
+| Recherche: [___________] Filtrer ∨ |
++------------------------------------------+
+| ID | Email | Statut | Abonnement | Actions |
++------------------------------------------+
+| u123 | user@... | ✓ Actif | Premium | ••• |
+| u456 | other@... | ⚠ Suspens | Free | ••• |
++------------------------------------------+
+```
+
+## 8. Module Contenus
+
+### Workflow de publication
+1. Création (brouillon)
+2. Révision
+3. Approbation
+4. Programmation
+5. Publication
+
+### Interface éditeur
+```
++------------------------------------------+
+| Éditeur d'expérience                 [+]|
++------------------------------------------+
+| Titre: [___________________] |
+| Catégorie: [Dropdown] |
+| Intensité: ○ Light ○ Medium ● Passionant |
+| Durée: [___] minutes |
+| Description (FR): |
+| [Text area] |
+| Description (EN): |
+| [Text area] |
+| |
+| Statut: [Brouillon] |
+| [Enregistrer] [Soumettre à révision] |
++------------------------------------------+
+```
+
+## 9. Module Paiements
+
+### Vue
+- Liste de transactions
+- Filtres: statut, type, période, pays
+- Détails: montant, devises, taxes
+- Actions: remboursement (double validation)
+
+## 10. Module Analytics
+
+### Métriques
+- Activation funnel
+- Rétention (D1, D7, D30)
+- Temps moyen par session
+- Top expériences utilisées
+
+### Graphiques
+- Courbe d'inscription
+- Courbe de rétention
+- Top catégories
+
+## 11. Module Audit
+
+### Logs
+- Admin qui a fait quoi
+- Quand, où, pourquoi
+- Ancienne/nouvelle valeur
+- Approbateur si nécessaire
+
+```
++------------------------------------------+
+| Journal d'audit                    🔍 |
++------------------------------------------+
+| Période: [De] [À] Utilisateur: [___] |
++------------------------------------------+
+| Date | Admin | Action | Module | Objet |
++------------------------------------------+
+| 01/11 10:23 | john@... | Suspendre | Users | u123 |
+| 01/11 09:45 | jane@... | Refund | Finance | tx456 |
++------------------------------------------+
+```
+
+---
+
+## 12. Plan de Construction
+
+### Phase 1: Foundations (P0)
+- [ ] Auth + 2FA
+- [ ] Layout + navigation
+- [ ] Dashboard
+- [ ] Users
+- [ ] Couples
+- [ ] Content (basic)
+
+### Phase 2: Core Modules (P1)
+- [ ] Payments
+- [ ] Support
+- [ ] Moderation
+- [ ] Analytics
+- [ ] Audit
+- [ ] RBAC
+
+### Phase 3: Advanced (P2)
+- [ ] Feature flags
+- [ ] A/B tests
+- [ ] Campaigns
+- [ ] Incidents
+- [ ] Settings
+- [ ] Exports
+
+
+<function=write>
