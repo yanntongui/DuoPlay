@@ -48,37 +48,48 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
     href === "/admin" ? pathname === "/admin" : pathname.startsWith(href);
 
   return (
-    <nav className="min-h-0 flex-1 overflow-y-auto px-3 pb-4">
-      {ADMIN_NAV.map((section) => (
-        <div key={section.label} className="mt-5 first:mt-2">
-          <p className="ad-nav-label px-3 pb-2">{section.label}</p>
-          <div className="space-y-0.5">
-            {section.items.map((item) => {
-              const Icon = item.icon;
-              const active = isActive(item.href);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  data-active={active}
-                  onClick={onNavigate}
-                  className="ad-nav-item"
-                >
-                  <Icon
-                    className="size-[17px] shrink-0"
-                    strokeWidth={active ? 2.1 : 1.7}
-                  />
-                  <span className="truncate">{item.label}</span>
-                  {typeof item.count === "number" && (
-                    <span className="ad-nav-count">{item.count}</span>
-                  )}
-                </Link>
-              );
-            })}
+    <div className="relative min-h-0 flex-1">
+      <nav className="h-full overflow-y-auto px-3 pb-6">
+        {ADMIN_NAV.map((section) => (
+          <div key={section.label} className="mt-5 first:mt-2">
+            <p className="ad-nav-label px-3 pb-2">{section.label}</p>
+            <div className="space-y-0.5">
+              {section.items.map((item) => {
+                const Icon = item.icon;
+                const active = isActive(item.href);
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    data-active={active}
+                    onClick={onNavigate}
+                    className="ad-nav-item"
+                  >
+                    <Icon
+                      className="size-[17px] shrink-0"
+                      strokeWidth={active ? 2.1 : 1.7}
+                    />
+                    <span className="truncate">{item.label}</span>
+                    {typeof item.count === "number" && (
+                      <span className="ad-nav-count">{item.count}</span>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
           </div>
-        </div>
-      ))}
-    </nav>
+        ))}
+      </nav>
+      {/* Dégradé de fin de liste : signale que la section « Système » continue
+          sous la ligne de flottaison. */}
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-9"
+        style={{
+          background:
+            "linear-gradient(to top, rgba(255,255,255,0.96), rgba(255,255,255,0))",
+        }}
+      />
+    </div>
   );
 }
 
