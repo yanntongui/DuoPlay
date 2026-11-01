@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { Logo } from "@/components/brand/logo";
+import { cookies } from "next/headers";
 
 export const metadata = { title: "Administration" };
 
@@ -9,6 +9,24 @@ export default async function AdminLoginPage({
   searchParams: Promise<{ error?: string }>;
 }) {
   const { error } = await searchParams;
+
+  async function login(formData: FormData) {
+    "use server";
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    // Pour la démo : accepte n'importe quel email/mot de passe
+    if (email && password) {
+      // Stocke le token dans un cookie
+      (await cookies()).set("admin_token", "demo_token", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 60 * 60 * 24, // 24h
+      });
+      redirect("/admin");
+    }
+  }
 
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center bg-gradient-to-br from-indigo-100 via-slate-100 to-indigo-100">
@@ -25,11 +43,7 @@ export default async function AdminLoginPage({
           </p>
         </div>
 
-        <form
-          action="/"
-          method="POST"
-          className="mt-8 space-y-6"
-        >
+        <form action={login} className="mt-8 space-y-6">
           {error && (
             <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700">
               Mot de passe incorrect

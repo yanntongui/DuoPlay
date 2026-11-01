@@ -1,125 +1,84 @@
-"use client";
+import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useAdminAuth } from "./hooks/use-admin-auth";
-
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { isAuthenticated, isLoading, logout } = useAdminAuth();
+  const token = (await cookies()).get("admin_token")?.value;
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      // L'hook gère la redirection, on ne fait rien ici
-    }
-  }, [isAuthenticated]);
-
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50">
-        <div className="flex flex-col items-center gap-4">
-          <div className="size-12 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent" />
-          <p className="text-sm text-slate-600">Chargement de la console...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return <>{children}</>;
-  }
-
-  return (
-    <LayoutContent children={children} onLogout={logout} />
-  );
-}
-
-function LayoutContent({
-  children,
-  onLogout,
-}: {
-  children: React.ReactNode;
-  onLogout: () => void;
-}) {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  if (!isClient) {
-    return <>{children}</>;
+  if (!token) {
+    redirect("/admin/login");
   }
 
   return (
     <div className="flex min-h-screen bg-slate-50">
       {/* Sidebar */}
-      <aside
-        className={`${
-          sidebarOpen ? "w-64" : "w-16"
-        } fixed left-0 top-0 z-30 h-screen border-r border-slate-200 bg-white transition-all duration-300`}
-      >
+      <aside className="w-64 fixed left-0 top-0 z-30 h-screen border-r border-slate-200 bg-white">
         <div className="flex h-full flex-col">
           {/* Logo */}
           <div className="flex items-center border-b border-slate-200 px-4 py-4">
             <div className="flex items-center gap-2">
               <div className="size-8 rounded-lg bg-indigo-600" />
-              {sidebarOpen && (
-                <div>
-                  <h1 className="text-sm font-bold text-slate-900">DuoPlay</h1>
-                  <p className="text-xs text-slate-500">Administration</p>
-                </div>
-              )}
+              <div>
+                <h1 className="text-sm font-bold text-slate-900">DuoPlay</h1>
+                <p className="text-xs text-slate-500">Administration</p>
+              </div>
             </div>
           </div>
 
           {/* Navigation */}
           <nav className="flex-1 overflow-y-auto px-2 py-4">
-            <NavItem href="/admin" icon="📊" label="Tableau de bord" open={sidebarOpen} />
-            <NavItem href="/admin/users" icon="👥" label="Utilisateurs" open={sidebarOpen} />
-            <NavItem href="/admin/couples" icon="💑" label="Couples" open={sidebarOpen} />
-            <NavItem href="/admin/experiences" icon="🎮" label="Expériences" open={sidebarOpen} />
-            <NavItem href="/admin/revenue" icon="💰" label="Revenus" open={sidebarOpen} />
-            <NavItem href="/admin/moderation" icon="🛡️" label="Modération" open={sidebarOpen} />
-            <NavItem href="/admin/support" icon="🎧" label="Support" open={sidebarOpen} />
-            <NavItem href="/admin/analytics" icon="📉" label="Analytics" open={sidebarOpen} />
-            <NavItem href="/admin/settings" icon="⚙️" label="Paramètres" open={sidebarOpen} />
-            <NavItem href="/admin/audit" icon="📋" label="Audit" open={sidebarOpen} />
+            <a href="/admin" className="flex items-center gap-3 rounded-lg px-2 py-2 text-sm text-slate-600 hover:bg-slate-100">
+              <span>📊</span>
+              <span>Tableau de bord</span>
+            </a>
+            <a href="/admin/users" className="flex items-center gap-3 rounded-lg px-2 py-2 text-sm text-slate-600 hover:bg-slate-100">
+              <span>👥</span>
+              <span>Utilisateurs</span>
+            </a>
+            <a href="/admin/couples" className="flex items-center gap-3 rounded-lg px-2 py-2 text-sm text-slate-600 hover:bg-slate-100">
+              <span>💑</span>
+              <span>Couples</span>
+            </a>
+            <a href="/admin/experiences" className="flex items-center gap-3 rounded-lg px-2 py-2 text-sm text-slate-600 hover:bg-slate-100">
+              <span>🎮</span>
+              <span>Expériences</span>
+            </a>
+            <a href="/admin/revenue" className="flex items-center gap-3 rounded-lg px-2 py-2 text-sm text-slate-600 hover:bg-slate-100">
+              <span>💰</span>
+              <span>Revenus</span>
+            </a>
+            <a href="/admin/moderation" className="flex items-center gap-3 rounded-lg px-2 py-2 text-sm text-slate-600 hover:bg-slate-100">
+              <span>🛡️</span>
+              <span>Modération</span>
+            </a>
+            <a href="/admin/support" className="flex items-center gap-3 rounded-lg px-2 py-2 text-sm text-slate-600 hover:bg-slate-100">
+              <span>🎧</span>
+              <span>Support</span>
+            </a>
+            <a href="/admin/analytics" className="flex items-center gap-3 rounded-lg px-2 py-2 text-sm text-slate-600 hover:bg-slate-100">
+              <span>📉</span>
+              <span>Analytics</span>
+            </a>
+            <a href="/admin/settings" className="flex items-center gap-3 rounded-lg px-2 py-2 text-sm text-slate-600 hover:bg-slate-100">
+              <span>⚙️</span>
+              <span>Paramètres</span>
+            </a>
+            <a href="/admin/audit" className="flex items-center gap-3 rounded-lg px-2 py-2 text-sm text-slate-600 hover:bg-slate-100">
+              <span>📋</span>
+              <span>Audit</span>
+            </a>
           </nav>
-
-          {/* Footer */}
-          <div className="border-t border-slate-200 p-4">
-            <button
-              onClick={onLogout}
-              className="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-sm text-slate-600 hover:bg-slate-100"
-            >
-              <span>🔓</span>
-              {sidebarOpen && <span>Déconnexion</span>}
-            </button>
-          </div>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main
-        className={`flex-1 transition-all duration-300 ${
-          sidebarOpen ? "ml-64" : "ml-16"
-        }`}
-      >
+      <main className="flex-1 ml-64">
         {/* Top Bar */}
         <header className="border-b border-slate-200 bg-white px-6 py-4">
           <div className="flex items-center justify-between">
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="rounded-lg p-2 hover:bg-slate-100"
-            >
-              <span className="text-xl">{sidebarOpen ? "◀" : "▶"}</span>
-            </button>
-
             <div className="flex items-center gap-4">
               <div className="text-right">
                 <p className="text-sm font-medium text-slate-900">Admin</p>
@@ -134,28 +93,5 @@ function LayoutContent({
         <div className="p-6">{children}</div>
       </main>
     </div>
-  );
-}
-
-function NavItem({
-  href,
-  icon,
-  label,
-  open,
-}: {
-  href: string;
-  icon: string;
-  label: string;
-  open: boolean;
-}) {
-  const router = useRouter();
-  return (
-    <a
-      href={href}
-      className="flex items-center gap-3 rounded-lg px-2 py-2 text-sm text-slate-600 hover:bg-slate-100"
-    >
-      <span>{icon}</span>
-      {open && <span>{label}</span>}
-    </a>
   );
 }
