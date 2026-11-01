@@ -15,14 +15,12 @@ export default async function AdminLoginPage({
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
-    // Pour la démo : accepte n'importe quel email/mot de passe
     if (email && password) {
-      // Stocke le token dans un cookie
       (await cookies()).set("admin_token", "demo_token", {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
-        maxAge: 60 * 60 * 24, // 24h
+        maxAge: 60 * 60 * 24,
       });
       redirect("/admin");
     }
@@ -64,7 +62,6 @@ export default async function AdminLoginPage({
               required
               defaultValue="admin@duoplay.com"
               className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-              placeholder="admin@duoplay.com"
             />
           </div>
 
@@ -81,7 +78,6 @@ export default async function AdminLoginPage({
               type="password"
               required
               className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-              placeholder="••••••••"
             />
           </div>
 
