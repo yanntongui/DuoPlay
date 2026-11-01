@@ -139,16 +139,47 @@ profiles: defineTable({
 
 ## Sécurité
 
-### Permissions (à implémenter)
+### Système RBAC avec Convex Auth
+
+La console utilise Convex Auth pour l'authentification et les autorisations.
+
+**Table `adminAccess`**
+
+```typescript
+adminAccess: defineTable({
+  userId: v.id("users"),
+  role: v.union(
+    v.literal("super_admin"),
+    v.literal("admin_produit"),
+    v.literal("admin_support"),
+    v.literal("admin_finance"),
+    v.literal("admin_moderateur"),
+    v.literal("admin_analyste"),
+  ),
+  permissions: v.array(v.string()),
+  canViewSensitive: v.boolean(),
+  twoFactorEnabled: v.boolean(),
+  lastLoginAt: v.optional(v.number()),
+  createdAt: v.number(),
+})
+```
+
+**Permissions par Rôle**
 
 | Rôle | Permissions |
 |------|-------------|
-| Super Admin | Tout accès |
-| Admin Produit | Contenu, expériences |
-| Support | Utilisateurs, tickets |
-| Finance | Abonnements, paiements |
-| Analyste | Analytics uniquement |
-| Modérateur | Signalements seulement |
+| `super_admin` | `"*"` (tout) |
+| `admin_produit` | `content.*`, `experience.*` |
+| `admin_support` | `user.read`, `user.activate`, `ticket.*` |
+| `admin_finance` | `revenue.*`, `subscription.*` |
+| `admin_moderateur` | `moderation.*`, `report.*` |
+| `admin_analyste` | `dashboard.read`, `analytics.*`, `audit.read` |
+
+**Fonctions d'Authentification**
+
+- `login` : Authentification email/mot de passe
+- `adminMe` : Profil admin actuel
+- `verifyAdmin` : Vérification avec permissions requises
 
 ### Protection des données sensibles
 
