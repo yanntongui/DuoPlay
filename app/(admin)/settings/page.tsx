@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 export default function SettingsPage() {
-  const [settings] = useState({
+  const [settings, setSettings] = useState({
     appName: "DuoPlay",
     languages: ["fr", "en", "es", "de"],
     countries: ["FR", "CA", "BE", "CH", "ES"],
@@ -29,7 +29,8 @@ export default function SettingsPage() {
             </label>
             <input
               type="text"
-              defaultValue={settings.appName}
+              value={settings.appName}
+              onChange={(e) => setSettings({ ...settings, appName: e.target.value })}
               className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
             />
           </div>
@@ -37,7 +38,11 @@ export default function SettingsPage() {
             <label className="block text-sm font-medium text-slate-700">
               Fuseau horaire
             </label>
-            <select className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+            <select
+              value={settings.timezone}
+              onChange={(e) => setSettings({ ...settings, timezone: e.target.value })}
+              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+            >
               <option>Europe/Paris</option>
               <option>America/New_York</option>
               <option>Asia/Tokyo</option>
@@ -47,15 +52,28 @@ export default function SettingsPage() {
             <label className="block text-sm font-medium text-slate-700">
               Langues supportées
             </label>
-            <div className="mt-1 flex gap-2">
+            <div className="mt-1 flex flex-wrap gap-2">
               {["fr", "en", "es", "de", "it", "pt"].map((lang) => (
                 <label key={lang} className="flex items-center gap-1">
                   <input
                     type="checkbox"
-                    defaultChecked={settings.languages.includes(lang)}
+                    checked={settings.languages.includes(lang)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSettings({
+                          ...settings,
+                          languages: [...settings.languages, lang],
+                        });
+                      } else {
+                        setSettings({
+                          ...settings,
+                          languages: settings.languages.filter((l) => l !== lang),
+                        });
+                      }
+                    }}
                     className="rounded border-slate-300"
                   />
-                  <span className="text-sm">{lang}</span>
+                  <span className="text-sm uppercase">{lang}</span>
                 </label>
               ))}
             </div>
@@ -66,7 +84,8 @@ export default function SettingsPage() {
             </label>
             <input
               type="text"
-              defaultValue={settings.minAppVersion}
+              value={settings.minAppVersion}
+              onChange={(e) => setSettings({ ...settings, minAppVersion: e.target.value })}
               className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
             />
           </div>
@@ -80,7 +99,8 @@ export default function SettingsPage() {
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
-              defaultChecked={settings.maintenanceMode}
+              checked={settings.maintenanceMode}
+              onChange={(e) => setSettings({ ...settings, maintenanceMode: e.target.checked })}
               className="rounded border-slate-300"
             />
             <span className="text-sm text-red-900">Activer le mode maintenance</span>

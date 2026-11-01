@@ -84,35 +84,19 @@ export default function ModerationPage() {
           <table className="w-full">
             <thead className="bg-slate-50">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-600">
-                  ID
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-600">
-                  Type
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-600">
-                  Gravité
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-600">
-                  Raison
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-600">
-                  Statut
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-600">
-                  Actions
-                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-slate-600">ID</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-slate-600">Type</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-slate-600">Gravité</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-slate-600">Raison</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-slate-600">Statut</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-slate-600">Actions</th>
               </tr>
             </thead>
             <tbody>
               {reports.map((report) => (
                 <tr key={report.id} className="border-b border-slate-100">
-                  <td className="px-4 py-3 text-sm text-slate-900">
-                    {report.id}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-slate-900">
-                    {report.type}
-                  </td>
+                  <td className="px-4 py-3 text-sm text-slate-900">{report.id}</td>
+                  <td className="px-4 py-3 text-sm text-slate-900">{report.type}</td>
                   <td className="px-4 py-3">
                     <span
                       className={`rounded-full px-2 py-1 text-xs font-medium ${
@@ -122,12 +106,8 @@ export default function ModerationPage() {
                       {report.severity}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm text-slate-900">
-                    {report.reason}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-slate-900">
-                    {report.status}
-                  </td>
+                  <td className="px-4 py-3 text-sm text-slate-900">{report.reason}</td>
+                  <td className="px-4 py-3 text-sm text-slate-900">{report.status}</td>
                   <td className="px-4 py-3">
                     <div className="flex gap-2">
                       <button className="rounded bg-indigo-100 px-3 py-1 text-sm text-indigo-700 hover:bg-indigo-200">

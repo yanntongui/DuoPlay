@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 export default function RevenuePage() {
-  const [timeRange] = useState("month");
+  const [timeRange, setTimeRange] = useState("month");
 
   return (
     <div className="space-y-6">
@@ -17,6 +17,7 @@ export default function RevenuePage() {
         {["day", "week", "month", "year"].map((range) => (
           <button
             key={range}
+            onClick={() => setTimeRange(range)}
             className={`rounded-lg px-4 py-2 text-sm font-medium ${
               timeRange === range
                 ? "bg-indigo-600 text-white"
@@ -35,16 +36,12 @@ export default function RevenuePage() {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-xl border border-slate-200 bg-white p-6">
           <p className="text-sm text-slate-600">Revenu brut</p>
-          <p className="mt-2 text-2xl font-bold text-slate-900">
-            €45,678.90
-          </p>
+          <p className="mt-2 text-2xl font-bold text-slate-900">€45,678.90</p>
           <p className="mt-1 text-sm text-green-600">+12% vs mois précédent</p>
         </div>
         <div className="rounded-xl border border-slate-200 bg-white p-6">
           <p className="text-sm text-slate-600">Revenu net</p>
-          <p className="mt-2 text-2xl font-bold text-slate-900">
-            €38,234.56
-          </p>
+          <p className="mt-2 text-2xl font-bold text-slate-900">€38,234.56</p>
           <p className="mt-1 text-sm text-slate-500">Après frais</p>
         </div>
         <div className="rounded-xl border border-slate-200 bg-white p-6">
