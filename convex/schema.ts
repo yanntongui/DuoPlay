@@ -69,6 +69,13 @@ export default defineSchema({
   /* Comptes & couples                                                 */
   /* ---------------------------------------------------------------- */
 
+  users: defineTable({
+    email: v.optional(v.string()),
+    name: v.optional(v.string()),
+    image: v.optional(v.string()),
+    createdAt: v.number(),
+  }).index("by_email", ["email"]),
+
   profiles: defineTable({
     userId: v.id("users"),
     displayName: v.string(),

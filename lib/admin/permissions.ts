@@ -84,7 +84,8 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
   ],
   marketing_admin: [
     'analytics:read',
-    'audits:export'
+    'analytics:export',
+    'reports:export'
   ],
   tech_admin: [
     'users:read',

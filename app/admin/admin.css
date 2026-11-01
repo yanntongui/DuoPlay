@@ -1,0 +1,541 @@
+/* ==================================================================== */
+/*  Console d'administration DuoPlay — système de design dédié          */
+/*                                                                      */
+/*  Volontairement distinct de l'application utilisateur (nocturne et   */
+/*  contemplative) : ici la densité prime. Toile chaude claire, cartes  */
+/*  franches, prune DuoPlay en accent principal, bordeaux pour les      */
+/*  actions irréversibles, vert/orange/rouge pour les états.            */
+/* ==================================================================== */
+
+.admin-shell {
+  /* Surfaces */
+  --ad-canvas: #ece9e4;
+  --ad-canvas-deep: #e3dfd8;
+  --ad-surface: #ffffff;
+  --ad-surface-soft: #f7f5f2;
+  --ad-surface-sunk: #f1eeea;
+
+  /* Encre */
+  --ad-ink: #17141a;
+  --ad-ink-soft: #453f4a;
+  --ad-muted: #6b6470;
+  --ad-faint: #9a939e;
+
+  /* Traits */
+  --ad-line: #eae5e0;
+  --ad-line-strong: #ddd6cf;
+
+  /* Prune DuoPlay */
+  --ad-plum-900: #241220;
+  --ad-plum-800: #321a2d;
+  --ad-plum-700: #40203c;
+  --ad-plum-600: #4e2a4a;
+  --ad-plum-500: #633a5d;
+  --ad-plum-400: #82587c;
+  --ad-plum-100: #f3eaf1;
+  --ad-plum-50: #faf6f9;
+
+  /* Bordeaux — actions importantes */
+  --ad-wine: #7a2242;
+  --ad-wine-soft: #f8e9ee;
+
+  /* États */
+  --ad-positive: #2c7a58;
+  --ad-positive-soft: #e6f2ec;
+  --ad-warning: #a06a17;
+  --ad-warning-soft: #fbf1de;
+  --ad-danger: #ad342a;
+  --ad-danger-soft: #fbeae8;
+  --ad-info: #3a5b8c;
+  --ad-info-soft: #eaf0f9;
+
+  /* Élévations */
+  --ad-shadow-card: 0 1px 2px rgb(30 22 27 / 0.04), 0 10px 24px -16px rgb(30 22 27 / 0.18);
+  --ad-shadow-float: 0 2px 6px rgb(30 22 27 / 0.05), 0 28px 60px -30px rgb(30 22 27 / 0.35);
+
+  font-family: var(--font-sans);
+  background-color: var(--ad-canvas);
+  color: var(--ad-ink);
+  color-scheme: light;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Le shell réinitialise les contraintes tactiles globales de la vitrine. */
+.admin-shell button,
+.admin-shell a,
+.admin-shell [role="button"] {
+  min-height: 0;
+  min-width: 0;
+}
+
+/* Typographie : Inter partout, y compris les titres (interface de données). */
+.admin-shell h1,
+.admin-shell h2,
+.admin-shell h3,
+.admin-shell h4 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Cartes                                                             */
+/* ------------------------------------------------------------------ */
+
+.ad-card {
+  background-color: var(--ad-surface);
+  border: 1px solid var(--ad-line);
+  border-radius: 22px;
+  box-shadow: var(--ad-shadow-card);
+}
+
+.ad-card-sunk {
+  background-color: var(--ad-surface-soft);
+  border: 1px solid var(--ad-line);
+  border-radius: 22px;
+}
+
+.ad-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 22px 0;
+}
+
+.ad-card-title {
+  font-size: 15.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ad-ink);
+}
+
+/* ------------------------------------------------------------------ */
+/*  Boutons                                                            */
+/* ------------------------------------------------------------------ */
+
+.ad-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 42px;
+  padding: 0 18px;
+  border-radius: 999px;
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  transition: background-color 140ms ease, color 140ms ease,
+    border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+}
+
+.ad-btn:active {
+  transform: translateY(0.5px);
+}
+
+.ad-btn-primary {
+  background-color: var(--ad-plum-700);
+  color: #fdfbfc;
+  box-shadow: 0 8px 20px -12px rgb(64 32 60 / 0.9);
+}
+
+.ad-btn-primary:hover {
+  background-color: var(--ad-plum-800);
+}
+
+.ad-btn-outline {
+  background-color: transparent;
+  color: var(--ad-ink);
+  border: 1px solid var(--ad-line-strong);
+}
+
+.ad-btn-outline:hover {
+  background-color: var(--ad-surface-soft);
+  border-color: var(--ad-faint);
+}
+
+.ad-btn-wine {
+  background-color: var(--ad-wine);
+  color: #fff;
+}
+
+.ad-btn-wine:hover {
+  background-color: #661a37;
+}
+
+.ad-btn-ghost {
+  color: var(--ad-muted);
+}
+
+.ad-btn-ghost:hover {
+  background-color: var(--ad-surface-sunk);
+  color: var(--ad-ink);
+}
+
+.ad-iab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  color: var(--ad-muted);
+  transition: background-color 140ms ease, color 140ms ease;
+}
+
+.ad-iab:hover {
+  background-color: var(--ad-surface-sunk);
+  color: var(--ad-ink);
+}
+
+.ad-iab-light {
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--ad-line);
+  background-color: var(--ad-surface);
+  box-shadow: var(--ad-shadow-card);
+}
+
+/* ------------------------------------------------------------------ */
+/*  Navigation                                                         */
+/* ------------------------------------------------------------------ */
+
+.ad-nav-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 42px;
+  padding: 0 12px;
+  border-radius: 12px;
+  font-size: 13.5px;
+  color: var(--ad-ink-soft);
+  transition: background-color 130ms ease, color 130ms ease;
+}
+
+.ad-nav-item:hover {
+  background-color: var(--ad-surface-sunk);
+  color: var(--ad-ink);
+}
+
+.ad-nav-item[data-active="true"] {
+  background-color: var(--ad-plum-50);
+  color: var(--ad-plum-800);
+  font-weight: 600;
+}
+
+.ad-nav-item[data-active="true"]::before {
+  content: "";
+  position: absolute;
+  left: -14px;
+  top: 50%;
+  height: 22px;
+  width: 3px;
+  transform: translateY(-50%);
+  border-radius: 0 3px 3px 0;
+  background-color: var(--ad-plum-700);
+}
+
+.ad-nav-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ad-faint);
+}
+
+.ad-nav-count {
+  margin-left: auto;
+  border-radius: 6px;
+  background-color: var(--ad-surface-sunk);
+  padding: 1px 7px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--ad-muted);
+}
+
+/* ------------------------------------------------------------------ */
+/*  Pastilles de statut                                                */
+/* ------------------------------------------------------------------ */
+
+.ad-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.ad-pill-positive { background: var(--ad-positive-soft); color: var(--ad-positive); }
+.ad-pill-warning  { background: var(--ad-warning-soft);  color: var(--ad-warning); }
+.ad-pill-danger   { background: var(--ad-danger-soft);   color: var(--ad-danger); }
+.ad-pill-info     { background: var(--ad-info-soft);     color: var(--ad-info); }
+.ad-pill-plum     { background: var(--ad-plum-100);       color: var(--ad-plum-700); }
+.ad-pill-neutral  { background: var(--ad-surface-sunk);   color: var(--ad-muted); }
+
+.ad-pill-outline {
+  background: transparent;
+  border: 1px solid var(--ad-line-strong);
+  color: var(--ad-muted);
+}
+
+/* ------------------------------------------------------------------ */
+/*  Formulaires                                                        */
+/* ------------------------------------------------------------------ */
+
+.ad-input {
+  height: 40px;
+  width: 100%;
+  border-radius: 11px;
+  border: 1px solid var(--ad-line-strong);
+  background-color: var(--ad-surface);
+  padding: 0 12px;
+  font-size: 13px;
+  color: var(--ad-ink);
+  transition: border-color 130ms ease, box-shadow 130ms ease;
+}
+
+.ad-input::placeholder {
+  color: var(--ad-faint);
+}
+
+.ad-input:focus {
+  outline: none;
+  border-color: var(--ad-plum-400);
+  box-shadow: 0 0 0 3px rgb(99 58 93 / 0.12);
+}
+
+.ad-select {
+  height: 40px;
+  border-radius: 11px;
+  border: 1px solid var(--ad-line-strong);
+  background-color: var(--ad-surface);
+  padding: 0 32px 0 12px;
+  font-size: 13px;
+  color: var(--ad-ink-soft);
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236b6470' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 11px center;
+}
+
+.ad-select:focus {
+  outline: none;
+  border-color: var(--ad-plum-400);
+  box-shadow: 0 0 0 3px rgb(99 58 93 / 0.12);
+}
+
+/* ------------------------------------------------------------------ */
+/*  Tableaux                                                           */
+/* ------------------------------------------------------------------ */
+
+.ad-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+}
+
+.ad-table thead th {
+  padding: 10px 18px;
+  text-align: left;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ad-faint);
+  background-color: var(--ad-surface-soft);
+  border-bottom: 1px solid var(--ad-line);
+  white-space: nowrap;
+}
+
+.ad-table thead th:first-child { border-top-left-radius: 12px; }
+.ad-table thead th:last-child  { border-top-right-radius: 12px; }
+
+.ad-table tbody td {
+  padding: 13px 18px;
+  border-bottom: 1px solid var(--ad-line);
+  color: var(--ad-ink-soft);
+  vertical-align: middle;
+}
+
+.ad-table tbody tr:last-child td { border-bottom: none; }
+
+.ad-table tbody tr {
+  transition: background-color 120ms ease;
+}
+
+.ad-table tbody tr:hover {
+  background-color: var(--ad-plum-50);
+}
+
+/* ------------------------------------------------------------------ */
+/*  Graphiques                                                         */
+/* ------------------------------------------------------------------ */
+
+.ad-bar {
+  border-radius: 999px;
+  background-color: var(--ad-plum-700);
+  transition: background-color 140ms ease;
+}
+
+.ad-bar-muted {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--ad-line-strong) 0px,
+    var(--ad-line-strong) 2px,
+    transparent 2px,
+    transparent 6px
+  );
+  background-color: var(--ad-surface-sunk);
+  border: 1px solid var(--ad-line);
+}
+
+.ad-spark {
+  stroke: var(--ad-plum-600);
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Cartes sombres (accent)                                            */
+/* ------------------------------------------------------------------ */
+
+.ad-card-dark {
+  position: relative;
+  overflow: hidden;
+  border-radius: 22px;
+  background:
+    radial-gradient(120% 130% at 10% 0%, #5b3354 0%, transparent 55%),
+    radial-gradient(100% 100% at 100% 100%, #2c1528 0%, transparent 60%),
+    linear-gradient(160deg, #42213d 0%, #2a1425 100%);
+  color: #f7f1f5;
+  border: 1px solid rgb(255 255 255 / 0.08);
+  box-shadow: var(--ad-shadow-float);
+}
+
+.ad-card-dark::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: repeating-radial-gradient(
+    circle at 110% 120%,
+    rgb(255 255 255 / 0.05) 0px,
+    rgb(255 255 255 / 0.05) 1px,
+    transparent 1px,
+    transparent 9px
+  );
+  opacity: 0.5;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Barre latérale mobile                                              */
+/* ------------------------------------------------------------------ */
+
+.ad-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background-color: rgb(23 20 26 / 0.45);
+  backdrop-filter: blur(2px);
+}
+
+@media (max-width: 1180px) {
+  .ad-sidebar-desktop {
+    display: none;
+  }
+}
+
+@media (min-width: 1181px) {
+  .ad-sidebar-mobile {
+    display: none;
+  }
+  .ad-mobile-trigger {
+    display: none;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Marionnettes                                                        */
+/* ------------------------------------------------------------------ */
+
+@keyframes ad-fade-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.ad-enter {
+  animation: ad-fade-up 260ms ease-out both;
+}
+
+/* Scrollbar discrète dans la console. */
+.admin-shell ::-webkit-scrollbar { width: 10px; height: 10px; }
+.admin-shell ::-webkit-scrollbar-track { background: transparent; }
+.admin-shell ::-webkit-scrollbar-thumb {
+  background: #d8d2cc;
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+.admin-shell ::-webkit-scrollbar-thumb:hover { background: #c3bbb3; background-clip: content-box; }
+
+/* ------------------------------------------------------------------ */
+/*  Utilitaires de couleur (évite toute ambiguïté Tailwind sur les      */
+/*  valeurs arbitraires de variables CSS)                              */
+/* ------------------------------------------------------------------ */
+
+.ad-ink       { color: var(--ad-ink); }
+.ad-soft      { color: var(--ad-ink-soft); }
+.ad-muted     { color: var(--ad-muted); }
+.ad-faint     { color: var(--ad-faint); }
+.ad-plum      { color: var(--ad-plum-600); }
+.ad-danger    { color: var(--ad-danger); }
+.ad-positive  { color: var(--ad-positive); }
+.ad-warning   { color: var(--ad-warning); }
+
+.ad-bg-surface        { background-color: var(--ad-surface); }
+.ad-bg-soft           { background-color: var(--ad-surface-soft); }
+.ad-bg-sunk           { background-color: var(--ad-surface-sunk); }
+.ad-bg-plum-50        { background-color: var(--ad-plum-50); }
+.ad-bg-plum           { background-color: var(--ad-plum-700); }
+.ad-bg-danger-soft    { background-color: var(--ad-danger-soft); }
+.ad-bg-positive-soft  { background-color: var(--ad-positive-soft); }
+.ad-bg-warning-soft   { background-color: var(--ad-warning-soft); }
+.ad-bg-info-soft      { background-color: var(--ad-info-soft); }
+.ad-bg-danger-solid   { background-color: var(--ad-danger); }
+.ad-bg-positive-solid { background-color: var(--ad-positive); }
+.ad-bg-warning-solid  { background-color: var(--ad-warning); }
+.ad-bg-white-12       { background-color: rgb(255 255 255 / 0.12); }
+
+.ad-bd               { border-color: var(--ad-line); }
+.ad-bd-strong        { border-color: var(--ad-line-strong); }
+.ad-bd-plum          { border-color: var(--ad-plum-400); }
+.ad-bd-danger        { border-color: #f0c9c4; }
+
+.ad-hover-soft:hover   { background-color: var(--ad-surface-soft); }
+.ad-hover-sunk:hover   { background-color: var(--ad-surface-sunk); }
+.ad-hover-plum-50:hover{ background-color: var(--ad-plum-50); }
+.ad-hover-white-12:hover { background-color: rgb(255 255 255 / 0.12); }
+.ad-hover-white-20:hover { background-color: rgb(255 255 255 / 0.20); }
+.ad-hover-danger-soft:hover { background-color: var(--ad-danger-soft); }
+.ad-hover-plum-800:hover { background-color: var(--ad-plum-800); }
+
+/* Les champs avec icône ont besoin d'un retrait plus large que le padding
+   de base : on le déclare ici pour primer sur .ad-input. */
+.ad-input.ad-pl-9  { padding-left: 34px; }
+.ad-input.ad-pl-10 { padding-left: 40px; }
+
+/* Le bouton de recherche compact ne sert qu'aux petits écrans : on le
+   masque explicitement, car .ad-iab impose display:inline-flex. */
+@media (min-width: 640px) {
+  .ad-search-mobile { display: none; }
+}

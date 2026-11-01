@@ -26,9 +26,9 @@
 
 - **Frontend**: Next.js 15 + TailwindCSS + React Server Components
 - **Backend**: Convex (fonctions serverless)
-- **Auth**: Cookies HTTP-only + 2FA TOTP
-- **Base de données**: PostgreSQL (Convex)
-- **Sécurité**: RBAC, audit logging, encryption
+- **Auth**: cookie de session + écran 2FA (démo : tout code à 6 chiffres est accepté)
+- **Base de données**: Convex (tables `users`, `profiles`, `couples`, `adminAccess`, `auditLogs`…)
+- **Sécurité**: RBAC (`lib/admin/permissions.ts`), journal d'audit, double validation
 
 ## 2. Structure de Navigation
 
@@ -383,3 +383,29 @@ moderation {
 
 
 <function=write>
+
+## Design system de la console
+
+La console possède son propre système de design, isolé de l'application utilisateur (nocturne).
+Il vit dans `app/admin/admin.css`, sous la portée `.admin-shell`, et n'affecte aucune route publique.
+
+- **Toile** : gris chaud `#ece9e4`, surfaces blanches arrondies (22 px), ombres très douces.
+- **Accents** : prune DuoPlay (`#40203c`) pour l'action principale, bordeaux (`#7a2242`) pour les actions sensibles.
+- **États** : vert (positif), orange (attention), rouge (erreur/destructif), bleu (information).
+- **Typographie** : Inter partout, densité élevée, titres 30–34 px, tableaux 12–13 px.
+- **Navigation** : barre latérale flottante groupée (Pilotage, Utilisateurs, Contenus, Revenus, Croissance, Système), item actif avec barre d'accent et compteurs, carte de gouvernance en pied.
+- **Composants** : `components/admin/ui.tsx` (`PageHeader`, `Card`, `TableCard`, `StatTile`, `Badge`, `StatusBadge`, `Avatar`, `ProgressBar`…) et utilitaires `ad-*` (jamais de variables CSS brutes dans les classes Tailwind).
+- **Responsive** : barre latérale en tiroir sous 1180 px, recherche compacte sur mobile, tableaux défilables horizontalement avec indication.
+
+### Parcours d'authentification
+
+1. `/admin/login` — e-mail + mot de passe (démo : toute combinaison non vide).
+2. `/admin/2fa` — code à 6 chiffres (démo : n'importe quel code).
+3. Le cookie `admin_token` est posé à l'étape 2 ; le middleware protège `/admin/*`.
+4. La déconnexion supprime le cookie et le stockage local.
+
+### Vérifications
+
+- `npx tsc --noEmit` — aucune erreur.
+- `npm run build` — build de production réussi, 21 routes `/admin/*` générées.
+- `npx eslint app/admin components/admin` — propre.
