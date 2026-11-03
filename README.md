@@ -647,17 +647,23 @@ désactivées lorsque le système demande moins de mouvement
 
 ## Déploiement Netlify
 
-- Build command : `next build` · Publish : `.next`
-- Variables d'environnement : `NEXT_PUBLIC_CONVEX_URL`, `NEXT_PUBLIC_SITE_URL`,
-  et `CONVEX_DEPLOY_KEY` pour le déploiement Convex en CI.
-- Convex se déploie séparément : `npx convex deploy`.
+- Build command : `npm run build` · Publish : `.next`
+- Variables d'environnement obligatoires : `NEXT_PUBLIC_CONVEX_URL`,
+  `NEXT_PUBLIC_SITE_URL`.
+- Le code généré Convex est versionné : `convex codegen` ne fait pas partie du
+  build Netlify (la commande refuse `CONVEX_DEPLOY_KEY` en CI).
+- Convex se déploie séparément : `npx convex deploy` (ou
+  `npx convex dev --once` pour le déploiement de développement).
+- Déploiement Convex depuis Netlify (optionnel) : ajouter
+  `CONVEX_DEPLOY_KEY` dans les variables du site, puis remplacer la commande
+  de build par `npx convex deploy --cmd 'npm run build'`.
 - Le temps réel passe directement du navigateur à Convex (pas par Netlify).
 - Configuration : [`netlify.toml`](netlify.toml).
 
 ## Statut
 
 Phase 0 — fondations terminées et **vérifiées de bout en bout** (backend Convex
-local, 6 univers seedés, routes servies, build/lint/types OK).
+local, 7 univers seedés, routes servies, build/lint/types OK).
 
 Phase 1 — **terminée** : back-office protégé (catégories, expériences,
 questions, modération), statistiques, et **contenu réel** (53 expériences,

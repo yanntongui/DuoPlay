@@ -1,5 +1,13 @@
 [build]
-  command = "npx convex codegen && next build"
+  # Le code généré Convex (`convex/_generated/`) est versionné : le build
+  # n'a pas besoin d'un déploiement Convex pour le régénérer. `convex codegen`
+  # refuse volontairement `CONVEX_DEPLOY_KEY` en CI.
+  #
+  # Pour aussi déployer les fonctions Convex depuis Netlify, ajoutez
+  # `CONVEX_DEPLOY_KEY` dans les variables d'environnement du site puis
+  # remplacez la commande par :
+  #   npx convex deploy --cmd 'npm run build'
+  command = "npm run build"
   publish = ".next"
 
 [build.environment]
