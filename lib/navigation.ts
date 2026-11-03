@@ -5,6 +5,7 @@ import {
   Heart,
   Home,
   Settings,
+  Sparkles,
   Star,
   User,
 } from "lucide-react";
@@ -36,6 +37,7 @@ export type NavItem = {
 export const PRIMARY_NAV: NavItem[] = [
   { href: "/accueil", labelKey: "nav.home", icon: Home },
   { href: "/explorer", labelKey: "nav.experiences", icon: Compass },
+  { href: "/ai", labelKey: "nav.ai", icon: Sparkles },
   { href: "/mes-parties", labelKey: "nav.games", icon: Gamepad2 },
   { href: "/mes-favoris", labelKey: "nav.favorites", icon: Star },
 ];
@@ -54,6 +56,7 @@ export const PERSONAL_NAV: NavItem[] = [
 export const MOBILE_NAV: NavItem[] = [
   { href: "/accueil", labelKey: "nav.home", icon: Home },
   { href: "/explorer", labelKey: "nav.experiences", icon: Compass },
+  { href: "/ai", labelKey: "nav.aiShort", icon: Sparkles },
   { href: "/mes-parties", labelKey: "nav.games", icon: Gamepad2 },
   { href: "/notre-espace", labelKey: "nav.spaceShort", icon: Heart },
 ];
@@ -61,6 +64,7 @@ export const MOBILE_NAV: NavItem[] = [
 const TITLES: { match: string; titleKey: MessageKey }[] = [
   { match: "/accueil", titleKey: "nav.home" },
   { match: "/explorer", titleKey: "nav.experiences" },
+  { match: "/ai", titleKey: "title.ai" },
   { match: "/mes-parties", titleKey: "nav.games" },
   { match: "/mes-favoris", titleKey: "nav.favorites" },
   { match: "/notre-espace", titleKey: "nav.space" },

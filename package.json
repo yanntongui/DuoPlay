@@ -27,7 +27,8 @@
     "test:partage": "node tests/partage.cjs",
     "test:i18n": "node tests/i18n.cjs",
     "test:differe": "node tests/differe.cjs",
-    "test:offline": "BASE_URL=${BASE_URL:-http://localhost:3100} node tests/offline.cjs"
+    "test:offline": "BASE_URL=${BASE_URL:-http://localhost:3100} node tests/offline.cjs",
+    "seed:catalogue": "convex run seed:seedCatalogue"
   },
   "dependencies": {
     "@auth/core": "^0.41.3",

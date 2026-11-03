@@ -10,6 +10,7 @@ import { ResumeCard } from "@/components/app/resume-card";
 import { ContextualSuggestions } from "@/components/app/contextual-suggestions";
 import { InstallPrompt } from "@/components/pwa/install-prompt";
 import { PreferencesOnboarding } from "@/components/app/preferences-onboarding";
+import { AiSpotlight } from "@/components/ai/ai-spotlight";
 import { cn } from "@/lib/utils";
 import { UNIVERSES } from "@/lib/content";
 
@@ -59,6 +60,8 @@ export default function AccueilPage() {
       <InstallPrompt />
 
       <PreferencesOnboarding />
+
+      <AiSpotlight />
 
       <ContextualSuggestions />
 

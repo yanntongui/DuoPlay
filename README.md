@@ -33,8 +33,12 @@ Laissez `npx convex dev` tourner, puis dans un second terminal :
 
 ```bash
 npm run dev           # http://localhost:3000
-npx convex run categories:seed   # peuple les six univers (une fois)
+npm run seed:catalogue   # peuple univers, expériences, questions et parcours (idempotent)
 ```
+
+> Le catalogue éditorial est versionné dans `convex/data/catalogue.ts`.
+> La commande `npm run seed:catalogue` peut être relancée sans créer de
+> doublons : elle retrouve chaque entrée par son slug (ou son jour de parcours).
 
 > Pour relier le projet à un vrai compte Convex plus tard :
 > `npx convex login` puis `npx convex dev` (reconfiguration).
@@ -48,6 +52,7 @@ npx convex run categories:seed   # peuple les six univers (une fois)
 | `npm run start` | Serveur de production |
 | `npm run lint` | ESLint |
 | `npx tsc --noEmit` | Vérification des types |
+| `npm run seed:catalogue` | Réamorce le catalogue (idempotent) |
 | `npm run test:e2e` | Test de bout en bout : boucle de jeu |
 | `npm run test:engagement` | Test de bout en bout : défi, favoris, historique, couple |
 | `npm run test:parcours` | Test de bout en bout : parcours guidés |

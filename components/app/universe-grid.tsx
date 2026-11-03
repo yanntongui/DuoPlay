@@ -33,6 +33,7 @@ type CategoryRow = {
   mvp: boolean;
   durationMinutes: number;
   intensity: Universe["intensity"];
+  experienceCount: number;
 };
 
 function MoodFilter({ mood }: { mood: string | null }) {
@@ -305,7 +306,9 @@ function categoriesToUniverses(categories: CategoryRow[]): Universe[] {
     descriptionEn: category.descriptionEn ?? category.description,
     emoji: category.emoji,
     accent: category.accent,
-    mvp: category.mvp,
+    // Un univers est jouable dès qu'il contient au moins une expérience
+    // publiée : le drapeau éditorial ne doit pas masquer du contenu réel.
+    mvp: category.experienceCount > 0,
     durationMinutes: category.durationMinutes ?? 10,
     intensity: category.intensity ?? "moyen",
   }));

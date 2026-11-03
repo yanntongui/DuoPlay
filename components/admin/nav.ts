@@ -2,6 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   LayoutDashboard,
   BarChart3,
+  Bot,
   Users,
   HeartHandshake,
   LifeBuoy,
@@ -56,6 +57,7 @@ export const ADMIN_NAV: NavSection[] = [
   {
     label: "Contenus",
     items: [
+      { href: "/admin/ai", label: "DuoPlay AI", icon: Bot, count: 2 },
       { href: "/admin/experiences", label: "Expériences", icon: Sparkles },
       { href: "/admin/cards", label: "Cartes", icon: Layers },
       { href: "/admin/dice", label: "Dés", icon: Dices },

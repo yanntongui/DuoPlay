@@ -607,4 +607,116 @@ export default defineSchema({
     .index("by_action", ["action"])
     .index("by_admin", ["adminId"])
     .index("by_createdAt", ["createdAt"]),
+
+  /* ---------------------------------------------------------------- */
+  /* DuoPlay AI (cf. docs/AI-DUOPLAY.md)                              */
+  /*                                                                  */
+  /* Règle de base : aucune réponse intime, note privée, conversation  */
+  /* privée, média sensible ou donnée de santé n'entre ici. Seules    */
+  /* les métadonnées nécessaires à l'orchestration sont conservées.    */
+  /* ---------------------------------------------------------------- */
+
+  aiConsents: defineTable({
+    deviceToken: v.string(),
+    feature: v.string(), // "global" | "generation" | "communication" | "recommendations" | "search"
+    granted: v.boolean(),
+    version: v.string(),
+    grantedAt: v.optional(v.number()),
+    revokedAt: v.optional(v.number()),
+    updatedAt: v.number(),
+  })
+    .index("by_device", ["deviceToken"])
+    .index("by_device_feature", ["deviceToken", "feature"]),
+
+  aiSessions: defineTable({
+    deviceToken: v.string(),
+    title: v.string(),
+    subtitle: v.string(),
+    mood: v.string(),
+    level: v.string(),
+    mode: v.string(),
+    durationMinutes: v.number(),
+    exclusions: v.array(v.string()),
+    source: v.string(), // "generated" | "search" | "recommendation"
+    status: v.string(), // "draft" | "active" | "paused" | "completed" | "ended" | "deleted"
+    steps: v.array(
+      v.object({
+        title: v.string(),
+        body: v.string(),
+        minutes: v.number(),
+        kind: v.string(),
+        intensity: v.string(),
+      }),
+    ),
+    finalQuestion: v.string(),
+    alternatives: v.array(
+      v.object({
+        label: v.string(),
+        description: v.string(),
+      }),
+    ),
+    rationale: v.array(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+    expiresAt: v.number(),
+    startedAt: v.optional(v.number()),
+    pausedAt: v.optional(v.number()),
+    completedAt: v.optional(v.number()),
+    deletedAt: v.optional(v.number()),
+    deletionHistory: v.optional(v.array(v.number())),
+  })
+    .index("by_device", ["deviceToken"])
+    .index("by_device_created", ["deviceToken", "createdAt"])
+    .index("by_expires", ["expiresAt"]),
+
+  aiEvents: defineTable({
+    deviceToken: v.string(),
+    sessionId: v.optional(v.id("aiSessions")),
+    kind: v.string(), // "generation" | "step" | "session" | "communication" | "search" | "consent" | "deletion"
+    action: v.string(), // accept | modify | skip | replace | pause | resume | finish | generate | delete | revoke
+    stepIndex: v.optional(v.number()),
+    createdAt: v.number(),
+  })
+    .index("by_device", ["deviceToken"])
+    .index("by_session", ["sessionId"])
+    .index("by_created", ["createdAt"]),
+
+  aiRecommendationDismissals: defineTable({
+    deviceToken: v.string(),
+    kind: v.string(), // "mood" | "theme" | "experience" | "duration" | "mode"
+    value: v.string(),
+    createdAt: v.number(),
+  }).index("by_device", ["deviceToken"]),
+
+  aiUsageDaily: defineTable({
+    deviceToken: v.string(),
+    day: v.string(), // YYYY-MM-DD (UTC)
+    generations: v.number(),
+    accepted: v.number(),
+    skipped: v.number(),
+    paused: v.number(),
+    completed: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_device", ["deviceToken"])
+    .index("by_device_day", ["deviceToken", "day"]),
+
+  aiSafetyEvents: defineTable({
+    deviceToken: v.optional(v.string()),
+    category: v.string(),
+    severity: v.string(), // "critique" | "eleve" | "moyen" | "faible"
+    action: v.string(), // "refus" | "reformulation" | "escalade"
+    excerptHash: v.optional(v.string()),
+    createdAt: v.number(),
+  })
+    .index("by_created", ["createdAt"])
+    .index("by_category", ["category"]),
+
+  aiFeatureFlags: defineTable({
+    key: v.string(),
+    enabled: v.boolean(),
+    note: v.optional(v.string()),
+    updatedAt: v.number(),
+  }).index("by_key", ["key"]),
 });

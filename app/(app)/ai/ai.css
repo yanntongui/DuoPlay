@@ -1,0 +1,251 @@
+/* ------------------------------------------------------------------ */
+/*  DuoPlay AI — palette dédiée                                        */
+/*  Prune, bordeaux, crème, rose poudré, posés sur la nuit DuoPlay.     */
+/*  Le scope `.ai-shell` isole ces variables du reste de l'application. */
+/* ------------------------------------------------------------------ */
+
+.ai-shell {
+  --ai-prune: #40203c;
+  --ai-prune-deep: #2a1428;
+  --ai-bordeaux: #7a2242;
+  --ai-bordeaux-light: #a63a5c;
+  --ai-cream: #f6efe7;
+  --ai-cream-muted: #d9cbbf;
+  --ai-rose: #d9a7c9;
+  --ai-rose-soft: rgba(217, 167, 201, 0.14);
+  --ai-rose-line: rgba(217, 167, 201, 0.24);
+  --ai-shadow: 0 24px 70px -34px rgba(0, 0, 0, 0.95);
+  color: var(--ai-cream);
+  overflow-x: clip;
+}
+
+.ai-aura {
+  position: absolute;
+  inset: -10% -20% auto -20%;
+  height: 420px;
+  pointer-events: none;
+  background:
+    radial-gradient(42% 60% at 20% 20%, rgba(122, 34, 66, 0.4), transparent 70%),
+    radial-gradient(38% 55% at 82% 10%, rgba(217, 167, 201, 0.16), transparent 72%),
+    radial-gradient(50% 65% at 55% 0%, rgba(64, 32, 60, 0.55), transparent 75%);
+  filter: blur(8px);
+  opacity: 0.85;
+}
+
+.ai-surface {
+  position: relative;
+  overflow: hidden;
+  border-radius: 22px;
+  border: 1px solid var(--ai-rose-line);
+  background:
+    linear-gradient(158deg, rgba(64, 32, 60, 0.42) 0%, rgba(11, 7, 16, 0.92) 62%),
+    #0b0710;
+  box-shadow: var(--ai-shadow);
+}
+
+.ai-surface-soft {
+  border-radius: 18px;
+  border: 1px solid rgba(217, 167, 201, 0.16);
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.ai-surface-cream {
+  border-radius: 18px;
+  border: 1px solid rgba(246, 239, 231, 0.14);
+  background: rgba(246, 239, 231, 0.055);
+}
+
+.ai-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  border-radius: 999px;
+  padding: 0 1.15rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1;
+  transition:
+    transform 160ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.ai-button:active {
+  transform: scale(0.97);
+}
+
+.ai-button:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px #0b0710,
+    0 0 0 4px var(--ai-rose);
+}
+
+.ai-button-primary {
+  border: 1px solid rgba(217, 167, 201, 0.5);
+  background: linear-gradient(135deg, var(--ai-bordeaux-light), var(--ai-bordeaux) 62%, #53162e);
+  color: #fff7f2;
+  box-shadow: 0 12px 30px -14px rgba(122, 34, 66, 0.9);
+}
+
+.ai-button-primary:hover {
+  filter: brightness(1.06);
+}
+
+.ai-button-soft {
+  border: 1px solid var(--ai-rose-line);
+  background: var(--ai-rose-soft);
+  color: var(--ai-cream);
+}
+
+.ai-button-soft:hover {
+  background: rgba(217, 167, 201, 0.22);
+}
+
+.ai-button-ghost {
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ai-cream-muted);
+}
+
+.ai-button-ghost:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--ai-cream);
+}
+
+.ai-button-danger {
+  border: 1px solid rgba(166, 58, 92, 0.45);
+  background: rgba(122, 34, 66, 0.18);
+  color: #f0b6c9;
+}
+
+.ai-button-danger:hover {
+  background: rgba(122, 34, 66, 0.3);
+}
+
+.ai-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 40px;
+  border-radius: 999px;
+  border: 1px solid rgba(217, 167, 201, 0.2);
+  background: rgba(255, 255, 255, 0.03);
+  padding: 0 0.9rem;
+  font-size: 0.8125rem;
+  color: var(--ai-cream-muted);
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease;
+}
+
+.ai-chip:hover {
+  border-color: rgba(217, 167, 201, 0.4);
+  color: var(--ai-cream);
+}
+
+.ai-chip[data-active="true"] {
+  border-color: rgba(217, 167, 201, 0.66);
+  background: rgba(217, 167, 201, 0.18);
+  color: #fff7f2;
+}
+
+.ai-input {
+  width: 100%;
+  border-radius: 16px;
+  border: 1px solid rgba(217, 167, 201, 0.22);
+  background: rgba(4, 2, 5, 0.5);
+  padding: 0.85rem 1rem;
+  color: var(--ai-cream);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  outline: none;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.ai-input::placeholder {
+  color: rgba(217, 203, 191, 0.45);
+}
+
+.ai-input:focus {
+  border-color: rgba(217, 167, 201, 0.55);
+  box-shadow: 0 0 0 3px rgba(217, 167, 201, 0.12);
+}
+
+.ai-rule {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(217, 167, 201, 0.3),
+    transparent
+  );
+}
+
+.ai-rise {
+  animation: ai-rise 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.ai-pulse {
+  animation: ai-pulse 2.4s ease-in-out infinite;
+}
+
+.ai-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 0%,
+    rgba(217, 167, 201, 0.11) 45%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+  background-size: 220% 100%;
+  animation: ai-shimmer 1.6s ease-in-out infinite;
+}
+
+@keyframes ai-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ai-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.94);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes ai-shimmer {
+  from {
+    background-position: 140% 0;
+  }
+  to {
+    background-position: -40% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-rise,
+  .ai-pulse,
+  .ai-shimmer {
+    animation: none !important;
+  }
+  .ai-button,
+  .ai-chip,
+  .ai-input {
+    transition: none !important;
+  }
+}
