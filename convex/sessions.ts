@@ -425,6 +425,14 @@ export const roomState = query({
       .withIndex("by_session", (q) => q.eq("sessionId", session._id))
       .collect();
 
+    const outcomes = await ctx.db
+      .query("revealOutcomes")
+      .withIndex("by_session", (q) => q.eq("sessionId", session._id))
+      .collect();
+
+    const outcomeOf = (questionId: string) =>
+      outcomes.find((outcome) => outcome.questionId === questionId)?.kind ?? null;
+
     const answerOf = (playerId: Id<"sessionPlayers">, questionId: string) =>
       answers.find(
         (answer) =>
@@ -440,6 +448,8 @@ export const roomState = query({
       const anySkipped = Boolean(
         (mine && mine.skipped) || (theirs && theirs.skipped),
       );
+      const bothAnswered = myAnswered && theirAnswered;
+      const isRevealed = Boolean(mine?.revealed && theirs?.revealed);
 
       let status:
         | "a_repondre"
@@ -451,7 +461,7 @@ export const roomState = query({
         status = myAnswered ? "revelee" : "a_repondre";
       } else if (anySkipped) {
         status = "passee";
-      } else if (myAnswered && theirAnswered) {
+      } else if (bothAnswered && isRevealed) {
         status = "revelee";
       } else if (myAnswered) {
         status = "attente_partenaire";
@@ -476,6 +486,10 @@ export const roomState = query({
         partnerValue: status === "revelee" && theirs ? theirs.value : null,
         status,
         same,
+        bothAnswered,
+        myRevealReady: Boolean(mine?.revealReady),
+        partnerRevealReady: Boolean(theirs?.revealReady),
+        outcome: outcomeOf(question._id),
       };
     });
 
@@ -614,7 +628,6 @@ export const submitAnswer = mutation({
       .withIndex("by_session", (q) => q.eq("sessionId", session._id))
       .collect();
 
-    const alreadyRevealed = sessionAnswers.some((answer) => answer.revealed);
     const partner = players.find((player) => player._id !== me._id);
     const theirs = partner
       ? sessionAnswers.find(
@@ -624,14 +637,12 @@ export const submitAnswer = mutation({
         )
       : undefined;
 
-    if (theirs && !theirs.skipped) {
+    // DuoReveal : les deux réponses restent masquées tant que chacun n'a pas
+    // appuyé sur « Découvrir ensemble » (cf. confirmReveal ci-dessous).
+    if (!partner) {
       await ctx.db.patch(answerId, { revealed: true });
-      await ctx.db.patch(theirs._id, { revealed: true });
-      if (!alreadyRevealed) {
-        await logEvent(ctx, "game_revealed", now, session._id, {
-          mode: session.mode,
-        });
-      }
+    } else if (theirs && !theirs.skipped) {
+      await ctx.db.patch(answerId, { revealReady: false, revealed: false });
     }
 
     await ctx.db.patch(session._id, { lastActivityAt: now });
@@ -640,6 +651,162 @@ export const submitAnswer = mutation({
     });
 
     return { ok: true };
+  },
+});
+
+/**
+ * DuoReveal — révélation consentie.
+ *
+ * Chaque partenaire confirme explicitement. Les deux réponses n'apparaissent
+ * qu'au moment où la seconde personne a appuyé : aucune réponse n'est dévoilée
+ * par le simple fait que l'autre ait répondu.
+ */
+export const confirmReveal = mutation({
+  args: {
+    token: v.string(),
+    playerToken: v.string(),
+    questionId: v.id("questions"),
+  },
+  handler: async (ctx, args) => {
+    const { session, players, me } = await requirePlayer(
+      ctx,
+      args.token,
+      args.playerToken,
+    );
+
+    if (!session.questionIds.includes(args.questionId)) {
+      throw new Error("Cette question ne fait pas partie de la partie.");
+    }
+
+    const partner = players.find((player) => player._id !== me._id);
+    if (!partner) throw new Error("Votre partenaire n'a pas encore rejoint.");
+
+    const answers = await ctx.db
+      .query("answers")
+      .withIndex("by_session", (q) => q.eq("sessionId", session._id))
+      .collect();
+
+    const mine = answers.find(
+      (answer) =>
+        answer.playerId === me._id && answer.questionId === args.questionId,
+    );
+    const theirs = answers.find(
+      (answer) =>
+        answer.playerId === partner._id &&
+        answer.questionId === args.questionId,
+    );
+
+    if (!mine || mine.skipped || !theirs || theirs.skipped) {
+      throw new Error("Les deux réponses doivent être prêtes.");
+    }
+
+    const now = Date.now();
+    await ctx.db.patch(mine._id, { revealReady: true });
+
+    if (theirs.revealReady) {
+      await ctx.db.patch(mine._id, { revealed: true });
+      await ctx.db.patch(theirs._id, { revealed: true });
+      await logEvent(ctx, "game_revealed", now, session._id, {
+        mode: session.mode,
+      });
+    }
+
+    await ctx.db.patch(session._id, { lastActivityAt: now });
+    return { revealed: Boolean(theirs.revealReady) };
+  },
+});
+
+/**
+ * DuoReveal — décision du couple après la révélation. « Supprimer » efface
+ * réellement les deux réponses de la partie : rien n'est conservé.
+ */
+export const setRevealOutcome = mutation({
+  args: {
+    token: v.string(),
+    playerToken: v.string(),
+    questionId: v.id("questions"),
+    kind: v.union(
+      v.literal("meme_reponse"),
+      v.literal("a_discuter"),
+      v.literal("envie"),
+      v.literal("prive"),
+      v.literal("supprime"),
+    ),
+  },
+  handler: async (ctx, args) => {
+    const { session, players, me } = await requirePlayer(
+      ctx,
+      args.token,
+      args.playerToken,
+    );
+
+    if (!session.questionIds.includes(args.questionId)) {
+      throw new Error("Cette question ne fait pas partie de la partie.");
+    }
+
+    const partner = players.find((player) => player._id !== me._id);
+    const answers = await ctx.db
+      .query("answers")
+      .withIndex("by_session", (q) => q.eq("sessionId", session._id))
+      .collect();
+    const mine = answers.find(
+      (answer) =>
+        answer.playerId === me._id && answer.questionId === args.questionId,
+    );
+    const theirs = partner
+      ? answers.find(
+          (answer) =>
+            answer.playerId === partner._id &&
+            answer.questionId === args.questionId,
+        )
+      : undefined;
+
+    if (!mine?.revealed || (partner && !theirs?.revealed)) {
+      throw new Error("La révélation n'a pas encore eu lieu.");
+    }
+
+    const existing = await ctx.db
+      .query("revealOutcomes")
+      .withIndex("by_session_question", (q) =>
+        q.eq("sessionId", session._id).eq("questionId", args.questionId),
+      )
+      .unique();
+
+    if (args.kind === "supprime") {
+      if (existing) await ctx.db.delete(existing._id);
+      await ctx.db.delete(mine._id);
+      if (theirs) await ctx.db.delete(theirs._id);
+      await ctx.db.patch(session._id, {
+        questionIds: session.questionIds.filter(
+          (id) => id !== args.questionId,
+        ),
+        lastActivityAt: Date.now(),
+      });
+      await logEvent(ctx, "reveal_deleted", Date.now(), session._id);
+      return { ok: true, deleted: true };
+    }
+
+    if (existing) {
+      await ctx.db.patch(existing._id, {
+        kind: args.kind,
+        createdBy: me._id,
+        createdAt: Date.now(),
+      });
+    } else {
+      await ctx.db.insert("revealOutcomes", {
+        sessionId: session._id,
+        questionId: args.questionId,
+        kind: args.kind,
+        createdBy: me._id,
+        createdAt: Date.now(),
+      });
+    }
+
+    await ctx.db.patch(session._id, { lastActivityAt: Date.now() });
+    await logEvent(ctx, "reveal_outcome", Date.now(), session._id, {
+      kind: args.kind,
+    });
+    return { ok: true, deleted: false };
   },
 });
 

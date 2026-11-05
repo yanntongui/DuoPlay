@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMutation, useQuery } from "convex/react";
 import type { FunctionReturnType } from "convex/server";
-import { Loader2, SlidersHorizontal } from "lucide-react";
+import { Loader2, ShieldCheck, SlidersHorizontal } from "lucide-react";
 import { api } from "@/convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -25,6 +26,13 @@ import {
   rememberPlayerName,
   setPlayerToken,
 } from "@/lib/game/storage";
+import {
+  CONSENT_DECISIONS,
+  isStopDecision,
+  saveConsent,
+  useConsent,
+  type ConsentDecision,
+} from "@/lib/consent";
 import { cn } from "@/lib/utils";
 
 type SetupData = NonNullable<
@@ -58,6 +66,10 @@ export function SetupForm({
   const [preferencesLoaded, setPreferencesLoaded] = useState(false);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [consentChoice, setConsentChoice] = useState<ConsentDecision | null>(
+    null,
+  );
+  const consent = useConsent();
 
   // Préférences enregistrées sur cet appareil (cf. §3.F) — chargées une fois.
   const storedPreferences = useQuery(
@@ -124,6 +136,24 @@ export function SetupForm({
   const selectedMood = findMood(mood);
   const plannedCount = preview?.count ?? questionCount;
   const tooFew = preview !== undefined && preview !== null && preview.count < 3;
+  const isAdult = category?.slug === "entre-nous";
+  const needsAge = isAdult && !consent.ageConfirmed;
+  const consentStopped =
+    consentChoice !== null && isStopDecision(consentChoice);
+  const canStart =
+    name.trim().length >= 2 &&
+    Boolean(mode) &&
+    plannedCount > 0 &&
+    consentChoice !== null &&
+    !consentStopped &&
+    (!isAdult || consent.ageConfirmed);
+
+  function chooseConsent(value: ConsentDecision) {
+    setConsentChoice(value);
+    saveConsent(
+      isAdult ? { depth: value, adult: value } : { depth: value },
+    );
+  }
 
   function toggleTheme(theme: string) {
     setAvoidThemes((current) =>
@@ -134,7 +164,7 @@ export function SetupForm({
   }
 
   async function start() {
-    if (!mode) return;
+    if (!mode || !canStart) return;
     setPending(true);
     setError(null);
     try {
@@ -385,6 +415,99 @@ export function SetupForm({
           )}
         </section>
 
+        <section
+          data-testid="setup-consent"
+          className="flex flex-col gap-3 rounded-xl border border-ivory-200/90 bg-ivory-100/70 p-4"
+        >
+          <div className="flex items-start gap-3">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-lavender-100 text-lavender-700">
+              <ShieldCheck className="size-5" />
+            </span>
+            <div>
+              <h2 className="text-base leading-tight">
+                {t("session.consentTitle")}
+              </h2>
+              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                {t("session.consentIntro")}
+              </p>
+            </div>
+          </div>
+
+          {isAdult && needsAge && (
+            <div className="rounded-xl border border-coral-200/60 bg-coral-100/50 p-3.5">
+              <p className="text-sm font-medium">
+                {t("session.adultTitle")}
+              </p>
+              <p className="mt-1 text-xs leading-relaxed text-graphite-600">
+                {t("session.adultBody")}
+              </p>
+              <Button
+                type="button"
+                size="sm"
+                variant="secondary"
+                className="mt-2"
+                onClick={() => saveConsent({ ageConfirmed: true })}
+              >
+                {t("session.ageConfirm")}
+              </Button>
+            </div>
+          )}
+
+          <div
+            role="group"
+            aria-label={t("session.consentLabel")}
+            className="grid gap-2 sm:grid-cols-2"
+          >
+            {CONSENT_DECISIONS.map((item) => {
+              const active = consentChoice === item.slug;
+              return (
+                <button
+                  key={item.slug}
+                  type="button"
+                  data-testid={`consent-${item.slug}`}
+                  aria-pressed={active}
+                  onClick={() => chooseConsent(item.slug)}
+                  className={cn(
+                    "press min-h-14 rounded-xl border px-3.5 py-2.5 text-left transition-all",
+                    active
+                      ? "border-lavender-300 bg-lavender-200/50 shadow-[var(--shadow-soft)]"
+                      : "border-ivory-200 bg-white/[0.03] hover:border-lavender-300/70",
+                  )}
+                >
+                  <span className="flex items-center gap-2 text-sm font-medium">
+                    <span
+                      aria-hidden="true"
+                      className={cn(
+                        "size-2 rounded-full",
+                        active ? "bg-lavender-400" : "bg-ivory-300",
+                      )}
+                    />
+                    {item.label}
+                  </span>
+                  <span className="mt-0.5 block pl-4 text-xs leading-relaxed text-muted-foreground">
+                    {item.description}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {consentStopped && (
+            <p
+              data-testid="consent-stopped"
+              className="rounded-xl border border-ivory-200 bg-card/80 px-3.5 py-2.5 text-sm leading-relaxed text-muted-foreground"
+            >
+              {t("session.consentStopped")}
+            </p>
+          )}
+
+          {isAdult && needsAge && consentChoice !== null && !consentStopped && (
+            <p className="text-xs leading-relaxed text-coral-600">
+              {t("session.ageRequired")}
+            </p>
+          )}
+        </section>
+
         {error && (
           <p
             data-testid="setup-error"
@@ -394,18 +517,25 @@ export function SetupForm({
           </p>
         )}
 
-        <Button
-          type="button"
-          size="lg"
-          onClick={start}
-          disabled={
-            pending || name.trim().length < 2 || !mode || plannedCount === 0
-          }
-          className="w-full"
-        >
-          {pending && <Loader2 className="size-4 animate-spin" />}
-          {t("setup.create")}
-        </Button>
+        {consentStopped ? (
+          <Link
+            href="/explorer"
+            className="press inline-flex h-12 w-full items-center justify-center rounded-full border border-ivory-300 bg-card/90 text-sm font-medium text-foreground hover:border-lavender-300"
+          >
+            {t("setup.backToCatalogue")}
+          </Link>
+        ) : (
+          <Button
+            type="button"
+            size="lg"
+            onClick={start}
+            disabled={pending || !canStart}
+            className="w-full"
+          >
+            {pending && <Loader2 className="size-4 animate-spin" />}
+            {t("setup.create")}
+          </Button>
+        )}
         <p className="text-center text-xs text-muted-foreground">
           {t("setup.footerHint")}
         </p>

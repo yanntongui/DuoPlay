@@ -191,6 +191,12 @@ export const list = query({
           description: journey.description,
           emoji: journey.emoji,
           lengthDays: journey.lengthDays,
+          ambiance: journey.ambiance ?? "Connexion",
+          durationMinutes:
+            journey.durationMinutes ?? Math.max(10, journey.lengthDays * 3),
+          depth: journey.depth ?? "moyen",
+          context: journey.context ?? null,
+          conclusion: journey.conclusion ?? null,
           stepCount: steps.length,
           preview: steps.slice(0, 3).map((step) => step.title),
           progress: summarize(journey, view),
@@ -227,6 +233,8 @@ export const bySlug = query({
           title: step.title,
           prompt: step.prompt ?? null,
           mission: step.mission ?? null,
+          kind: step.kind ?? (step.experienceId ? "question" : "connexion"),
+          durationMinutes: step.durationMinutes ?? null,
           done: completedDays.includes(step.dayIndex),
           experience: experience
             ? {
@@ -252,6 +260,12 @@ export const bySlug = query({
         description: journey.description,
         emoji: journey.emoji,
         lengthDays: journey.lengthDays,
+        ambiance: journey.ambiance ?? "Connexion",
+        durationMinutes:
+          journey.durationMinutes ?? Math.max(10, journey.lengthDays * 3),
+        depth: journey.depth ?? "moyen",
+        context: journey.context ?? null,
+        conclusion: journey.conclusion ?? null,
       },
       steps: detailed,
       progress: summarize(journey, view),

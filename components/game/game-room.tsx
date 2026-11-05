@@ -12,8 +12,11 @@ import {
   Flag,
   HandHeart,
   Loader2,
+  Lock,
+  MessageCircle,
   Share2,
   Sparkles,
+  Trash2,
 } from "lucide-react";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
@@ -50,6 +53,31 @@ const DEPTH_LABEL: Record<string, MessageKey> = {
   moyen: "room.depthMoyen",
   profond: "room.depthProfond",
 };
+
+type RevealOutcomeKind =
+  | "meme_reponse"
+  | "a_discuter"
+  | "envie"
+  | "prive"
+  | "supprime";
+
+const REVEAL_OUTCOMES: Array<{
+  kind: RevealOutcomeKind;
+  labelKey: MessageKey;
+  icon: typeof Check;
+  destructive?: boolean;
+}> = [
+  { kind: "meme_reponse", labelKey: "room.outcomeSame", icon: Check },
+  { kind: "a_discuter", labelKey: "room.outcomeDiscuss", icon: MessageCircle },
+  { kind: "envie", labelKey: "room.outcomeDesire", icon: Sparkles },
+  { kind: "prive", labelKey: "room.outcomePrivate", icon: Lock },
+  {
+    kind: "supprime",
+    labelKey: "room.outcomeDelete",
+    icon: Trash2,
+    destructive: true,
+  },
+];
 
 /**
  * Rappel des préférences appliquées à cette partie (cf. PRD §3.F) —
@@ -500,9 +528,15 @@ function QuestionCard({
   const { t } = useT();
   const submit = useMutation(api.sessions.submitAnswer);
   const skip = useMutation(api.sessions.skipQuestion);
+  const confirmReveal = useMutation(api.sessions.confirmReveal);
+  const setRevealOutcome = useMutation(api.sessions.setRevealOutcome);
   const [draft, setDraft] = useState("");
   const [pending, setPending] = useState(false);
+  const [revealPending, setRevealPending] = useState(false);
+  const [outcomePending, setOutcomePending] = useState(false);
+  const [deleteArmed, setDeleteArmed] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [outcomeError, setOutcomeError] = useState<string | null>(null);
 
   async function send(value: string) {
     setPending(true);
@@ -541,9 +575,72 @@ function QuestionCard({
     }
   }
 
+  async function reveal() {
+    setRevealPending(true);
+    setError(null);
+    try {
+      await confirmReveal({
+        token,
+        playerToken,
+        questionId: question.id,
+      });
+    } catch (cause) {
+      setError(
+        cause instanceof Error
+          ? cause.message.replace(/^.*Uncaught Error:\s*/, "")
+          : "La révélation n'a pas pu se faire. Vous pouvez réessayer.",
+      );
+    } finally {
+      setRevealPending(false);
+    }
+  }
+
+  async function chooseOutcome(kind: RevealOutcomeKind) {
+    setOutcomePending(true);
+    setOutcomeError(null);
+    try {
+      await setRevealOutcome({
+        token,
+        playerToken,
+        questionId: question.id,
+        kind,
+      });
+      setDeleteArmed(false);
+    } catch (cause) {
+      setOutcomeError(
+        cause instanceof Error
+          ? cause.message.replace(/^.*Uncaught Error:\s*/, "")
+          : "Impossible d'enregistrer ce choix. Vous pouvez réessayer.",
+      );
+    } finally {
+      setOutcomePending(false);
+    }
+  }
+
+  function handleOutcome(kind: RevealOutcomeKind) {
+    if (outcomePending) return;
+    if (kind === "supprime" && !deleteArmed) {
+      setDeleteArmed(true);
+      return;
+    }
+    void chooseOutcome(kind);
+  }
+
   const answered = question.myValue !== null || question.mySkipped;
   const revealed = question.status === "revelee";
   const locked = question.status === "passee";
+
+  // DuoReveal : on ne passe pas à la suite avant que le couple ait choisi
+  // ce qu'il fait de la question révélée.
+  const canContinue = locked
+    ? true
+    : !answered
+      ? false
+      : !partnerName
+        ? true
+        : revealed
+          ? question.outcome !== null
+          : false;
 
   const announcement = locked
     ? t("room.announcePassed")
@@ -554,7 +651,11 @@ function QuestionCard({
           ? t("room.announceDifferent")
           : t("room.announceReveal")
       : answered && partnerName
-        ? t("room.announceAnswered", { name: partnerName })
+        ? question.bothAnswered
+          ? question.myRevealReady
+            ? t("room.revealWaiting", { name: partnerName })
+            : t("room.revealBody")
+          : t("room.announceAnswered", { name: partnerName })
         : "";
 
   return (
@@ -652,6 +753,44 @@ function QuestionCard({
         />
       )}
 
+      {/* DuoReveal : rien ne s'affiche avant l'accord explicite des deux. */}
+      {answered && !revealed && !locked && partnerName && question.bothAnswered && (
+        <div
+          data-testid="reveal-gate"
+          className="flex flex-col gap-3 rounded-xl border border-lavender-300/25 bg-lavender-100/50 p-4"
+        >
+          <div>
+            <p className="text-sm font-medium">{t("room.revealTitle")}</p>
+            <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+              {t("room.revealBody")}
+            </p>
+          </div>
+          {question.myRevealReady ? (
+            <p className="flex items-center gap-2.5 text-sm text-muted-foreground">
+              <Clock className="size-4 shrink-0 text-lavender-600" />
+              <span data-testid="reveal-waiting">
+                {t("room.revealWaiting", { name: partnerName })}
+              </span>
+            </p>
+          ) : (
+            <Button
+              type="button"
+              size="sm"
+              data-testid="reveal"
+              onClick={reveal}
+              disabled={revealPending}
+            >
+              {revealPending ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Sparkles className="size-4" />
+              )}
+              {t("room.revealButton")}
+            </Button>
+          )}
+        </div>
+      )}
+
       {/* Révélation : le voile givré se lève, une lueur champagne diffuse. */}
       {revealed && partnerName && (
         <div className="flex flex-col gap-3">
@@ -684,6 +823,66 @@ function QuestionCard({
           <p className="rounded-xl border border-ivory-200/80 bg-ivory-100/70 px-3.5 py-2.5 text-sm leading-relaxed text-graphite-600">
             {followUp(t, question)}
           </p>
+
+          <div
+            data-testid="reveal-outcomes"
+            className="flex flex-col gap-3 rounded-xl border border-ivory-200/80 bg-ivory-100/60 p-4"
+          >
+            <div>
+              <p className="text-sm font-medium">{t("room.outcomeTitle")}</p>
+              <p className="mt-1 text-xs leading-relaxed text-graphite-500">
+                {t("room.outcomeBody")}
+              </p>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {REVEAL_OUTCOMES.map((entry) => {
+                const active = question.outcome === entry.kind;
+                const Icon = entry.icon;
+                const arming = entry.destructive && deleteArmed && !active;
+                return (
+                  <button
+                    key={entry.kind}
+                    type="button"
+                    data-testid={`outcome-${entry.kind}`}
+                    aria-pressed={active}
+                    onClick={() => handleOutcome(entry.kind)}
+                    disabled={outcomePending}
+                    className={cn(
+                      "press flex min-h-11 items-center gap-2 rounded-xl border px-3.5 py-2.5 text-left text-sm transition-all disabled:opacity-60",
+                      active
+                        ? entry.destructive
+                          ? "border-coral-300 bg-coral-100 text-coral-700"
+                          : "border-lavender-300 bg-lavender-200/60 text-lavender-700"
+                        : arming
+                          ? "border-coral-300 bg-coral-100/60 text-coral-700"
+                          : "border-ivory-200 bg-white/[0.03] text-foreground hover:border-lavender-300/70",
+                    )}
+                  >
+                    {outcomePending && active ? (
+                      <Loader2 className="size-4 shrink-0 animate-spin" />
+                    ) : (
+                      <Icon className="size-4 shrink-0" aria-hidden="true" />
+                    )}
+                    {arming ? "Confirmer la suppression" : t(entry.labelKey)}
+                  </button>
+                );
+              })}
+            </div>
+            {question.outcome === "supprime" ? (
+              <p className="text-xs leading-relaxed text-graphite-500">
+                {t("room.outcomeDeleted")}
+              </p>
+            ) : question.outcome ? (
+              <p className="text-xs leading-relaxed text-graphite-500">
+                {t("room.outcomeSaved")}
+              </p>
+            ) : null}
+            {outcomeError && (
+              <p className="rounded-xl border border-coral-200/70 bg-coral-100/70 px-3 py-2 text-xs text-coral-700">
+                {outcomeError}
+              </p>
+            )}
+          </div>
         </div>
       )}
 
@@ -696,7 +895,7 @@ function QuestionCard({
         </p>
       )}
 
-      {answered && !revealed && !locked && partnerName && (
+      {answered && !revealed && !locked && partnerName && !question.bothAnswered && (
         <p className="flex items-center gap-2.5 rounded-xl border border-ivory-200/80 bg-ivory-100/70 px-3.5 py-3 text-sm text-muted-foreground">
           <Clock className="size-4 shrink-0 text-lavender-600" />
           <span data-testid="waiting">
@@ -724,11 +923,17 @@ function QuestionCard({
           </button>
         ) : (
           <span className="text-xs text-muted-foreground">
-            {t("room.revealedForBoth")}
+            {revealed && partnerName
+              ? question.outcome
+                ? t("room.outcomeSaved")
+                : t("room.outcomeChooseNext")
+              : !revealed && partnerName && question.bothAnswered
+                ? t("room.revealLocked", { name: partnerName })
+                : t("room.revealedForBoth")}
           </span>
         )}
 
-        {answered && (
+        {canContinue && (
           <Button type="button" size="sm" data-testid="next" onClick={onNext}>
             {isLast ? t("room.seeRecap") : t("room.nextQuestion")}
             <ArrowRight className="size-4" />
@@ -976,7 +1181,7 @@ function Play({
     return <Lobby token={token} state={state} onStart={() => setStarted(true)} />;
   }
 
-  const index = cursor ?? 0;
+  const index = Math.min(cursor ?? 0, Math.max(0, questions.length - 1));
   const question = questions[index];
 
   if (!question) {

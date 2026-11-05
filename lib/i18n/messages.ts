@@ -32,11 +32,15 @@ export const fr = {
   "nav.ai": "DuoPlay AI",
   "nav.aiShort": "IA",
   "nav.space": "Notre espace",
+  "nav.spaceShort": "Espace",
+  "nav.soiree": "Soirée",
+  "nav.soireeShort": "Soirée",
+  "nav.remote": "À distance",
+  "nav.remoteShort": "À distance",
   "nav.profile": "Mon profil",
   "nav.settings": "Paramètres",
   "nav.soon": "Bientôt",
   "nav.soonTitle": "{label} — bientôt disponible",
-  "nav.spaceShort": "Espace",
   "title.app": "DuoPlay",
   "title.defi": "Défi du jour",
   "title.journeys": "Parcours guidés",
@@ -441,6 +445,37 @@ export const fr = {
   "room.passedNotice":
     "Question passée — aucun souci, on avance. Personne n'a à se justifier.",
   "room.waitingFor": "En attente de {name}…",
+  "room.revealTitle": "Vous avez tous les deux répondu.",
+  "room.revealBody":
+    "Vos réponses restent masquées. Quand vous êtes prêts, découvrez-les ensemble.",
+  "room.revealButton": "Découvrir ensemble",
+  "room.revealWaiting":
+    "C'est noté. Rien n'apparaît tant que {name} n'a pas appuyé à son tour.",
+  "room.revealLocked": "En attente de l'accord de {name}.",
+  "room.outcomeTitle": "Et maintenant ?",
+  "room.outcomeBody":
+    "Choisissez ensemble ce que vous voulez faire de cette question. Rien n'est publié.",
+  "room.outcomeSame": "Même réponse",
+  "room.outcomeDiscuss": "À discuter",
+  "room.outcomeDesire": "Ajouter aux envies",
+  "room.outcomePrivate": "Garder privé",
+  "room.outcomeDelete": "Supprimer",
+  "room.outcomeSaved": "Choix enregistré pour vous deux.",
+  "room.outcomeDeleted": "Question supprimée. Elle ne reviendra pas.",
+  "room.outcomeChooseNext": "Choisissez une suite pour continuer.",
+  "room.outcomePending": "Enregistrement…",
+  "session.consentTitle": "Avant de commencer",
+  "session.consentIntro":
+    "Comment vous sentez-vous pour cette session ? Votre réponse est personnelle et peut changer à tout moment. Rien n'est déduit de votre silence.",
+  "session.consentLabel": "Choix de consentement",
+  "session.consentStopped":
+    "C'est noté, rien ne commence. Vous pouvez revenir quand vous voulez, ou choisir un autre moment. Ce n'est ni un refus de l'autre, ni un échec.",
+  "session.adultTitle": "Contenu réservé aux adultes",
+  "session.adultBody":
+    "Cette expérience parle de sensualité et d'intimité. Confirmez votre âge pour continuer. Rien n'est affiché avant votre accord.",
+  "session.ageConfirm": "J'ai 18 ans ou plus",
+  "session.ageRequired":
+    "Confirmez votre âge pour continuer. Vous pouvez aussi choisir une autre expérience, sans rien justifier.",
   "room.pass": "Passer · sans justification",
   "room.revealedForBoth": "Révélé pour vous deux",
   "room.seeRecap": "Voir le bilan",
@@ -537,6 +572,7 @@ export const fr = {
   "setup.noneMatch":
     "Aucune question ne correspond : retirez au moins un thème écarté.",
   "setup.create": "Créer la partie",
+  "setup.backToCatalogue": "Retour au catalogue",
   "setup.footerHint":
     "Vous recevrez un lien privé à partager avec votre partenaire. Vos préférences sont retenues sur cet appareil.",
   "wheel.challengeNow": "À relever maintenant, sans se défiler.",
@@ -734,11 +770,15 @@ export const en: Record<MessageKey, string> = {
   "nav.ai": "DuoPlay AI",
   "nav.aiShort": "AI",
   "nav.space": "Our space",
+  "nav.spaceShort": "Space",
+  "nav.soiree": "Soirée",
+  "nav.soireeShort": "Soirée",
+  "nav.remote": "Remote",
+  "nav.remoteShort": "Remote",
   "nav.profile": "My profile",
   "nav.settings": "Settings",
   "nav.soon": "Soon",
   "nav.soonTitle": "{label} — coming soon",
-  "nav.spaceShort": "Space",
   "title.app": "DuoPlay",
   "title.defi": "Daily challenge",
   "title.journeys": "Guided journeys",
@@ -1139,6 +1179,37 @@ export const en: Record<MessageKey, string> = {
   "room.passedNotice":
     "Question skipped — no worries, we move on. No one has to justify themselves.",
   "room.waitingFor": "Waiting for {name}…",
+  "room.revealTitle": "You have both answered.",
+  "room.revealBody":
+    "Your answers stay hidden. When you are both ready, discover them together.",
+  "room.revealButton": "Discover together",
+  "room.revealWaiting":
+    "Noted. Nothing appears until {name} has pressed too.",
+  "room.revealLocked": "Waiting for {name}'s agreement.",
+  "room.outcomeTitle": "What now?",
+  "room.outcomeBody":
+    "Choose together what to do with this question. Nothing is published.",
+  "room.outcomeSame": "Same answer",
+  "room.outcomeDiscuss": "To discuss",
+  "room.outcomeDesire": "Add to desires",
+  "room.outcomePrivate": "Keep private",
+  "room.outcomeDelete": "Delete",
+  "room.outcomeSaved": "Choice saved for both of you.",
+  "room.outcomeDeleted": "Question deleted. It will not come back.",
+  "room.outcomeChooseNext": "Choose what comes next to continue.",
+  "room.outcomePending": "Saving…",
+  "session.consentTitle": "Before we begin",
+  "session.consentIntro":
+    "How do you feel about this session? Your answer is personal and can change at any time. Nothing is inferred from your silence.",
+  "session.consentLabel": "Consent choice",
+  "session.consentStopped":
+    "Noted, nothing starts. You can come back whenever you want, or choose another moment. It is neither a refusal of your partner nor a failure.",
+  "session.adultTitle": "Adults only",
+  "session.adultBody":
+    "This experience is about sensuality and intimacy. Confirm your age to continue. Nothing is shown before your agreement.",
+  "session.ageConfirm": "I am 18 or older",
+  "session.ageRequired":
+    "Confirm your age to continue. You can also choose another experience, without justifying anything.",
   "room.pass": "Skip · no explanation",
   "room.revealedForBoth": "Revealed for both of you",
   "room.seeRecap": "See the summary",
@@ -1234,6 +1305,7 @@ export const en: Record<MessageKey, string> = {
   "setup.noneMatch":
     "No question matches: remove at least one avoided theme.",
   "setup.create": "Create the game",
+  "setup.backToCatalogue": "Back to the catalogue",
   "setup.footerHint":
     "You'll get a private link to share with your partner. Your preferences are kept on this device.",
   "wheel.challengeNow": "Do it now, no wriggling out.",

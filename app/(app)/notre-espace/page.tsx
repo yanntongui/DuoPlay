@@ -1,18 +1,11 @@
-import { OurSpace } from "@/components/app/our-space";
+import { Space } from "@/components/space/space";
 
-export const metadata = { title: "Notre espace" };
+export const metadata = { title: "Notre espace · DuoPlay" };
 
-export default function NotreEspacePage() {
+export default function SpacePage() {
   return (
-    <div className="flex flex-col gap-6">
-      <section>
-        <h1 className="text-2xl font-semibold">Notre espace</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Votre couple, vos favoris et vos parties, au même endroit.
-        </p>
-      </section>
-
-      <OurSpace />
+    <div className="mx-auto w-full max-w-5xl">
+      <Space />
     </div>
   );
 }

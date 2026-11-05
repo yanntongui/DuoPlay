@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { Star } from "lucide-react";
+import { motion } from "framer-motion";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import { useDeviceToken } from "@/lib/game/use-device";
@@ -41,7 +42,7 @@ export function FavoriteButton({
   }
 
   return (
-    <button
+    <motion.button
       type="button"
       data-testid="favorite"
       aria-pressed={active}
@@ -49,12 +50,21 @@ export function FavoriteButton({
       onClick={onClick}
       disabled={!ready}
       className={cn(
-        "press inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-ivory-200 bg-card text-graphite-500 shadow-[var(--shadow-soft)] transition-colors hover:border-coral-300 hover:text-coral-600 disabled:opacity-50",
+        "inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-ivory-200 bg-card text-graphite-500 shadow-[var(--shadow-soft)] transition-colors hover:border-coral-300 hover:text-coral-600 disabled:opacity-50",
         active && "border-coral-200 bg-coral-100 text-coral-600",
         className,
       )}
+      initial={{ scale: 1 }}
+      animate={active ? { scale: 1 } : { scale: 1 }}
+      whileTap={!pending ? { scale: 0.9, rotate: 15 } : {}}
+      transition={{ duration: 0.15, ease: "easeOut" }}
     >
-      <Star className={cn("size-4", active && "fill-current")} />
-    </button>
+      <motion.div
+        animate={active ? { rotate: 0 } : { rotate: 0 }}
+        transition={{ duration: 0.1 }}
+      >
+        <Star className={cn("size-4", active && "fill-current")} />
+      </motion.div>
+    </motion.button>
   );
 }

@@ -109,6 +109,148 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_role", ["role"]),
 
+  /* ---------------------------------------------------------------- */
+  /* Soirée DuoPlay (multi-couples)                                     */
+  /* ---------------------------------------------------------------- */
+
+  soireeGames: defineTable({
+    hostDeviceToken: v.string(),
+    hostName: v.string(),
+    roomCode: v.string(),
+    status: v.union(
+      v.literal("waiting"),
+      v.literal("in_progress"),
+      v.literal("finished"),
+    ),
+    rankingEnabled: v.boolean(),
+    createdAt: v.number(),
+  }).index("by_room_code", ["roomCode"]),
+
+  soireeTeams: defineTable({
+    gameId: v.id("soireeGames"),
+    deviceToken: v.string(),
+    coupleId: v.optional(v.id("couples")),
+    teamName: v.string(),
+    score: v.number(),
+    joinedAt: v.number(),
+  }).index("by_game", ["gameId"]),
+
+  soireeQuestions: defineTable({
+    gameId: v.id("soireeGames"),
+    questionId: v.id("questions"),
+    order: v.number(),
+    points: v.number(),
+  }).index("by_game", ["gameId"]),
+
+  soireeTeamAnswers: defineTable({
+    teamId: v.id("soireeTeams"),
+    questionId: v.id("questions"),
+    answer: v.string(),
+    submittedAt: v.optional(v.number()),
+    correct: v.optional(v.boolean()),
+  }).index("by_team", ["teamId"]).index("by_question", ["questionId"]),
+
+  /* ---------------------------------------------------------------- */
+  /* Mode à distance - Questions                                       */
+  /* ---------------------------------------------------------------- */
+
+  remoteRooms: defineTable({
+    hostDeviceToken: v.string(),
+    hostName: v.string(),
+    guestToken: v.optional(v.string()),
+    guestName: v.optional(v.string()),
+    roomCode: v.string(),
+    status: v.union(
+      v.literal("waiting"),
+      v.literal("ready"),
+      v.literal("in_progress"),
+      v.literal("completed"),
+    ),
+    experienceId: v.optional(v.id("experiences")),
+    questions: v.array(v.id("questions")),
+    currentQuestion: v.number(),
+    hostAnswered: v.boolean(),
+    guestAnswered: v.boolean(),
+    createdAt: v.number(),
+  }).index("by_host", ["hostDeviceToken"]).index("by_code", ["roomCode"]),
+
+  remoteAnswers: defineTable({
+    roomId: v.id("remoteRooms"),
+    playerToken: v.string(),
+    questionId: v.id("questions"),
+    answer: v.string(),
+    submittedAt: v.number(),
+  }).index("by_room", ["roomId"]).index("by_player", ["playerToken"]),
+
+  /* ---------------------------------------------------------------- */
+  /* Mode à distance - Cartes                                          */
+  /* ---------------------------------------------------------------- */
+
+  remoteCardGames: defineTable({
+    hostDeviceToken: v.string(),
+    hostName: v.string(),
+    guestToken: v.optional(v.string()),
+    guestName: v.optional(v.string()),
+    roomCode: v.string(),
+    status: v.union(
+      v.literal("waiting"),
+      v.literal("ready"),
+      v.literal("in_progress"),
+      v.literal("completed"),
+    ),
+    experienceId: v.id("experiences"),
+    questions: v.array(v.id("questions")),
+    currentCard: v.number(),
+    hostResponded: v.boolean(),
+    guestResponded: v.boolean(),
+    createdAt: v.number(),
+  }).index("by_host", ["hostDeviceToken"]).index("by_code", ["roomCode"]),
+
+  remoteCardResponses: defineTable({
+    roomId: v.id("remoteCardGames"),
+    playerToken: v.string(),
+    questionId: v.id("questions"),
+    response: v.union(
+      v.literal("jaime"),
+      v.literal("a_discuter"),
+      v.literal("pas_maintenant"),
+      v.literal("passer")
+    ),
+    submittedAt: v.number(),
+  }).index("by_room", ["roomId"]).index("by_player", ["playerToken"]),
+
+  /* ---------------------------------------------------------------- */
+  /* Mode à distance - Dés                                             */
+  /* ---------------------------------------------------------------- */
+
+  remoteDiceGames: defineTable({
+    hostDeviceToken: v.string(),
+    hostName: v.string(),
+    guestToken: v.optional(v.string()),
+    guestName: v.optional(v.string()),
+    roomCode: v.string(),
+    status: v.union(
+      v.literal("waiting"),
+      v.literal("ready"),
+      v.literal("in_progress"),
+      v.literal("completed"),
+    ),
+    ambiance: v.optional(v.string()),
+    durationMinutes: v.number(),
+    category: v.optional(v.string()),
+    hostRolled: v.boolean(),
+    guestRolled: v.boolean(),
+    createdAt: v.number(),
+  }).index("by_host", ["hostDeviceToken"]).index("by_code", ["roomCode"]),
+
+  remoteDiceResults: defineTable({
+    roomId: v.id("remoteDiceGames"),
+    playerToken: v.string(),
+    category: v.string(),
+    result: v.number(),
+    rolledAt: v.number(),
+  }).index("by_room", ["roomId"]).index("by_player", ["playerToken"]),
+
   couples: defineTable({
     deviceA: v.string(),
     deviceB: v.optional(v.string()),
@@ -139,6 +281,58 @@ export default defineSchema({
   })
     .index("by_deviceA", ["deviceA"])
     .index("by_deviceB", ["deviceB"]),
+
+  /* ---------------------------------------------------------------- */
+  /* Couple & espace personnel                                         */
+  /* ---------------------------------------------------------------- */
+
+  coupleCustomItems: defineTable({
+    coupleId: v.optional(v.id("couples")),
+    userId: v.optional(v.id("users")),
+    deviceToken: v.optional(v.string()),
+    kind: v.union(
+      v.literal("desire"),
+      v.literal("memory"),
+      v.literal("favorite"),
+      v.literal("upcoming"),
+      v.literal("date"),
+      v.literal("custom_experience"),
+    ),
+    title: v.string(),
+    description: v.optional(v.string()),
+    data: v.optional(v.any()),
+    visibility: v.union(
+      v.literal("private"),
+      v.literal("shared"),
+      v.literal("common"),
+      v.literal("to_discuss"),
+      v.literal("deleted"),
+    ),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+    deletedAt: v.optional(v.number()),
+  })
+    .index("by_couple", ["coupleId"])
+    .index("by_user", ["userId"])
+    .index("by_kind", ["kind"]),
+
+  customExperienceDrafts: defineTable({
+    coupleId: v.optional(v.id("couples")),
+    userId: v.optional(v.id("users")),
+    title: v.string(),
+    theme: v.string(),
+    mood: v.optional(v.string()),
+    durationMinutes: v.number(),
+    depth: v.optional(v.union(v.literal("leger"), v.literal("moyen"), v.literal("profond"))),
+    questionIds: v.optional(v.array(v.id("questions"))),
+    customQuestions: v.optional(v.array(v.any())),
+    excludedCategories: v.optional(v.array(v.string())),
+    savedTo: v.optional(v.union(v.literal("favorites"), v.literal("space"), v.literal("none"))),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_couple", ["coupleId"])
+    .index("by_user", ["userId"]),
 
   /* ---------------------------------------------------------------- */
   /* Contenu éditorial                                                 */
@@ -287,11 +481,30 @@ export default defineSchema({
     value: v.string(),
     skipped: v.boolean(),
     revealed: v.boolean(),
+    /** DuoReveal : le joueur a appuyé sur « Découvrir ensemble ». */
+    revealReady: v.optional(v.boolean()),
     answeredAt: v.number(),
   })
     .index("by_session", ["sessionId"])
     .index("by_session_question", ["sessionId", "questionId"])
     .index("by_player", ["playerId"]),
+
+  /* DuoReveal : décision du couple après la révélation. Jamais publique. */
+  revealOutcomes: defineTable({
+    sessionId: v.id("sessions"),
+    questionId: v.id("questions"),
+    kind: v.union(
+      v.literal("meme_reponse"),
+      v.literal("a_discuter"),
+      v.literal("envie"),
+      v.literal("prive"),
+      v.literal("supprime"),
+    ),
+    createdBy: v.optional(v.id("sessionPlayers")),
+    createdAt: v.number(),
+  })
+    .index("by_session", ["sessionId"])
+    .index("by_session_question", ["sessionId", "questionId"]),
 
   /* ---------------------------------------------------------------- */
   /* Défi du jour                                                      */
@@ -346,6 +559,12 @@ export default defineSchema({
     lengthDays: v.number(),
     order: v.number(),
     status: publishStatus,
+    /** Métadonnées éditoriales DuoPath. */
+    ambiance: v.optional(v.string()),
+    durationMinutes: v.optional(v.number()),
+    depth: v.optional(depth),
+    context: v.optional(v.string()),
+    conclusion: v.optional(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
@@ -359,6 +578,21 @@ export default defineSchema({
     prompt: v.optional(v.string()),
     experienceId: v.optional(v.id("experiences")),
     mission: v.optional(v.string()),
+    /** Nature de l'étape, pour le chemin visuel DuoPath. */
+    kind: v.optional(
+      v.union(
+        v.literal("depart"),
+        v.literal("connexion"),
+        v.literal("question"),
+        v.literal("carte"),
+        v.literal("defi"),
+        v.literal("souvenir"),
+        v.literal("surprise"),
+        v.literal("pause"),
+        v.literal("arrivee"),
+      ),
+    ),
+    durationMinutes: v.optional(v.number()),
   })
     .index("by_journey", ["journeyId"])
     .index("by_journey_day", ["journeyId", "dayIndex"]),

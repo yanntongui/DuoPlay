@@ -115,7 +115,7 @@ export function AiSearch({
               Filtres compris
             </p>
             <div className="mt-2 flex flex-wrap gap-1.5">
-              {result.filters.understood.map((label) => (
+              {result.filters.understood.map((label: string) => (
                 <span
                   key={label}
                   className="rounded-full border border-[#d9a7c9]/22 bg-[#d9a7c9]/8 px-2.5 py-1 text-[11px] text-[#e8d6e2]"
@@ -149,7 +149,7 @@ export function AiSearch({
                 title={`${result.experiences.length} proposition${result.experiences.length > 1 ? "s" : ""}`}
               />
               <div className="grid gap-2.5">
-                {result.experiences.map((item) => (
+                {result.experiences.map((item: any) => (
                   <AiCard key={item.slug} soft className="p-4">
                     <div className="flex items-start gap-3">
                       <span aria-hidden="true" className="text-xl">
@@ -168,7 +168,7 @@ export function AiSearch({
                           {item.description}
                         </p>
                         <ul className="mt-2 space-y-1">
-                          {item.reasons.map((reason) => (
+                          {item.reasons.map((reason: string) => (
                             <li
                               key={reason}
                               className="flex gap-1.5 text-[11.5px] leading-snug text-[#e8d6e2]/75"

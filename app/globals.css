@@ -706,7 +706,9 @@
     position: absolute;
     top: 0;
     bottom: 0;
+    left: 0;
     width: 40%;
+    pointer-events: none;
     background-image: linear-gradient(
       90deg,
       transparent,
@@ -764,9 +766,86 @@
   50% { transform: translateY(-4px); }
 }
 
+/* ------------------------------------------------------------------ */
+/*  Animations fonctionnelles (spécifiques)                            */
+/* ------------------------------------------------------------------ */
+
+/* Retourner de carte */
+@keyframes duoplay-flip {
+  from { transform: perspective(1000px) rotateY(0); }
+  to { transform: perspective(1000px) rotateY(180deg); }
+}
+
+/* Lancement de dé */
+@keyframes duoplay-dice-roll {
+  0% { transform: rotateX(0) rotateY(0) rotateZ(0); }
+  50% { transform: rotateX(360deg) rotateY(360deg) rotateZ(180deg); }
+  100% { transform: rotateX(720deg) rotateY(720deg) rotateZ(360deg); }
+}
+
+/* Pop rapide (confirmation) */
+@keyframes duoplay-pop-quick {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  50% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Apparition de souvenir */
+@keyframes duoplay-memory-reveal {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Progression */
+@keyframes duoplay-progress-fill {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+/* Révélation avec flou */
+@keyframes duoplay-reveal-blur {
+  from { opacity: 0; filter: blur(8px); }
+  to { opacity: 1; filter: blur(0); }
+}
+
 @media (prefers-reduced-motion: no-preference) {
+  /* Micro-retours (100-150ms) */
+  .micro-pop {
+    animation: duoplay-pop-quick 150ms ease-out both;
+  }
+
+  /* Petites transitions (200-300ms) */
   .slide-in {
-    animation: duoplay-slide-in 200ms ease-out both;
+    animation: duoplay-slide-in 250ms ease-out both;
+  }
+
+  .memory-reveal {
+    animation: duoplay-memory-reveal 300ms ease-out both;
+  }
+
+  /* Transitions importantes (300-500ms) */
+  .progress-fill {
+    animation: duoplay-progress-fill 400ms ease-out;
+  }
+
+  .reveal-blur {
+    animation: duoplay-reveal-blur 500ms ease-out both;
+  }
+
+  /* Retourner de carte (300ms) */
+  .flip-card {
+    transform-style: preserve-3d;
+    transition: transform 300ms ease-out;
+  }
+
+  /* Lancement de dé (<1s) */
+  .dice-roll {
+    animation: duoplay-dice-roll 800ms ease-in-out;
+  }
+
+  /* Révélation simultanée (500ms) */
+  .reveal-sync {
+    animation: duoplay-reveal-blur 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
   .fade-in {

@@ -56,8 +56,7 @@ export const PERSONAL_NAV: NavItem[] = [
 export const MOBILE_NAV: NavItem[] = [
   { href: "/accueil", labelKey: "nav.home", icon: Home },
   { href: "/explorer", labelKey: "nav.experiences", icon: Compass },
-  { href: "/ai", labelKey: "nav.aiShort", icon: Sparkles },
-  { href: "/mes-parties", labelKey: "nav.games", icon: Gamepad2 },
+  { href: "/remote", labelKey: "nav.remoteShort", icon: Sparkles },
   { href: "/notre-espace", labelKey: "nav.spaceShort", icon: Heart },
 ];
 

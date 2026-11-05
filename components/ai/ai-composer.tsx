@@ -165,7 +165,7 @@ export function AiComposer({
           </p>
 
           <ol className="mt-5 space-y-2">
-            {result.session.steps.map((item, index) => (
+            {result.session.steps.map((item: any, index: number) => (
               <li
                 key={`${item.title}-${index}`}
                 className="ai-surface-soft flex items-start gap-3 p-3.5"
@@ -202,7 +202,7 @@ export function AiComposer({
               Pourquoi cette session
             </p>
             <ul className="space-y-1.5">
-              {result.session.rationale.map((reason) => (
+              {result.session.rationale.map((reason: string) => (
                 <li
                   key={reason}
                   className="flex gap-1.5 text-[12px] leading-snug text-[#d9cbbf]/70"
@@ -215,7 +215,7 @@ export function AiComposer({
           </div>
 
           <div className="mt-4 flex flex-wrap gap-2">
-            {result.session.alternatives.map((alternative) => (
+            {result.session.alternatives.map((alternative: any) => (
               <span
                 key={alternative.label}
                 className="rounded-full border border-[#d9a7c9]/18 px-2.5 py-1 text-[11px] text-[#d9cbbf]/65"

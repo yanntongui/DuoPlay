@@ -433,7 +433,7 @@ export function AiHome({
                   {item.description}
                 </p>
                 <ul className="mt-3 space-y-1.5">
-                  {item.reasons.map((reason) => (
+                  {item.reasons.map((reason: string) => (
                     <li
                       key={reason}
                       className="flex gap-1.5 text-[11.5px] leading-snug text-[#e8d6e2]/80"
@@ -505,7 +505,7 @@ export function AiHome({
           <>
             <ul className="grid gap-2">
               {(historyOpen ? overview.sessions : overview.sessions.slice(0, 3)).map(
-                (session) => (
+                (session: any) => (
                   <li key={session.id}>
                     <div className="ai-surface-soft flex items-center gap-3 p-3.5">
                       <button

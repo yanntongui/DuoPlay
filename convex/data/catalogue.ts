@@ -54,6 +54,12 @@ export type SeedJourney = {
   lengthDays: number;
   order: number;
   status: "draft" | "published" | "archived";
+  /** DuoPath : ambiance, durée et niveau affichés sur la fiche. */
+  ambiance?: string;
+  durationMinutes?: number;
+  depth?: "leger" | "moyen" | "profond";
+  context?: string;
+  conclusion?: string;
   createdAt: number;
   updatedAt: number;
 };
@@ -65,6 +71,18 @@ export type SeedJourneyStep = {
   prompt?: string;
   mission?: string;
   experienceSlug?: string;
+  /** Nature de l'étape dans le chemin visuel DuoPath. */
+  kind?:
+    | "depart"
+    | "connexion"
+    | "question"
+    | "carte"
+    | "defi"
+    | "souvenir"
+    | "surprise"
+    | "pause"
+    | "arrivee";
+  durationMinutes?: number;
 };
 
 export type SeedCatalogue = {
@@ -7092,6 +7110,125 @@ export const CATALOGUE: SeedCatalogue = {
       "lengthDays": 7,
       "createdAt": 1792244501957,
       "updatedAt": 1792244501957
+    },
+    {
+      "slug": "retrouvons-nous-10",
+      "title": "Retrouvons-nous",
+      "tagline": "Dix minutes pour se rejoindre",
+      "description": "Un parcours court et tendre pour passer du mode « logistique » au mode « nous ».",
+      "emoji": "🤍",
+      "order": 10.0,
+      "status": "published",
+      "lengthDays": 6,
+      "ambiance": "Reconnexion",
+      "durationMinutes": 10,
+      "depth": "leger",
+      "context": "Après une journée chargée, sans préparation.",
+      "conclusion": "Vous voilà revenus l'un vers l'autre. Gardez une seule image de ce moment.",
+      "createdAt": 1792244501957,
+      "updatedAt": 1792244501957
+    },
+    {
+      "slug": "les-cinq-sens-20",
+      "title": "Les cinq sens",
+      "tagline": "Ralentir et ressentir",
+      "description": "Un parcours sensoriel pour retrouver la complicité par le corps, la voix et l'attention.",
+      "emoji": "🌿",
+      "order": 11.0,
+      "status": "published",
+      "lengthDays": 7,
+      "ambiance": "Tendre",
+      "durationMinutes": 20,
+      "depth": "moyen",
+      "context": "Un moment calme, lumière douce, téléphones en silence.",
+      "conclusion": "Vos sens ont repris le dessus sur le quotidien. Choisissez une sensation à refaire bientôt.",
+      "createdAt": 1792244501957,
+      "updatedAt": 1792244501957
+    },
+    {
+      "slug": "nos-souvenirs-15",
+      "title": "Nos souvenirs",
+      "tagline": "Revisiter votre histoire",
+      "description": "Quinze minutes pour rouvrir les petits chapitres qui font votre histoire commune.",
+      "emoji": "📷",
+      "order": 12.0,
+      "status": "published",
+      "lengthDays": 6,
+      "ambiance": "Souvenir",
+      "durationMinutes": 15,
+      "depth": "moyen",
+      "context": "Un soir tranquille, avec une photo ou un objet qui vous rappelle un moment.",
+      "conclusion": "Votre histoire n'est pas derrière vous : elle continue de vous tenir ensemble.",
+      "createdAt": 1792244501957,
+      "updatedAt": 1792244501957
+    },
+    {
+      "slug": "sortons-de-la-routine-30",
+      "title": "Sortons de la routine",
+      "tagline": "Une petite aventure aujourd'hui",
+      "description": "Trente minutes pour casser un automatisme et créer un souvenir qui ne ressemble pas aux autres.",
+      "emoji": "🚪",
+      "order": 13.0,
+      "status": "published",
+      "lengthDays": 7,
+      "ambiance": "Routine",
+      "durationMinutes": 30,
+      "depth": "moyen",
+      "context": "Quand les mêmes soirées se répètent et que vous voulez autre chose.",
+      "conclusion": "La routine n'a pas disparu : elle a juste été interrompue. Recommencez quand vous voulez.",
+      "createdAt": 1792244501957,
+      "updatedAt": 1792244501957
+    },
+    {
+      "slug": "a-distance-mais-proches-15",
+      "title": "À distance mais proches",
+      "tagline": "La distance n'empêche pas la proximité",
+      "description": "Un parcours pensé pour deux écrans : chacun chez soi, mais ensemble dans le même moment.",
+      "emoji": "🛰️",
+      "order": 14.0,
+      "status": "published",
+      "lengthDays": 5,
+      "ambiance": "À distance",
+      "durationMinutes": 15,
+      "depth": "leger",
+      "context": "Deux villes, deux téléphones, un créneau commun de quinze minutes.",
+      "conclusion": "La distance a beau être réelle, vous venez de partager un vrai moment. Gardez le lien ouvert.",
+      "createdAt": 1792244501957,
+      "updatedAt": 1792244501957
+    },
+    {
+      "slug": "notre-prochaine-aventure-20",
+      "title": "Notre prochaine aventure",
+      "tagline": "Rêver le prochain chapitre",
+      "description": "Vingt minutes pour transformer une envie floue en projet concret à deux.",
+      "emoji": "🧭",
+      "order": 15.0,
+      "status": "published",
+      "lengthDays": 6,
+      "ambiance": "Aventure",
+      "durationMinutes": 20,
+      "depth": "moyen",
+      "context": "Un dimanche, un carnet et l'envie de regarder devant.",
+      "conclusion": "Vous avez maintenant une direction, pas une obligation. Le prochain pas peut être tout petit.",
+      "createdAt": 1792244501957,
+      "updatedAt": 1792244501957
+    },
+    {
+      "slug": "une-soiree-rien-qua-nous-45",
+      "title": "Une soirée rien qu'à nous",
+      "tagline": "Le grand format",
+      "description": "Quarante-cinq minutes, plusieurs étapes et une vraie parenthèse pour prendre soin de votre couple.",
+      "emoji": "🕯️",
+      "order": 16.0,
+      "status": "published",
+      "lengthDays": 10,
+      "ambiance": "Sensuel",
+      "durationMinutes": 45,
+      "depth": "profond",
+      "context": "Une soirée libre, sans impératif de performance ni de résultat.",
+      "conclusion": "Cette soirée vous appartient. Vous pouvez la refaire autrement, ou en garder seulement ce qui vous a plu.",
+      "createdAt": 1792244501957,
+      "updatedAt": 1792244501957
     }
   ],
   "journeySteps": [
@@ -7297,6 +7434,386 @@ export const CATALOGUE: SeedCatalogue = {
       "title": "Nos rêves",
       "prompt": "Vos aspirations, grandes et petites.",
       "experienceSlug": "nos-reves"
+    },
+    {
+      "journeySlug": "retrouvons-nous-10",
+      "dayIndex": 1,
+      "title": "Départ",
+      "mission": "Posez vos téléphones, asseyez-vous face à face. Respirez lentement, ensemble, trois fois.",
+      "kind": "depart",
+      "durationMinutes": 1
+    },
+    {
+      "journeySlug": "retrouvons-nous-10",
+      "dayIndex": 2,
+      "title": "Un regard",
+      "mission": "Regardez-vous vingt secondes sans parler. Rien à prouver, rien à dire.",
+      "kind": "connexion",
+      "durationMinutes": 1
+    },
+    {
+      "journeySlug": "retrouvons-nous-10",
+      "dayIndex": 3,
+      "title": "Ce qui m'a occupé",
+      "prompt": "Chacun raconte en une minute ce qui l'a le plus occupé aujourd'hui. L'autre écoute sans interrompre.",
+      "kind": "question",
+      "durationMinutes": 3
+    },
+    {
+      "journeySlug": "retrouvons-nous-10",
+      "dayIndex": 4,
+      "title": "Une chose que j'aime",
+      "prompt": "Chacun nomme une petite chose que l'autre a faite cette semaine et qui lui a fait du bien.",
+      "kind": "carte",
+      "durationMinutes": 2
+    },
+    {
+      "journeySlug": "retrouvons-nous-10",
+      "dayIndex": 5,
+      "title": "Notre prochain petit moment",
+      "prompt": "Choisissez ensemble un moment de dix minutes à vous offrir dans les trois prochains jours.",
+      "kind": "question",
+      "durationMinutes": 2
+    },
+    {
+      "journeySlug": "retrouvons-nous-10",
+      "dayIndex": 6,
+      "title": "Arrivée",
+      "mission": "Un câlin de vingt secondes ou une main posée sur l'autre. Ce qui vous ressemble.",
+      "kind": "arrivee",
+      "durationMinutes": 1
+    },
+    {
+      "journeySlug": "les-cinq-sens-20",
+      "dayIndex": 1,
+      "title": "Départ",
+      "mission": "Baissez la lumière, coupez les notifications et installez-vous côte à côte.",
+      "kind": "depart",
+      "durationMinutes": 1
+    },
+    {
+      "journeySlug": "les-cinq-sens-20",
+      "dayIndex": 2,
+      "title": "La vue",
+      "prompt": "Chacun décrit trois détails qu'il aime chez l'autre, uniquement avec ses yeux.",
+      "kind": "connexion",
+      "durationMinutes": 3
+    },
+    {
+      "journeySlug": "les-cinq-sens-20",
+      "dayIndex": 3,
+      "title": "L'ouïe",
+      "prompt": "Chuchotez chacun une phrase que vous aimez entendre de l'autre.",
+      "kind": "question",
+      "durationMinutes": 3
+    },
+    {
+      "journeySlug": "les-cinq-sens-20",
+      "dayIndex": 4,
+      "title": "Le toucher",
+      "mission": "Main dans la main, yeux fermés, pendant trente secondes. Puis décrivez ce que vous avez ressenti.",
+      "kind": "carte",
+      "durationMinutes": 3
+    },
+    {
+      "journeySlug": "les-cinq-sens-20",
+      "dayIndex": 5,
+      "title": "L'odorat",
+      "prompt": "Quelle odeur vous ramène le plus vite à un souvenir de vous deux ?",
+      "kind": "souvenir",
+      "durationMinutes": 3
+    },
+    {
+      "journeySlug": "les-cinq-sens-20",
+      "dayIndex": 6,
+      "title": "Le goût",
+      "mission": "Choisissez ensemble quelque chose à goûter lentement, sans écran. Prenez le temps.",
+      "kind": "defi",
+      "durationMinutes": 5
+    },
+    {
+      "journeySlug": "les-cinq-sens-20",
+      "dayIndex": 7,
+      "title": "Arrivée",
+      "mission": "Nommez chacun le sens qui vous a le plus rapprochés. Gardez-le pour la prochaine fois.",
+      "kind": "arrivee",
+      "durationMinutes": 2
+    },
+    {
+      "journeySlug": "nos-souvenirs-15",
+      "dayIndex": 1,
+      "title": "Départ",
+      "mission": "Choisissez une photo ou un objet qui vous rappelle un moment de votre histoire.",
+      "kind": "depart",
+      "durationMinutes": 1
+    },
+    {
+      "journeySlug": "nos-souvenirs-15",
+      "dayIndex": 2,
+      "title": "Le premier souvenir",
+      "prompt": "Quel est le premier moment où vous avez senti que quelque chose se passait entre vous ?",
+      "experienceSlug": "premier-baiser",
+      "kind": "souvenir",
+      "durationMinutes": 3
+    },
+    {
+      "journeySlug": "nos-souvenirs-15",
+      "dayIndex": 3,
+      "title": "Le fou rire",
+      "prompt": "Racontez le fou rire qui vous revient encore aujourd'hui.",
+      "experienceSlug": "le-rire-qui-nous-unis",
+      "kind": "souvenir",
+      "durationMinutes": 3
+    },
+    {
+      "journeySlug": "nos-souvenirs-15",
+      "dayIndex": 4,
+      "title": "Le moment difficile",
+      "prompt": "Quel épisode a changé votre façon d'être ensemble ? Restez dans ce que vous pouvez raconter aujourd'hui.",
+      "experienceSlug": "notre-premiere-dispute",
+      "kind": "question",
+      "durationMinutes": 4
+    },
+    {
+      "journeySlug": "nos-souvenirs-15",
+      "dayIndex": 5,
+      "title": "Ce que nous avons construit",
+      "prompt": "Nommez chacun trois choses que vous avez construites ensemble et qui comptent encore.",
+      "kind": "carte",
+      "durationMinutes": 3
+    },
+    {
+      "journeySlug": "nos-souvenirs-15",
+      "dayIndex": 6,
+      "title": "Arrivée",
+      "mission": "Choisissez un souvenir à raconter à quelqu'un qui vous aime, ou à garder rien qu'à vous.",
+      "kind": "arrivee",
+      "durationMinutes": 1
+    },
+    {
+      "journeySlug": "sortons-de-la-routine-30",
+      "dayIndex": 1,
+      "title": "Départ",
+      "mission": "Regardez votre semaine habituelle. Choisissez un seul automatisme à interrompre aujourd'hui.",
+      "kind": "depart",
+      "durationMinutes": 2
+    },
+    {
+      "journeySlug": "sortons-de-la-routine-30",
+      "dayIndex": 2,
+      "title": "Changer un détail",
+      "mission": "Modifiez un détail de votre soirée : la place, la lumière, la musique, le repas. Juste un.",
+      "kind": "defi",
+      "durationMinutes": 3
+    },
+    {
+      "journeySlug": "sortons-de-la-routine-30",
+      "dayIndex": 3,
+      "title": "Vingt minutes dehors",
+      "mission": "Sortez vingt minutes ensemble, sans destination obligatoire. Marchez côte à côte.",
+      "kind": "defi",
+      "durationMinutes": 5
+    },
+    {
+      "journeySlug": "sortons-de-la-routine-30",
+      "dayIndex": 4,
+      "title": "Une question imprévue",
+      "prompt": "Si vous pouviez prendre une journée entière ensemble demain, sans contrainte, qu'est-ce que vous feriez ?",
+      "kind": "question",
+      "durationMinutes": 4
+    },
+    {
+      "journeySlug": "sortons-de-la-routine-30",
+      "dayIndex": 5,
+      "title": "Le défi du jour",
+      "prompt": "Choisissez un petit défi à faire aujourd'hui, à la hauteur de votre énergie réelle.",
+      "experienceSlug": "surprises-simples",
+      "kind": "carte",
+      "durationMinutes": 5
+    },
+    {
+      "journeySlug": "sortons-de-la-routine-30",
+      "dayIndex": 6,
+      "title": "Raconter",
+      "prompt": "Qu'est-ce qui vous a plu dans ce changement ? Qu'est-ce que vous aimeriez garder ?",
+      "kind": "question",
+      "durationMinutes": 4
+    },
+    {
+      "journeySlug": "sortons-de-la-routine-30",
+      "dayIndex": 7,
+      "title": "Arrivée",
+      "mission": "Notez une seule habitude à réessayer ce mois-ci. Pas plus.",
+      "kind": "arrivee",
+      "durationMinutes": 2
+    },
+    {
+      "journeySlug": "a-distance-mais-proches-15",
+      "dayIndex": 1,
+      "title": "Départ",
+      "mission": "Ouvrez chacun votre écran et regardez-vous trente secondes par caméra. Coupez le reste.",
+      "kind": "depart",
+      "durationMinutes": 1
+    },
+    {
+      "journeySlug": "a-distance-mais-proches-15",
+      "dayIndex": 2,
+      "title": "Le même ciel",
+      "prompt": "Décrivez chacun le ciel que vous voyez en ce moment. Qu'est-ce qui est identique, qu'est-ce qui change ?",
+      "kind": "connexion",
+      "durationMinutes": 3
+    },
+    {
+      "journeySlug": "a-distance-mais-proches-15",
+      "dayIndex": 3,
+      "title": "Une photo de ta journée",
+      "mission": "Envoyez-vous une photo de votre journée, sans commentaire. L'autre devine ce qu'elle raconte.",
+      "kind": "defi",
+      "durationMinutes": 4
+    },
+    {
+      "journeySlug": "a-distance-mais-proches-15",
+      "dayIndex": 4,
+      "title": "Ce qui me manque",
+      "prompt": "Nommez chacun une chose concrète qui vous manque de l'autre en ce moment. Sans reproche.",
+      "kind": "question",
+      "durationMinutes": 4
+    },
+    {
+      "journeySlug": "a-distance-mais-proches-15",
+      "dayIndex": 5,
+      "title": "Arrivée",
+      "mission": "Choisissez votre prochain créneau commun et écrivez-le quelque part. Court, mais réel.",
+      "kind": "arrivee",
+      "durationMinutes": 3
+    },
+    {
+      "journeySlug": "notre-prochaine-aventure-20",
+      "dayIndex": 1,
+      "title": "Départ",
+      "mission": "Prenez un carnet ou une note partagée. Vous allez dessiner un projet, pas prendre une décision.",
+      "kind": "depart",
+      "durationMinutes": 2
+    },
+    {
+      "journeySlug": "notre-prochaine-aventure-20",
+      "dayIndex": 2,
+      "title": "Un rêve à trois ans",
+      "prompt": "Où aimeriez-vous être dans trois ans ? Chacun répond sans filtrer, puis vous comparez.",
+      "kind": "question",
+      "durationMinutes": 4
+    },
+    {
+      "journeySlug": "notre-prochaine-aventure-20",
+      "dayIndex": 3,
+      "title": "Le premier pas",
+      "mission": "Choisissez ensemble le plus petit pas possible vers ce rêve, faisable dans les sept prochains jours.",
+      "kind": "defi",
+      "durationMinutes": 4
+    },
+    {
+      "journeySlug": "notre-prochaine-aventure-20",
+      "dayIndex": 4,
+      "title": "Nos contraintes",
+      "prompt": "Qu'est-ce qui pourrait vous empêcher d'avancer ? Nommez-le sans en faire un reproche.",
+      "kind": "question",
+      "durationMinutes": 4
+    },
+    {
+      "journeySlug": "notre-prochaine-aventure-20",
+      "dayIndex": 5,
+      "title": "Le pacte",
+      "prompt": "Écrivez une phrase commune qui commence par « Nous allons essayer de… ». Affichez-la ou gardez-la.",
+      "kind": "carte",
+      "durationMinutes": 4
+    },
+    {
+      "journeySlug": "notre-prochaine-aventure-20",
+      "dayIndex": 6,
+      "title": "Arrivée",
+      "mission": "Fixez une date pour faire le point sur ce premier pas. Pas un bilan, juste un rendez-vous.",
+      "kind": "arrivee",
+      "durationMinutes": 2
+    },
+    {
+      "journeySlug": "une-soiree-rien-qua-nous-45",
+      "dayIndex": 1,
+      "title": "Départ",
+      "mission": "Choisissez une heure où vous ne serez dérangés par personne. Posez les téléphones loin de vous.",
+      "kind": "depart",
+      "durationMinutes": 3
+    },
+    {
+      "journeySlug": "une-soiree-rien-qua-nous-45",
+      "dayIndex": 2,
+      "title": "Le rituel d'ouverture",
+      "mission": "Choisissez ensemble un petit rituel de début de soirée : une boisson, une lumière, une musique.",
+      "kind": "connexion",
+      "durationMinutes": 4
+    },
+    {
+      "journeySlug": "une-soiree-rien-qua-nous-45",
+      "dayIndex": 3,
+      "title": "Ce que j'aime en toi",
+      "prompt": "Chacun dit trois choses qu'il aime chez l'autre, sans se moquer et sans se presser.",
+      "kind": "carte",
+      "durationMinutes": 5
+    },
+    {
+      "journeySlug": "une-soiree-rien-qua-nous-45",
+      "dayIndex": 4,
+      "title": "Un souvenir qui nous fait sourire",
+      "prompt": "Racontez chacun un souvenir tendre ou drôle de votre histoire. L'autre peut en ajouter un détail.",
+      "kind": "souvenir",
+      "durationMinutes": 5
+    },
+    {
+      "journeySlug": "une-soiree-rien-qua-nous-45",
+      "dayIndex": 5,
+      "title": "Le dîner sans écran",
+      "mission": "Mangez ensemble sans écran. Parlez de ce que vous voulez, sauf de logistique.",
+      "kind": "pause",
+      "durationMinutes": 8
+    },
+    {
+      "journeySlug": "une-soiree-rien-qua-nous-45",
+      "dayIndex": 6,
+      "title": "Une envie à raconter",
+      "prompt": "Chacun raconte une envie, tendre ou sensuelle, en précisant ce qui serait agréable et ce qui ne l'est pas. Rien n'est une promesse.",
+      "kind": "carte",
+      "durationMinutes": 6
+    },
+    {
+      "journeySlug": "une-soiree-rien-qua-nous-45",
+      "dayIndex": 7,
+      "title": "Le défi tendre",
+      "mission": "Choisissez ensemble un geste tendre à faire maintenant, à la hauteur du consentement de chacun.",
+      "kind": "defi",
+      "durationMinutes": 5
+    },
+    {
+      "journeySlug": "une-soiree-rien-qua-nous-45",
+      "dayIndex": 8,
+      "title": "Ce que je veux garder",
+      "prompt": "Qu'est-ce que vous voulez garder de cette soirée ? Une image, une phrase, une sensation.",
+      "kind": "question",
+      "durationMinutes": 4
+    },
+    {
+      "journeySlug": "une-soiree-rien-qua-nous-45",
+      "dayIndex": 9,
+      "title": "Notre prochain rendez-vous",
+      "prompt": "Choisissez une date pour refaire une soirée comme celle-ci, même plus courte.",
+      "kind": "carte",
+      "durationMinutes": 3
+    },
+    {
+      "journeySlug": "une-soiree-rien-qua-nous-45",
+      "dayIndex": 10,
+      "title": "Arrivée",
+      "mission": "Terminez par ce qui vous fait du bien à tous les deux. Le reste peut attendre demain.",
+      "kind": "arrivee",
+      "durationMinutes": 2
     }
   ]
 };
