@@ -12,6 +12,9 @@
 
 [build.environment]
   NODE_VERSION = "20"
+  # Console /admin = maquette non authentifiée : fermée (404) en production.
+  # Passer à "1" uniquement quand l'auth réelle sera branchée.
+  ADMIN_ENABLED = "0"
 
 # Le service worker doit toujours être revalidé.
 [[headers]]

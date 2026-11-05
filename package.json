@@ -31,8 +31,6 @@
     "seed:catalogue": "convex run seed:seedCatalogue"
   },
   "dependencies": {
-    "@auth/core": "^0.41.3",
-    "@convex-dev/auth": "^0.0.96",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "convex": "^1.47.0",

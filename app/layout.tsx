@@ -19,6 +19,14 @@ export const metadata: Metadata = {
     "DuoPlay est une plateforme de jeux, de défis et d'expériences pour aider les couples à renforcer leurs liens, briser la routine et raviver la flamme.",
   applicationName: "DuoPlay",
   manifest: "/manifest.webmanifest",
+  icons: {
+    icon: [
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180" }],
+  },
   appleWebApp: {
     capable: true,
     title: "DuoPlay",

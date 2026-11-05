@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMutation, useQuery } from "convex/react";
 import { Check, Copy, Dices, HelpCircle, Layers, RotateCcw } from "lucide-react";
 import { api } from "@/convex/_generated/api";
@@ -41,6 +43,7 @@ const GAME_TYPES: Array<{
 ];
 
 export function RemoteRoomLanding({ backHref = "/explorer" }: { backHref?: string }) {
+  const router = useRouter();
   const deviceToken = useDeviceToken();
   const experiences = useQuery(api.experiences.listAll);
 
@@ -118,14 +121,14 @@ export function RemoteRoomLanding({ backHref = "/explorer" }: { backHref?: strin
           🤝
         </span>
         <div>
-          <p className="eyebrow mb-1">Code d'invitation</p>
+          <p className="eyebrow mb-1">Code d’invitation</p>
           <h1 className="text-3xl font-bold tracking-wider">{code}</h1>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            Partagez ce code avec votre partenaire pour qu'il vous rejoigne.
+            Partagez ce code avec votre partenaire pour qu’il vous rejoigne.
           </p>
         </div>
         <div className="flex w-full flex-col gap-2">
-          <Button onClick={() => (window.location.href = `/remote/${code}`)}>
+          <Button onClick={() => router.push(`/remote/${code}`)}>
             Passer à la salle
           </Button>
           <Button
@@ -276,12 +279,12 @@ export function RemoteRoomLanding({ backHref = "/explorer" }: { backHref?: strin
         <div>
           <p className="text-sm font-medium">Créer une session</p>
           <p className="text-xs leading-relaxed text-muted-foreground">
-            Vous êtes l'hôte, votre partenaire rejoint avec le code
+            Vous êtes l’hôte, votre partenaire rejoint avec le code
           </p>
         </div>
       </button>
 
-      <a
+      <Link
         href="/remote/join"
         className="press flex min-h-16 items-center gap-4 rounded-2xl border border-ivory-300 bg-card/80 px-4 py-4 text-left hover:border-lavender-300"
       >
@@ -294,7 +297,7 @@ export function RemoteRoomLanding({ backHref = "/explorer" }: { backHref?: strin
             Entrez le code que votre partenaire vous a donné
           </p>
         </div>
-      </a>
+      </Link>
 
       <a
         href={backHref}
