@@ -11,18 +11,27 @@ import { useT } from "@/lib/i18n";
 export function AppFooter() {
   const { t } = useT();
   return (
-    <footer className="mt-16 border-t border-white/[0.06] px-4 pb-24 pt-8 sm:px-6 md:pb-10 lg:px-8">
-      <div className="mx-auto flex w-full max-w-5xl flex-col items-center justify-between gap-4 text-sm text-muted-foreground sm:flex-row">
-        <Logo showWordmark />
-        <nav aria-label={t("nav.legalLabel")} className="flex gap-5">
-          <Link href="/confidentialite" className="hover:text-foreground">
+    <footer className="mt-10 border-t border-white/[0.06] px-4 pb-20 pt-5 sm:px-6 md:pb-6 lg:px-8">
+      <div className="mx-auto flex w-full max-w-5xl flex-col items-center justify-between gap-3 text-xs text-muted-foreground sm:flex-row">
+        <Logo showWordmark size="sm" className="opacity-85" />
+        <nav
+          aria-label={t("nav.legalLabel")}
+          className="flex items-center gap-4"
+        >
+          <Link
+            href="/confidentialite"
+            className="transition-colors hover:text-foreground"
+          >
             {t("nav.privacy")}
           </Link>
-          <Link href="/cgu" className="hover:text-foreground">
+          <span aria-hidden="true" className="text-white/15">
+            ·
+          </span>
+          <Link href="/cgu" className="transition-colors hover:text-foreground">
             {t("nav.terms")}
           </Link>
         </nav>
-        <p>© {new Date().getFullYear()} DuoPlay</p>
+        <p className="tabular-nums">© {new Date().getFullYear()} DuoPlay</p>
       </div>
     </footer>
   );

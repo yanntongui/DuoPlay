@@ -6,6 +6,7 @@ import { Check, Share2 } from "lucide-react";
 import { api } from "@/convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { copyText } from "@/lib/clipboard";
 import { useDeviceToken } from "@/lib/game/use-device";
 import { cn } from "@/lib/utils";
 
@@ -112,10 +113,11 @@ export function RemoteCardGame({ code }: { code: string }) {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => {
-              navigator.clipboard.writeText(game.roomCode);
-              setCopied(true);
-              setTimeout(() => setCopied(false), 2000);
+            onClick={async () => {
+              if (await copyText(game.roomCode)) {
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+              }
             }}
           >
             {copied ? (

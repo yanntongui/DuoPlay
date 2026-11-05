@@ -32,15 +32,25 @@ export function LogoMark({
 export function Logo({
   className,
   showWordmark = true,
+  size = "md",
 }: {
   className?: string;
   showWordmark?: boolean;
+  size?: "sm" | "md";
 }) {
+  const markSize = size === "sm" ? "size-7" : "size-9";
+  const wordSize = size === "sm" ? "text-lg" : "text-2xl";
+
   return (
     <span className={cn("inline-flex items-center gap-2", className)}>
-      <LogoMark />
+      <LogoMark className={markSize} />
       {showWordmark && (
-        <span className="inline-flex items-baseline font-display text-2xl font-semibold tracking-tight">
+        <span
+          className={cn(
+            "inline-flex items-baseline font-display font-semibold tracking-tight",
+            wordSize,
+          )}
+        >
           Duo<span className="text-primary">Play</span>
           <span
             aria-hidden="true"

@@ -10,20 +10,20 @@ export default function AppLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <div className="relative min-h-dvh">
+    <div className="relative flex min-h-dvh flex-col">
       <AppBackground />
       <AppSidebar />
 
-      <div className="md:pl-[4.75rem] lg:pl-64">
+      <div className="flex flex-1 flex-col md:pl-[4.75rem] lg:pl-64">
         <AppIsland />
         <AppHeader />
 
-        <div className="pt-20 sm:pt-24 md:pt-0">
+        <div className="flex flex-1 flex-col pt-20 sm:pt-24 md:pt-0">
           <OfflineBanner />
 
           <main
             id="contenu"
-            className="mx-auto w-full px-4 pt-6 sm:px-6 lg:px-8"
+            className="mx-auto w-full flex-1 px-4 pt-6 sm:px-6 lg:px-8"
           >
             <div className="max-w-5xl">
               {children}

@@ -6,6 +6,7 @@ import { Check, Share2 } from "lucide-react";
 import { api } from "@/convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { copyText } from "@/lib/clipboard";
 import { useDeviceToken } from "@/lib/game/use-device";
 import { cn } from "@/lib/utils";
 
@@ -121,8 +122,8 @@ export function RemoteDiceGame({ code }: { code: string }) {
     }
   }
 
-  function copyCode(value: string) {
-    navigator.clipboard.writeText(value);
+  async function copyCode(value: string) {
+    if (!(await copyText(value))) return;
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
@@ -145,7 +146,7 @@ export function RemoteDiceGame({ code }: { code: string }) {
               Mode dés · {game.durationMinutes} min
             </p>
           </div>
-          <Button variant="outline" size="sm" onClick={() => copyCode(game.roomCode)}>
+          <Button variant="outline" size="sm" onClick={() => void copyCode(game.roomCode)}>
             {copied ? (
               <>
                 <Check className="size-4" />

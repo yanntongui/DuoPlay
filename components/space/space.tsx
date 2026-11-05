@@ -24,10 +24,6 @@ import { Card } from "@/components/ui/card";
 import { EmojiTile, Pill } from "@/components/ui/surface";
 import { useDeviceToken } from "@/lib/game/use-device";
 import { cn } from "@/lib/utils";
-import {
-  update as updateItem,
-  remove as removeItem,
-} from "@/convex/customItems";
 
 type CustomItem = NonNullable<
   FunctionReturnType<typeof api.customItems.list>
@@ -153,7 +149,7 @@ function EditDialog({
   open: boolean;
   onClose: () => void;
 }) {
-  const update = useMutation(updateItem as any);
+  const update = useMutation(api.customItems.update);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [visibility, setVisibility] = useState<VisibilityKind>("shared");
@@ -254,7 +250,7 @@ function ItemCard({
   onEdit: (item: CustomItem) => void;
 }) {
   const [confirming, setConfirming] = useState(false);
-  const remove = useMutation(removeItem as any);
+  const remove = useMutation(api.customItems.remove);
 
   return (
     <>

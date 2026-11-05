@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmojiTile, Pill } from "@/components/ui/surface";
 import { useDeviceToken } from "@/lib/game/use-device";
+import { copyText } from "@/lib/clipboard";
 import { cn } from "@/lib/utils";
 
 export function SoireeRoom({ code }: { code: string }) {
@@ -133,8 +134,8 @@ export function SoireeRoom({ code }: { code: string }) {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => {
-              navigator.clipboard.writeText(code);
+            onClick={async () => {
+              if (!(await copyText(code))) return;
               setCopied(true);
               setTimeout(() => setCopied(false), 2000);
             }}
