@@ -26,7 +26,7 @@
 
 - **Frontend**: Next.js 15 + TailwindCSS + React Server Components
 - **Backend**: Convex (fonctions serverless)
-- **Auth**: mot de passe unique (`ADMIN_PASSWORD`) vérifié par une Server Action, puis cookie `duoplay_admin` **HttpOnly signé HMAC-SHA256** (`ADMIN_SESSION_SECRET`), valable 7 jours. Pas encore de 2FA ni de comptes nominatifs.
+- **Auth**: identifiant (`ADMIN_USERNAME`, défaut `admin`) + mot de passe (`ADMIN_PASSWORD`) vérifiés par une Server Action, puis cookie `duoplay_admin` **HttpOnly signé HMAC-SHA256** (`ADMIN_SESSION_SECRET`), valable 7 jours. Pas encore de 2FA ni de comptes nominatifs multiples.
 - **Base de données**: Convex (tables `users`, `profiles`, `couples`, `auditLogs`…)
 - **Sécurité**: RBAC (`lib/admin/permissions.ts`), journal d'audit (à câbler), double validation
 

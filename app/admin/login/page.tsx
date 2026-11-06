@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowRight, Lock, ShieldCheck } from "lucide-react";
+import { ArrowRight, Lock, Mail, ShieldCheck } from "lucide-react";
 import { login } from "@/lib/admin/actions";
 
 /**
@@ -17,7 +17,7 @@ export default function AdminLogin() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("error")) {
-      setError("Mot de passe incorrect.");
+      setError("Identifiants incorrects.");
     }
   }, []);
 
@@ -109,10 +109,32 @@ export default function AdminLogin() {
           <form action={login} className="mt-6 space-y-4">
             <div>
               <label
+                htmlFor="username"
+                className="mb-1.5 block text-[12px] font-medium ad-soft"
+              >
+                Identifiant
+              </label>
+              <div className="relative">
+                <Mail className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 ad-faint" />
+                <input
+                  id="username"
+                  name="username"
+                  type="text"
+                  autoComplete="username"
+                  required
+                  autoFocus
+                  placeholder="admin"
+                  className="ad-input h-11 ad-pl-10"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label
                 htmlFor="password"
                 className="mb-1.5 block text-[12px] font-medium ad-soft"
               >
-                Mot de passe administrateur
+                Mot de passe
               </label>
               <div className="relative">
                 <Lock className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 ad-faint" />
@@ -122,7 +144,6 @@ export default function AdminLogin() {
                   type="password"
                   autoComplete="current-password"
                   required
-                  autoFocus
                   placeholder="••••••••••"
                   className="ad-input h-11 ad-pl-10"
                 />

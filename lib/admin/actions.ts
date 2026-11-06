@@ -6,7 +6,7 @@ import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import { adminClient, adminKey } from "@/lib/admin/convex";
 import {
-  checkPassword,
+  checkCredentials,
   endAdminSession,
   isAdminAuthenticated,
   startAdminSession,
@@ -17,10 +17,13 @@ import {
 /* ------------------------------------------------------------------ */
 
 export async function login(formData: FormData) {
+  const username = String(formData.get("username") ?? "");
   const password = String(formData.get("password") ?? "");
-  if (!checkPassword(password)) {
+
+  if (!checkCredentials(username, password)) {
     redirect("/admin/login?error=1");
   }
+
   await startAdminSession();
   redirect("/admin");
 }
