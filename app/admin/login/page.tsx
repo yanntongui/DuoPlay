@@ -1,33 +1,25 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { ArrowRight, Lock, Mail, ShieldCheck } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowRight, Lock, ShieldCheck } from "lucide-react";
+import { login } from "@/lib/admin/actions";
 
+/**
+ * Connexion à la console interne.
+ *
+ * Le formulaire poste vers une **Server Action** : le mot de passe est comparé
+ * côté serveur à `ADMIN_PASSWORD`, puis un cookie HttpOnly signé est posé. Rien
+ * n'est stocké en `localStorage`, rien n'est validable depuis le navigateur.
+ */
 export default function AdminLogin() {
-  const router = useRouter();
-  const [email, setEmail] = useState("admin@duoplay.com");
-  const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setIsLoading(true);
-
-    try {
-      // Démonstration — toute combinaison non vide est acceptée.
-      await new Promise((r) => setTimeout(r, 700));
-      if (!email || !password) {
-        setError("Renseignez votre e-mail et votre mot de passe.");
-        return;
-      }
-      router.push("/admin/2fa");
-    } finally {
-      setIsLoading(false);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("error")) {
+      setError("Mot de passe incorrect.");
     }
-  };
+  }, []);
 
   return (
     <div className="flex min-h-dvh flex-col lg:flex-row">
@@ -62,7 +54,7 @@ export default function AdminLogin() {
           </h1>
           <p className="mt-4 text-[13.5px] leading-relaxed text-white/60">
             Utilisateurs, contenus, revenus, conformité. Un accès unique pour
-            l&apos;équipe — cloisonné par rôle et tracé de bout en bout.
+            l&apos;équipe.
           </p>
         </div>
 
@@ -106,92 +98,53 @@ export default function AdminLogin() {
           </p>
 
           {error && (
-            <div className="mt-5 rounded-xl border ad-bd-danger ad-bg-danger-soft px-3.5 py-2.5 text-[12.5px] ad-danger">
+            <div
+              role="alert"
+              className="mt-5 rounded-xl border ad-bd-danger ad-bg-danger-soft px-3.5 py-2.5 text-[12.5px] ad-danger"
+            >
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+          <form action={login} className="mt-6 space-y-4">
             <div>
               <label
-                htmlFor="email"
+                htmlFor="password"
                 className="mb-1.5 block text-[12px] font-medium ad-soft"
               >
-                Adresse e-mail
+                Mot de passe administrateur
               </label>
-              <div className="relative">
-                <Mail className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 ad-faint" />
-                <input
-                  id="email"
-                  type="email"
-                  autoComplete="username"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="prenom@duoplay.com"
-                  className="ad-input h-11 ad-pl-10"
-                  required
-                />
-              </div>
-            </div>
-
-            <div>
-              <div className="mb-1.5 flex items-baseline justify-between">
-                <label
-                  htmlFor="password"
-                  className="block text-[12px] font-medium ad-soft"
-                >
-                  Mot de passe
-                </label>
-                <button
-                  type="button"
-                  className="text-[11.5px] ad-plum hover:underline"
-                >
-                  Oublié ?
-                </button>
-              </div>
               <div className="relative">
                 <Lock className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 ad-faint" />
                 <input
                   id="password"
+                  name="password"
                   type="password"
                   autoComplete="current-password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  autoFocus
                   placeholder="••••••••••"
                   className="ad-input h-11 ad-pl-10"
-                  required
                 />
               </div>
             </div>
 
             <button
               type="submit"
-              disabled={isLoading}
-              className="ad-btn ad-btn-primary mt-2 h-11 w-full disabled:opacity-60"
+              className="ad-btn ad-btn-primary mt-2 h-11 w-full"
             >
-              {isLoading ? (
-                "Vérification…"
-              ) : (
-                <>
-                  Se connecter
-                  <ArrowRight className="size-4" strokeWidth={2} />
-                </>
-              )}
+              Se connecter
+              <ArrowRight className="size-4" strokeWidth={2} />
             </button>
           </form>
 
           <div className="mt-6 flex items-start gap-2.5 rounded-xl border ad-bd ad-bg-soft p-3">
             <ShieldCheck className="mt-0.5 size-4 shrink-0 ad-plum" />
             <p className="text-[11.5px] leading-snug ad-muted">
-              L&apos;authentification à deux facteurs sera demandée à l&apos;étape
-              suivante. Toutes les actions sont horodatées dans le journal
-              d&apos;audit.
+              Session signée, valable 7 jours. Déconnexion immédiate depuis le
+              menu du compte.
             </p>
           </div>
-
-          <p className="mt-6 text-center text-[11px] ad-faint">
-            Environnement de démonstration — toute combinaison est acceptée.
-          </p>
         </div>
       </div>
     </div>

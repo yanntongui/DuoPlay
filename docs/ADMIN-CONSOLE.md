@@ -26,9 +26,11 @@
 
 - **Frontend**: Next.js 15 + TailwindCSS + React Server Components
 - **Backend**: Convex (fonctions serverless)
-- **Auth**: cookie de session + écran 2FA (démo : tout code à 6 chiffres est accepté)
-- **Base de données**: Convex (tables `users`, `profiles`, `couples`, `adminAccess`, `auditLogs`…)
-- **Sécurité**: RBAC (`lib/admin/permissions.ts`), journal d'audit, double validation
+- **Auth**: mot de passe unique (`ADMIN_PASSWORD`) vérifié par une Server Action, puis cookie `duoplay_admin` **HttpOnly signé HMAC-SHA256** (`ADMIN_SESSION_SECRET`), valable 7 jours. Pas encore de 2FA ni de comptes nominatifs.
+- **Base de données**: Convex (tables `users`, `profiles`, `couples`, `auditLogs`…)
+- **Sécurité**: RBAC (`lib/admin/permissions.ts`), journal d'audit (à câbler), double validation
+
+> ⚠️ **État actuel** : les écrans de la console affichent des **données de démonstration** codées en dur ; ils ne lisent pas encore Convex. L'authentification, elle, est réelle.
 
 ## 2. Structure de Navigation
 

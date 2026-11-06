@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import {
   Bell,
@@ -14,6 +14,7 @@ import {
   X,
 } from "lucide-react";
 import { ADMIN_NAV } from "./nav";
+import { logout as endAdminSession } from "@/lib/admin/actions";
 
 /* ---------------------------------------------------------------- */
 /*  Marque                                                           */
@@ -94,13 +95,11 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 }
 
 function SidebarFooter() {
-  const router = useRouter();
 
+  // Server Action : le cookie HttpOnly est supprimé côté serveur, puis
+  // redirection vers l'écran de connexion.
   const logout = () => {
-    localStorage.removeItem("admin_token");
-    localStorage.removeItem("admin_role");
-    document.cookie = "admin_token=; path=/; max-age=0; SameSite=Lax";
-    router.push("/admin/login");
+    void endAdminSession();
   };
 
   return (
@@ -175,7 +174,6 @@ function Topbar({ onOpenMenu }: { onOpenMenu: () => void }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [bellOpen, setBellOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const router = useRouter();
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -188,11 +186,10 @@ function Topbar({ onOpenMenu }: { onOpenMenu: () => void }) {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
+  // Server Action : le cookie HttpOnly est supprimé côté serveur, puis
+  // redirection vers l'écran de connexion.
   const logout = () => {
-    localStorage.removeItem("admin_token");
-    localStorage.removeItem("admin_role");
-    document.cookie = "admin_token=; path=/; max-age=0; SameSite=Lax";
-    router.push("/admin/login");
+    void endAdminSession();
   };
 
   return (
@@ -356,7 +353,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   // Les écrans d'authentification occupent tout l'écran, sans navigation.
-  if (pathname === "/admin/login" || pathname === "/admin/2fa") {
+  if (pathname === "/admin/login") {
     return <div className="admin-shell min-h-dvh">{children}</div>;
   }
 

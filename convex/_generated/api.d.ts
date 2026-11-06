@@ -10,7 +10,6 @@
 
 import type * as accounts from "../accounts.js";
 import type * as activity from "../activity.js";
-import type * as admin from "../admin.js";
 import type * as ai from "../ai.js";
 import type * as ai_catalogue from "../ai/catalogue.js";
 import type * as ai_communication from "../ai/communication.js";
@@ -69,7 +68,6 @@ import type {
 declare const fullApi: ApiFromModules<{
   accounts: typeof accounts;
   activity: typeof activity;
-  admin: typeof admin;
   ai: typeof ai;
   "ai/catalogue": typeof ai_catalogue;
   "ai/communication": typeof ai_communication;
