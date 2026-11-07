@@ -830,17 +830,49 @@ export default defineSchema({
   /* Audit Logs pour la console d'administration                      */
   /* ---------------------------------------------------------------- */
 
-  auditLogs: defineTable({
-    action: v.string(),
-    target: v.optional(v.any()),
-    adminId: v.optional(v.string()),
-    reason: v.optional(v.string()),
-    metadata: v.optional(v.any()),
+  /* ---------------------------------------------------------------- */
+  /* Admin Console - Segments & Incidents                               */
+  /* ---------------------------------------------------------------- */
+
+  segments: defineTable({
+    name: v.string(),
+    description: v.optional(v.string()),
+    type: v.string(), // Cycle de vie, Engagement, Rétention, Revenus, etc.
+    size: v.number(),
+    growthRate: v.optional(v.number()),
+    status: v.union(
+      v.literal("published"),
+      v.literal("draft"),
+      v.literal("review"),
+    ),
+    updatedAt: v.number(),
     createdAt: v.number(),
   })
-    .index("by_action", ["action"])
-    .index("by_admin", ["adminId"])
-    .index("by_createdAt", ["createdAt"]),
+    .index("by_status", ["status"])
+    .index("by_type", ["type"]),
+
+  incidents: defineTable({
+    title: v.string(),
+    severity: v.union(
+      v.literal("critical"),
+      v.literal("major"),
+      v.literal("minor"),
+    ),
+    status: v.union(
+      v.literal("in_progress"),
+      v.literal("resolved"),
+    ),
+    service: v.string(),
+    startedAt: v.number(),
+    resolvedAt: v.optional(v.number()),
+    durationMinutes: v.number(),
+    owner: v.string(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_status", ["status"])
+    .index("by_severity", ["severity"])
+    .index("by_startedAt", ["startedAt"]),
 
   /* ---------------------------------------------------------------- */
   /* DuoPlay AI (cf. docs/AI-DUOPLAY.md)                              */
