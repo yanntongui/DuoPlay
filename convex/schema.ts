@@ -20,6 +20,9 @@ export const experienceType = v.union(
   v.literal("cartes"),
   v.literal("des"),
   v.literal("parcours"),
+  v.literal("chemin-intimite"),
+  v.literal("5-sens"),
+  v.literal("parcour-des-envies"),
 );
 
 export const cardCategory = v.union(
@@ -985,4 +988,225 @@ export default defineSchema({
     note: v.optional(v.string()),
     updatedAt: v.number(),
   }).index("by_key", ["key"]),
+
+  /* ---------------------------------------------------------------- */
+  /* Cinq Sens                                                         */
+  /* ---------------------------------------------------------------- */
+
+  fiveSensesCards: defineTable({
+    experienceId: v.id("experiences"),
+    step: v.union(
+      v.literal("vue"),
+      v.literal("ouie"),
+      v.literal("odeur"),
+      v.literal("goût"),
+      v.literal("toucher"),
+    ),
+    titre: v.string(),
+    description: v.string(),
+    duree: v.number(),
+    valide: v.boolean(),
+    createAt: v.number(),
+  })
+    .index("by_step", ["step"]),
+
+  fiveSensesRolls: defineTable({
+    gameId: v.id("fiveSensesGames"),
+    step: v.union(
+      v.literal("vue"),
+      v.literal("ouie"),
+      v.literal("odeur"),
+      v.literal("goût"),
+      v.literal("toucher"),
+    ),
+    newStep: v.union(
+      v.literal("vue"),
+      v.literal("ouie"),
+      v.literal("odeur"),
+      v.literal("goût"),
+      v.literal("toucher"),
+    ),
+    rolledAt: v.number(),
+    deviceToken: v.optional(v.string()),
+  })
+    .index("by_game", ["gameId"])
+    .index("by_rolledAt", ["rolledAt"]),
+
+  fiveSensesHistory: defineTable({
+    cardId: v.string(),
+    step: v.union(
+      v.literal("vue"),
+      v.literal("ouie"),
+      v.literal("odeur"),
+      v.literal("goût"),
+      v.literal("toucher"),
+    ),
+    valide: v.boolean(),
+    passer: v.boolean(),
+    validateAt: v.optional(v.number()),
+    passAt: v.optional(v.number()),
+    createdAt: v.number(),
+  })
+    .index("by_step", ["step"])
+    .index("by_createdAt", ["createdAt"]),
+
+  /* ---------------------------------------------------------------- */
+  /* Chemin de l'Intimité                                              */
+  /* ---------------------------------------------------------------- */
+
+  cheminIntimiteCards: defineTable({
+    step: v.union(
+      v.literal("decouverte"),
+      v.literal("complicite"),
+      v.literal("romantisme"),
+      v.literal("proximite"),
+      v.literal("intimite"),
+    ),
+    category: v.union(
+      v.literal("decouverte"),
+      v.literal("complicite"),
+      v.literal("romantisme"),
+      v.literal("proximite"),
+      v.literal("intimite"),
+    ),
+    prompt: v.string(),
+    challenge: v.optional(v.string()),
+    validated: v.boolean(),
+    createdAt: v.number(),
+  })
+    .index("by_step", ["step"])
+    .index("by_validated", ["validated"]),
+
+  cheminIntimiteRolls: defineTable({
+    step: v.union(
+      v.literal("decouverte"),
+      v.literal("complicite"),
+      v.literal("romantisme"),
+      v.literal("proximite"),
+      v.literal("intimite"),
+    ),
+    newStep: v.union(
+      v.literal("decouverte"),
+      v.literal("complicite"),
+      v.literal("romantisme"),
+      v.literal("proximite"),
+      v.literal("intimite"),
+    ),
+    rolledAt: v.number(),
+    deviceToken: v.optional(v.string()),
+  })
+    .index("by_rolledAt", ["rolledAt"]),
+
+  cheminIntimiteHistory: defineTable({
+    cardId: v.string(),
+    step: v.union(
+      v.literal("decouverte"),
+      v.literal("complicite"),
+      v.literal("romantisme"),
+      v.literal("proximite"),
+      v.literal("intimite"),
+    ),
+    passed: v.boolean(),
+    validated: v.boolean(),
+    passedAt: v.optional(v.number()),
+    validatedAt: v.optional(v.number()),
+    createdAt: v.number(),
+  })
+    .index("by_step", ["step"])
+    .index("by_createdAt", ["createdAt"]),
+
+  /* ---------------------------------------------------------------- */
+  /* Parcours des Envies                                                */
+  /* ---------------------------------------------------------------- */
+
+  parcoursDesEnviesGames: defineTable({
+    experienceId: v.id("experiences"),
+    title: v.string(),
+    description: v.string(),
+    zone: v.union(
+      v.literal("depart"),
+      v.literal("decouverte"),
+      v.literal("complicite"),
+      v.literal("romantisme"),
+      v.literal("sensations"),
+      v.literal("rapprochement"),
+      v.literal("notre-moment"),
+    ),
+    currentCase: v.number(),
+    totalCases: v.number(),
+    status: v.union(
+      v.literal("lobby"),
+      v.literal("en_cours"),
+      v.literal("en_attente"),
+      v.literal("terminee"),
+    ),
+    mode: v.union(
+      v.literal("parcours"),
+      v.literal("roulette"),
+    ),
+    dureeMinutes: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_experience", ["experienceId"])
+    .index("by_status", ["status"]),
+
+  parcoursDesEnviesRolls: defineTable({
+    gameId: v.id("parcoursDesEnviesGames"),
+    step: v.union(
+      v.literal("depart"),
+      v.literal("decouverte"),
+      v.literal("complicite"),
+      v.literal("romantisme"),
+      v.literal("sensations"),
+      v.literal("rapprochement"),
+      v.literal("notre-moment"),
+    ),
+    result: v.number(),
+    rolledAt: v.number(),
+    deviceToken: v.optional(v.string()),
+  })
+    .index("by_game", ["gameId"])
+    .index("by_rolledAt", ["rolledAt"]),
+
+  parcoursDesEnviesCards: defineTable({
+    gameId: v.id("parcoursDesEnviesGames"),
+    zone: v.union(
+      v.literal("depart"),
+      v.literal("decouverte"),
+      v.literal("complicite"),
+      v.literal("romantisme"),
+      v.literal("sensations"),
+      v.literal("rapprochement"),
+      v.literal("notre-moment"),
+    ),
+    title: v.string(),
+    description: v.string(),
+    category: v.union(
+      v.literal("question"),
+      v.literal("defi"),
+      v.literal("souvenir"),
+      v.literal("surprise"),
+      v.literal("sensorial"),
+    ),
+    duree: v.number(),
+    isRevelee: v.boolean(),
+    createdAt: v.number(),
+  })
+    .index("by_game", ["gameId"])
+    .index("by_zone", ["zone"]),
+
+  parcoursDesEnviesPreferences: defineTable({
+    gameId: v.id("parcoursDesEnviesGames"),
+    deviceToken: v.string(),
+    preferences: v.optional(v.any()),
+    limits: v.optional(v.any()),
+    updatedAt: v.number(),
+  })
+    .index("by_game", ["gameId"])
+    .index("by_device", ["deviceToken"]),
+
+  /* ---------------------------------------------------------------- */
+  /* Admin Console - Segments & Incidents                               */
+
 });

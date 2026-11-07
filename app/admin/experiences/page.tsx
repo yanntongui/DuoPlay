@@ -41,13 +41,17 @@ type Experience = {
 
 const SEED: Experience[] = [
   { id: "exp_101", title: "Soirée à deux — édition hiver", category: "Intimité", intensity: "Passionnée", status: "published", uses: 1234, completion: 82 },
-  { id: "exp_102", title: "Parcours « Retrouvailles »", category: "Complicité", intensity: "Modérée", status: "review", uses: 0, completion: 0 },
-  { id: "exp_103", title: "Cartes — niveau passionné", category: "Intimité", intensity: "Passionnée", status: "draft", uses: 0, completion: 0 },
+  { id: "exp_102", title: "Parcours « Retrouvailles »", category: "Complicité", intensity: "Modérée", status: "published", uses: 0, completion: 0 },
+  { id: "exp_103", title: "Cartes — niveau passionné", category: "Intimité", intensity: "Passionnée", status: "published", uses: 0, completion: 0 },
   { id: "exp_104", title: "Défis du week-end", category: "Activités", intensity: "Légère", status: "published", uses: 3891, completion: 74 },
-  { id: "exp_105", title: "Roue des envies", category: "Jeux", intensity: "Modérée", status: "scheduled", uses: 0, completion: 0 },
+  { id: "exp_105", title: "Roue des envies", category: "Jeux", intensity: "Modérée", status: "published", uses: 0, completion: 0 },
   { id: "exp_106", title: "Quiz découverte du couple", category: "Complicité", intensity: "Légère", status: "published", uses: 2108, completion: 91 },
   { id: "exp_107", title: "Rituel du dimanche soir", category: "Activités", intensity: "Légère", status: "published", uses: 640, completion: 68 },
-  { id: "exp_108", title: "Jeu des 5 sens", category: "Intimité", intensity: "Passionnée", status: "review", uses: 0, completion: 0 },
+  { id: "exp_108", title: "Jeu des 5 sens", category: "Intimité", intensity: "Passionnée", status: "published", uses: 0, completion: 0 },
+  { id: "exp_109", title: "Parcours des Envies", category: "Jeux", intensity: "Modérée", status: "published", uses: 0, completion: 0 },
+  { id: "exp_110", title: "Soirée Sensuelle", category: "Intimité", intensity: "Modérée", status: "published", uses: 0, completion: 0 },
+  { id: "exp_111", title: "Défis Coquins", category: "Intimité", intensity: "Modérée", status: "published", uses: 0, completion: 0 },
+  { id: "exp_112", title: "Nuits Sensuelles", category: "Intimité", intensity: "Modérée", status: "published", uses: 0, completion: 0 },
 ];
 
 const TABS = [

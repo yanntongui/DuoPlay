@@ -32,6 +32,7 @@ import type * as dice from "../dice.js";
 import type * as events from "../events.js";
 import type * as experiences from "../experiences.js";
 import type * as favorites from "../favorites.js";
+import type * as finance from "../finance.js";
 import type * as formats from "../formats.js";
 import type * as history from "../history.js";
 import type * as incidents from "../incidents.js";
@@ -45,7 +46,9 @@ import type * as lib_notify from "../lib/notify.js";
 import type * as lib_personalization from "../lib/personalization.js";
 import type * as lib_ratelimit from "../lib/ratelimit.js";
 import type * as maintenance from "../maintenance.js";
+import type * as moderation from "../moderation.js";
 import type * as notifications from "../notifications.js";
+import type * as offers from "../offers.js";
 import type * as preferences from "../preferences.js";
 import type * as presence from "../presence.js";
 import type * as profiles from "../profiles.js";
@@ -60,6 +63,7 @@ import type * as segments from "../segments.js";
 import type * as sessions from "../sessions.js";
 import type * as soiree from "../soiree.js";
 import type * as stats from "../stats.js";
+import type * as support from "../support.js";
 
 import type {
   ApiFromModules,
@@ -92,6 +96,7 @@ declare const fullApi: ApiFromModules<{
   events: typeof events;
   experiences: typeof experiences;
   favorites: typeof favorites;
+  finance: typeof finance;
   formats: typeof formats;
   history: typeof history;
   incidents: typeof incidents;
@@ -105,7 +110,9 @@ declare const fullApi: ApiFromModules<{
   "lib/personalization": typeof lib_personalization;
   "lib/ratelimit": typeof lib_ratelimit;
   maintenance: typeof maintenance;
+  moderation: typeof moderation;
   notifications: typeof notifications;
+  offers: typeof offers;
   preferences: typeof preferences;
   presence: typeof presence;
   profiles: typeof profiles;
@@ -120,6 +127,7 @@ declare const fullApi: ApiFromModules<{
   sessions: typeof sessions;
   soiree: typeof soiree;
   stats: typeof stats;
+  support: typeof support;
 }>;
 
 /**
