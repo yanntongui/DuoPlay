@@ -215,11 +215,10 @@ moderation {
 ## 5. Plan de Sécurité
 
 ### Authentification
-- Login avec email + mot de passe (bcrypt)
-- 2FA TOTP obligatoire
-- Sessions expirent après 24h
-- Cookies HTTP-only + SameSite=strict
-- Rate limiting: 5 tentatives / 15min
+
+**Implémenté** : identifiant + mot de passe uniques, comparaison à temps constant côté serveur, cookie HttpOnly signé HMAC-SHA256, expiration 7 jours, `404` par défaut hors production.
+
+**Cible** (non implémenté) : comptes nominatifs (bcrypt), 2FA TOTP obligatoire, sessions révocables 24 h, rate limiting 5 tentatives / 15 min.
 
 ### Permissions
 - Vérification côté serveur pour chaque action
@@ -384,8 +383,6 @@ moderation {
 - [ ] Exports
 
 
-<function=write>
-
 ## Design system de la console
 
 La console possède son propre système de design, isolé de l'application utilisateur (nocturne).
@@ -399,15 +396,45 @@ Il vit dans `app/admin/admin.css`, sous la portée `.admin-shell`, et n'affecte 
 - **Composants** : `components/admin/ui.tsx` (`PageHeader`, `Card`, `TableCard`, `StatTile`, `Badge`, `StatusBadge`, `Avatar`, `ProgressBar`…) et utilitaires `ad-*` (jamais de variables CSS brutes dans les classes Tailwind).
 - **Responsive** : barre latérale en tiroir sous 1180 px, recherche compacte sur mobile, tableaux défilables horizontalement avec indication.
 
-### Parcours d'authentification
+### Parcours d'authentification (réel)
 
-1. `/admin/login` — e-mail + mot de passe (démo : toute combinaison non vide).
-2. `/admin/2fa` — code à 6 chiffres (démo : n'importe quel code).
-3. Le cookie `admin_token` est posé à l'étape 2 ; le middleware protège `/admin/*`.
-4. La déconnexion supprime le cookie et le stockage local.
+1. `/admin` sans cookie valide → redirection `307` vers `/admin/login?next=%2Fadmin`.
+2. `/admin/login` — identifiant (`ADMIN_USERNAME`, défaut `admin`) + mot de passe (`ADMIN_PASSWORD`), comparés côté serveur à temps constant par une Server Action. Message unique en cas d'échec : « Identifiants incorrects. »
+3. Succès → cookie `duoplay_admin` **HttpOnly**, `Secure`, `SameSite=Lax`, signé HMAC-SHA256 (`ADMIN_SESSION_SECRET`), valable 7 jours. Le cookie est invisible en JavaScript.
+4. Un cookie forgé, tronqué ou expiré est rejeté par le middleware (signature vérifiée à chaque requête).
+5. « Déconnexion » (Server Action) supprime le cookie et renvoie au login.
+
+Sans `ADMIN_ENABLED=1`, **toutes** les routes `/admin/*` renvoient `404` — c'est le défaut en production.
+
+### Déploiement
+
+Le site est relié à GitHub : **chaque push sur `main` déclenche un build et un déploiement de production**.
+
+| Élément | Valeur |
+|---|---|
+| Site Netlify | `duoplaygame` (`f65d3748-a6d3-454a-a04a-99a85eae429c`) |
+| URL | https://duoplaygame.netlify.app |
+| Runtime | `@netlify/plugin-nextjs` v5, déclaré dans `netlify.toml` |
+| Build | `npm run build` (`netlify.toml`), Node 20 |
+| Convex | `https://adventurous-salmon-154.convex.cloud` |
+
+Variables d'environnement du site :
+
+| Variable | Contexte | Note |
+|---|---|---|
+| `NEXT_PUBLIC_CONVEX_URL` | all | figée au build |
+| `NEXT_PUBLIC_SITE_URL` | all | metadata, OG, sitemap, liens d'invitation |
+| `ADMIN_ENABLED` | production | `1` = console accessible |
+| `ADMIN_USERNAME` | production | défaut `admin` |
+| `ADMIN_PASSWORD` | production | secret |
+| `ADMIN_SESSION_SECRET` | production | secret, invalide les sessions si changé |
+
+> ⚠️ `NEXT_PUBLIC_*` et `ADMIN_SESSION_SECRET` sont lus **à la compilation** : après modification d'une variable, il faut redéployer (*Deploys → Trigger deploy → Clear cache and deploy site*).
+
+Les variables `ADMIN_*` ne sont volontairement définies que dans le contexte `production` : les Deploy Previews renvoient donc `404` sur `/admin`.
 
 ### Vérifications
 
 - `npx tsc --noEmit` — aucune erreur.
 - `npm run build` — build de production réussi, 21 routes `/admin/*` générées.
-- `npx eslint app/admin components/admin` — propre.
+- En ligne : `/admin` → `307` vers le login, mauvais identifiants → `?error=1`, bons identifiants → tableau de bord, cookie HttpOnly.
