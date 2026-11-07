@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { assertAdmin } from "./lib/admin";
 
 // Catégories de dés (filtrent les cartes)
 const CATEGORIES = [
@@ -33,7 +34,6 @@ export const roll = mutation({
     preferredCategories: v.optional(v.array(v.string())),
   },
   handler: async (_ctx, args) => {
-    // Récupérer les limites du couple si elles existent
     const filters: string[] = [];
 
     if (args.coupleId !== undefined) {
@@ -51,7 +51,6 @@ export const roll = mutation({
       }
     }
 
-    // Sélectionner une catégorie (filtrée si nécessaire)
     const availableCategories = args.preferredCategories?.length
       ? args.preferredCategories.filter((c) => CATEGORIES.includes(c as "connexion" | "sensations" | "defis" | "fantasmes"))
       : CATEGORIES;
@@ -61,14 +60,10 @@ export const roll = mutation({
         Math.floor(Math.random() * availableCategories.length)
       ];
 
-    // Sélectionner une ambiance
     const ambiance = AMBIANCES[Math.floor(Math.random() * AMBIANCES.length)];
-
-    // Sélectionner une durée
     const durationMinutes =
       DURATIONS[Math.floor(Math.random() * DURATIONS.length)];
 
-    // Enregistrer le résultat
     const resultId = await _ctx.db.insert("diceResults", {
       sessionId: args.sessionId,
       coupleId: args.coupleId,
@@ -116,5 +111,68 @@ export const list = query({
     }
 
     return [];
+  },
+});
+
+// ============================================
+// Admin Functions for Dice
+// ============================================
+
+export const adminList = query({
+  args: {
+    page: v.number(),
+    pageSize: v.number(),
+  },
+  handler: async (ctx: any, args: any) => {
+    const { page, pageSize } = args;
+
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Accès refusé");
+    }
+    const access = await ctx.db.query("adminAccess").collect();
+    if (!access.some((a: any) => a.userId === identity._id)) {
+      throw new Error("Accès refusé");
+    }
+
+    let results = await ctx.db.query("diceResults").collect();
+    results.sort((a: any, b: any) => b.createdAt - a.createdAt);
+
+    const totalCount = results.length;
+    const start = page * pageSize;
+    const paginated = results.slice(start, start + pageSize);
+
+    return {
+      results: paginated,
+      totalCount,
+      page,
+      pageSize,
+    };
+  },
+});
+
+export const adminGetStats = query({
+  args: {},
+  handler: async (ctx: any) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Accès refusé");
+    }
+    const access = await ctx.db.query("adminAccess").collect();
+    if (!access.some((a: any) => a.userId === identity._id)) {
+      throw new Error("Accès refusé");
+    }
+
+    const all = await ctx.db.query("diceResults").collect();
+    
+    const byCategory: Record<string, number> = {};
+    for (const r of all) {
+      byCategory[r.category] = (byCategory[r.category] || 0) + 1;
+    }
+
+    return {
+      total: all.length,
+      byCategory,
+    };
   },
 });
