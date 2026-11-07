@@ -13,6 +13,12 @@
 [build.environment]
   NODE_VERSION = "20"
 
+# Runtime Next.js (SSR, Server Actions, middleware, images). Déclaré
+# explicitement plutôt que laissé à l'auto-détection : sans lui, Netlify
+# publie le dossier `.next` brut et tout le rendu serveur casse.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
 # Le service worker doit toujours être revalidé.
 [[headers]]
   for = "/sw.js"
