@@ -1,44 +1,150 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
-  ArrowDownRight,
-  ArrowUpRight,
-  Download,
-  Filter,
+  CheckCircle2,
+  Copy,
   Plus,
   Search,
-  Sparkles,
-  UsersRound,
+  Send,
+  Trash2,
 } from "lucide-react";
 import {
   Badge,
-  Card,
   PageHeader,
   StatTile,
   TableCard,
 } from "@/components/admin/ui";
+import {
+  DemoCreateDialog,
+  DemoPagination,
+  DemoPill,
+  DemoToast,
+  RowMenu,
+  exportCsv,
+  useDemoRows,
+} from "@/components/admin/demo-kit";
 
-const SEGMENTS = [
-  { name: "Nouveaux couples", desc: "Inscrits depuis moins de 14 jours", size: "12 408", growth: "+8,2 %", type: "Cycle de vie", updated: "il y a 2 h", tone: "positive" as const },
-  { name: "Actifs hebdomadaires", desc: "Au moins 3 sessions sur 7 jours", size: "24 582", growth: "+5,1 %", type: "Engagement", updated: "il y a 1 h", tone: "positive" as const },
-  { name: "À risque de churn", desc: "Aucune session depuis 21 jours", size: "3 142", growth: "+12,4 %", type: "Rétention", updated: "il y a 4 h", tone: "danger" as const },
-  { name: "Abonnés annuels", desc: "Offre annuelle active", size: "4 902", growth: "+2,4 %", type: "Revenus", updated: "hier", tone: "plum" as const },
-  { name: "Invitations non acceptées", desc: "Partenaire invité sans réponse sous 7 j", size: "312", growth: "-3,1 %", type: "Activation", updated: "il y a 6 h", tone: "warning" as const },
+type SegmentStatus = "published" | "draft" | "review";
+
+type Segment = {
+  id: string;
+  name: string;
+  desc: string;
+  size: number;
+  growth: string;
+  type: string;
+  updated: string;
+  tone: "positive" | "danger" | "plum" | "warning" | "neutral";
+};
+
+const SEED: Segment[] = [
+  { id: "seg_01", name: "Nouveaux couples", desc: "Inscrits depuis moins de 14 jours", size: 12408, growth: "+8,2 %", type: "Cycle de vie", updated: "il y a 2 h", tone: "positive" },
+  { id: "seg_02", name: "Actifs hebdomadaires", desc: "Au moins 3 sessions sur 7 jours", size: 24582, growth: "+5,1 %", type: "Engagement", updated: "il y a 1 h", tone: "positive" },
+  { id: "seg_03", name: "À risque de churn", desc: "Aucune session depuis 21 jours", size: 3142, growth: "+12,4 %", type: "Rétention", updated: "il y a 4 h", tone: "danger" },
+  { id: "seg_04", name: "Abonnés annuels", desc: "Offre annuelle active", size: 4902, growth: "+2,4 %", type: "Revenus", updated: "hier", tone: "plum" },
+  { id: "seg_05", name: "Invitations non acceptées", desc: "Partenaire invité sans réponse sous 7 j", size: 312, growth: "-3,1 %", type: "Activation", updated: "il y a 6 h", tone: "warning" },
+  { id: "seg_06", name: "Premium récents", desc: "Passés au premium depuis 30 jours", size: 1864, growth: "+6,6 %", type: "Revenus", updated: "il y a 3 h", tone: "plum" },
+  { id: "seg_07", name: "Ambassadeurs", desc: "Au moins 2 invitations acceptées", size: 486, growth: "+1,8 %", type: "Fidélité", updated: "hier", tone: "positive" },
 ];
 
-const RULES = [
-  { field: "Plan", op: "est", value: "Premium" },
-  { field: "Dernière session", op: "il y a plus de", value: "14 jours" },
-  { field: "Pays", op: "parmi", value: "France, Belgique" },
-];
+const PAGE_SIZE = 5;
+const STORAGE_KEY = "duoplay.admin.segments.v1";
+
+const numberFormat = new Intl.NumberFormat("fr-FR");
 
 export default function AdminSegments() {
+  const [rows, setRows] = useDemoRows<Segment>(STORAGE_KEY, SEED);
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(0);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
 
-  const rows = SEGMENTS.filter((s) =>
-    `${s.name} ${s.type}`.toLowerCase().includes(search.toLowerCase()),
+  useEffect(() => {
+    setPage(0);
+  }, [search]);
+
+  const filtered = useMemo(
+    () =>
+      rows.filter((row) => {
+        const query = search.trim().toLowerCase();
+        if (!query) return true;
+        return `${row.name} ${row.type}`.toLowerCase().includes(query);
+      }),
+    [rows, search],
   );
+
+  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const safePage = Math.min(page, pageCount - 1);
+  const visible = filtered.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE);
+  const rangeStart = filtered.length === 0 ? 0 : safePage * PAGE_SIZE + 1;
+  const rangeEnd = safePage * PAGE_SIZE + visible.length;
+
+  const totalSize = rows.reduce((sum, row) => sum + row.size, 0);
+
+  function nextId(): string {
+    const highest = rows.reduce((max, row) => {
+      const match = /^seg_(\d+)$/.exec(row.id);
+      return match ? Math.max(max, Number(match[1])) : max;
+    }, 0);
+    return `seg_${String(highest + 1).padStart(2, "0")}`;
+  }
+
+  function create(values: Record<string, string>) {
+    const size = Number.parseInt(values.size || "0", 10);
+    const row: Segment = {
+      id: nextId(),
+      name: values.name,
+      desc: values.desc || "Segment créé manuellement",
+      size: Number.isFinite(size) ? size : 0,
+      growth: "+0,0 %",
+      type: values.type,
+      updated: "à l’instant",
+      tone: "neutral",
+    };
+    setRows((current) => [row, ...current]);
+    setPage(0);
+    setDialogOpen(false);
+    setToast(`Segment « ${row.name} » créé (${numberFormat.format(size)} comptes).`);
+  }
+
+  function duplicate(row: Segment) {
+    const copy: Segment = {
+      ...row,
+      id: nextId(),
+      name: `${row.name} (copie)`,
+      updated: "à l’instant",
+    };
+    setRows((current) => [copy, ...current]);
+    setPage(0);
+    setToast(`Segment « ${row.name} » dupliqué.`);
+  }
+
+  function remove(row: Segment) {
+    setRows((current) => current.filter((item) => item.id !== row.id));
+    setToast(`Segment « ${row.name} » supprimé.`);
+  }
+
+  function handleExport() {
+    const ok = exportCsv(
+      `duoplay-segments-${new Date().toISOString().slice(0, 10)}.csv`,
+      [
+        { key: "id", label: "Identifiant" },
+        { key: "name", label: "Segment" },
+        { key: "desc", label: "Description" },
+        { key: "size", label: "Taille" },
+        { key: "growth", label: "Évolution 30 j" },
+        { key: "type", label: "Type" },
+        { key: "updated", label: "Actualisé" },
+      ],
+      filtered.map((row) => ({ ...row, size: String(row.size) })),
+    );
+    setToast(
+      ok
+        ? `${filtered.length} segment(s) exporté(s).`
+        : "Aucun segment à exporter avec ces filtres.",
+    );
+  }
 
   return (
     <div className="ad-enter">
@@ -47,11 +153,19 @@ export default function AdminSegments() {
         subtitle="Regroupez les utilisateurs par comportement pour cibler les campagnes. Les segments sont recalculés chaque nuit."
         actions={
           <>
-            <button className="ad-btn ad-btn-outline">
-              <Download className="size-4" strokeWidth={1.9} />
+            <DemoPill />
+            <button
+              type="button"
+              className="ad-btn ad-btn-outline"
+              onClick={handleExport}
+            >
               Exporter
             </button>
-            <button className="ad-btn ad-btn-primary">
+            <button
+              type="button"
+              className="ad-btn ad-btn-primary"
+              onClick={() => setDialogOpen(true)}
+            >
               <Plus className="size-4" strokeWidth={2.2} />
               Créer un segment
             </button>
@@ -60,94 +174,40 @@ export default function AdminSegments() {
       />
 
       <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <StatTile label="Segments actifs" value="18" delta="3 dynamiques" tone="plum" />
-        <StatTile label="Utilisateurs segmentés" value="31 204" delta="+4,2 %" tone="positive" />
+        <StatTile label="Segments actifs" value={String(rows.length)} delta="3 dynamiques" tone="plum" />
+        <StatTile label="Utilisateurs segmentés" value={numberFormat.format(totalSize)} delta="+4,2 %" tone="positive" />
         <StatTile label="Segments sans campagne" value="4" delta="à activer" tone="warning" />
         <StatTile label="Taux de correspondance" value="92 %" delta="couverture" tone="neutral" />
       </div>
 
-      <div className="mb-4 grid grid-cols-1 gap-4 xl:grid-cols-12">
-        <Card
-          title="Aperçu du segment"
-          subtitle="Brouillon · non enregistré"
-          className="xl:col-span-5"
-          action={<Badge tone="neutral">Brouillon</Badge>}
-        >
-          <div className="space-y-2">
-            {RULES.map((r) => (
-              <div
-                key={r.field}
-                className="flex flex-wrap items-center gap-2 rounded-xl ad-bg-soft px-3 py-2.5"
-              >
-                <span className="text-[11px] font-semibold uppercase tracking-[0.06em] ad-faint">
-                  {r.field}
-                </span>
-                <span className="text-[12px] ad-muted">{r.op}</span>
-                <span className="rounded-md bg-white px-2 py-0.5 text-[12px] font-medium ad-ink">
-                  {r.value}
-                </span>
-              </div>
-            ))}
-          </div>
-          <button className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed ad-bd-strong py-2.5 text-[12px] font-medium ad-muted ad-hover-soft">
-            <Plus className="size-3.5" /> Ajouter une condition
-          </button>
-          <div className="mt-4 flex items-center justify-between rounded-xl ad-bg-plum-50 p-3">
-            <div>
-              <p className="text-[11px] ad-muted">Estimation</p>
-              <p className="text-[20px] font-semibold tracking-[-0.02em] ad-plum">2 418</p>
-            </div>
-            <UsersRound className="size-6 ad-plum" />
-          </div>
-        </Card>
-
-        <Card title="Segments les plus sollicités" className="xl:col-span-7">
-          <div className="space-y-3">
-            {[
-              { l: "Onboarding — J+3", v: "14 campagnes", w: 82 },
-              { l: "Relance panier / offre", v: "9 campagnes", w: 56 },
-              { l: "À risque de churn", v: "6 campagnes", w: 38 },
-              { l: "Ambassadeurs", v: "3 campagnes", w: 18 },
-            ].map((s) => (
-              <div key={s.l}>
-                <div className="mb-1.5 flex items-baseline justify-between">
-                  <span className="text-[12px] ad-soft">{s.l}</span>
-                  <span className="text-[11.5px] ad-muted">{s.v}</span>
-                </div>
-                <div className="h-1.5 w-full overflow-hidden rounded-full ad-bg-sunk">
-                  <div className="h-full rounded-full ad-bg-plum" style={{ width: `${s.w}%` }} />
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="mt-4 flex items-start gap-2 rounded-xl ad-bg-soft p-3 text-[11.5px] ad-muted">
-            <Sparkles className="mt-0.5 size-4 shrink-0 ad-plum" />
-            Astuce : un segment de moins de 500 personnes limite la pertinence
-            statistique des tests A/B.
-          </div>
-        </Card>
-      </div>
-
       <TableCard
         title="Tous les segments"
-        subtitle={`${rows.length} segment(s)`}
-        action={
-          <div className="flex items-center gap-2">
-            <div className="relative min-w-[190px]">
+        subtitle={`${filtered.length} segment(s) sur ${rows.length}`}
+        toolbar={
+          <>
+            <div className="relative min-w-[220px] flex-1">
               <Search className="pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2 ad-faint" />
               <input
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(event) => setSearch(event.target.value)}
                 placeholder="Rechercher…"
                 className="ad-input h-9 ad-pl-9 text-[12.5px]"
+                aria-label="Rechercher un segment"
               />
             </div>
-            <button className="ad-btn ad-btn-outline h-9 px-3 text-[12px]">
-              <Filter className="size-3.5" /> Type
-            </button>
-          </div>
+          </>
         }
-        footer={<span>Recalcul automatique chaque nuit à 03:00 (Europe/Paris).</span>}
+        footer={
+          <DemoPagination
+            page={safePage}
+            pageCount={pageCount}
+            rangeStart={rangeStart}
+            rangeEnd={rangeEnd}
+            total={filtered.length}
+            onPage={setPage}
+            note="Recalcul automatique chaque nuit à 03:00 (Europe/Paris)."
+          />
+        }
       >
         <table className="ad-table">
           <thead>
@@ -161,37 +221,82 @@ export default function AdminSegments() {
             </tr>
           </thead>
           <tbody>
-            {rows.map((s) => (
-              <tr key={s.name}>
+            {visible.length === 0 && (
+              <tr>
+                <td colSpan={6} className="py-10 text-center text-[12.5px] ad-muted">
+                  Aucun segment ne correspond à cette recherche.
+                </td>
+              </tr>
+            )}
+            {visible.map((row) => (
+              <tr key={row.id}>
                 <td>
-                  <p className="text-[12.5px] font-medium ad-ink">{s.name}</p>
-                  <p className="text-[11px] ad-faint">{s.desc}</p>
+                  <p className="text-[12.5px] font-medium ad-ink">{row.name}</p>
+                  <p className="text-[11px] ad-faint">{row.desc}</p>
                 </td>
                 <td>
-                  <Badge tone="neutral">{s.type}</Badge>
+                  <Badge tone="neutral">{row.type}</Badge>
                 </td>
-                <td className="text-[12.5px] font-medium ad-ink">{s.size}</td>
+                <td className="text-[12.5px] font-medium ad-ink">
+                  {numberFormat.format(row.size)}
+                </td>
                 <td>
-                  <Badge tone={s.tone}>
-                    {s.growth.startsWith("-") ? (
-                      <ArrowDownRight className="size-3" />
-                    ) : (
-                      <ArrowUpRight className="size-3" />
-                    )}
-                    {s.growth}
-                  </Badge>
+                  <Badge tone={row.tone}>{row.growth}</Badge>
                 </td>
-                <td className="text-[11.5px] ad-faint">{s.updated}</td>
+                <td className="text-[11.5px] ad-faint">{row.updated}</td>
                 <td className="text-right">
-                  <button className="ad-btn ad-btn-outline h-8 px-3 text-[11.5px]">
-                    Cibler
-                  </button>
+                  <RowMenu
+                    label={row.name}
+                    items={[
+                      {
+                        label: "Cibler par campagne",
+                        icon: <Plus className="size-3.5" />,
+                        onSelect: () =>
+                          setToast(`Campagne préparée pour « ${row.name} » (${numberFormat.format(row.size)} comptes).`),
+                      },
+                      {
+                        label: "Dupliquer",
+                        icon: <Copy className="size-3.5" />,
+                        onSelect: () => duplicate(row),
+                      },
+                      {
+                        label: "Supprimer",
+                        icon: <Trash2 className="size-3.5" />,
+                        tone: "danger",
+                        confirm: `Supprimer « ${row.name} » ? Action locale à la démonstration.`,
+                        onSelect: () => remove(row),
+                      },
+                    ]}
+                  />
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </TableCard>
+
+      <DemoToast message={toast} onClose={() => setToast(null)} />
+
+      {dialogOpen && (
+        <DemoCreateDialog
+          title="Créer un segment"
+          description="Le segment est ajouté à cette démonstration, avec une taille simulée."
+          submitLabel="Créer le segment"
+          fields={[
+            { key: "name", label: "Nom du segment", required: true, placeholder: "Revenus — hiver" },
+            { key: "desc", label: "Description", type: "textarea", placeholder: "Qui ce segment regroupe-t-il ?" },
+            {
+              key: "type",
+              label: "Type",
+              options: ["Cycle de vie", "Engagement", "Rétention", "Revenus", "Activation", "Fidélité"],
+              half: true,
+            },
+            { key: "size", label: "Taille estimée", type: "number", placeholder: "1200", half: true },
+          ]}
+          onClose={() => setDialogOpen(false)}
+          onSubmit={create}
+        />
+      )}
     </div>
   );
 }

@@ -1,20 +1,54 @@
 "use client";
 
-import { useState } from "react";
-import { ArrowDownRight, ArrowUpRight, Download, Search, Wallet } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  ArrowDownRight,
+  ArrowUpRight,
+  Download,
+  FileText,
+  RefreshCw,
+  Search,
+  Undo2,
+  Wallet,
+} from "lucide-react";
 import {
   Badge,
   PageHeader,
   StatTile,
   TableCard,
 } from "@/components/admin/ui";
+import {
+  DemoCreateDialog,
+  DemoPagination,
+  DemoPill,
+  DemoToast,
+  RowMenu,
+  exportCsv,
+  useDemoRows,
+} from "@/components/admin/demo-kit";
 
-const TX = [
-  { id: "tx_2291", user: "Camille R.", type: "Abonnement", amount: "9,99 €", status: "completed", date: "1 nov. 2026", method: "Visa •• 4021" },
-  { id: "tx_2290", user: "Lukas B.", type: "Abonnement annuel", amount: "79,00 €", status: "completed", date: "1 nov. 2026", method: "Mastercard •• 8812" },
-  { id: "tx_2289", user: "Diego F.", type: "Abonnement", amount: "9,99 €", status: "failed", date: "31 oct. 2026", method: "Visa •• 1190" },
-  { id: "tx_2288", user: "Nadia E.", type: "Remboursement", amount: "-9,99 €", status: "completed", date: "31 oct. 2026", method: "Visa •• 7743" },
-  { id: "tx_2287", user: "Marta N.", type: "Abonnement", amount: "9,99 €", status: "pending", date: "30 oct. 2026", method: "SEPA" },
+type TxStatus = "completed" | "failed" | "pending";
+
+type Transaction = {
+  id: string;
+  user: string;
+  type: string;
+  amount: string;
+  status: TxStatus;
+  date: string;
+  method: string;
+};
+
+const SEED: Transaction[] = [
+  { id: "tx_2291", user: "Camille R.", type: "Abonnement", amount: "9,99 €", status: "completed", date: "2026-11-01", method: "Visa •• 4021" },
+  { id: "tx_2290", user: "Lukas B.", type: "Abonnement annuel", amount: "79,00 €", status: "completed", date: "2026-11-01", method: "Mastercard •• 8812" },
+  { id: "tx_2289", user: "Diego F.", type: "Abonnement", amount: "9,99 €", status: "failed", date: "2026-10-31", method: "Visa •• 1190" },
+  { id: "tx_2288", user: "Nadia E.", type: "Remboursement", amount: "-9,99 €", status: "completed", date: "2026-10-31", method: "Visa •• 7743" },
+  { id: "tx_2287", user: "Marta N.", type: "Abonnement", amount: "9,99 €", status: "pending", date: "2026-10-30", method: "SEPA" },
+  { id: "tx_2286", user: "Léa D.", type: "Abonnement annuel", amount: "79,00 €", status: "completed", date: "2026-10-29", method: "Visa •• 2245" },
+  { id: "tx_2285", user: "Samir K.", type: "Abonnement", amount: "9,99 €", status: "completed", date: "2026-10-28", method: "Mastercard •• 5510" },
+  { id: "tx_2284", user: "Clara V.", type: "Abonnement", amount: "9,99 €", status: "failed", date: "2026-10-27", method: "Visa •• 9032" },
+  { id: "tx_2283", user: "Hugo V.", type: "Achat ponctuel", amount: "4,99 €", status: "completed", date: "2026-10-26", method: "Apple Pay" },
 ];
 
 const MONTHS = [
@@ -27,12 +61,134 @@ const MONTHS = [
   { m: "Nov.", v: 72 },
 ];
 
-export default function AdminFinance() {
-  const [search, setSearch] = useState("");
+const PAGE_SIZE = 5;
+const STORAGE_KEY = "duoplay.admin.finance.v1";
 
-  const rows = TX.filter((t) =>
-    `${t.id} ${t.user}`.toLowerCase().includes(search.trim().toLowerCase()),
+const dateFormatter = new Intl.DateTimeFormat("fr-FR", {
+  day: "2-digit",
+  month: "short",
+  year: "numeric",
+});
+
+function formatDate(iso: string): string {
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
+  const date = match
+    ? new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]))
+    : new Date(iso);
+  return Number.isNaN(date.getTime()) ? iso : dateFormatter.format(date);
+}
+
+function parseAmount(amount: string): number {
+  const normalised = amount.replace(/\s/g, "").replace("€", "").replace(",", ".");
+  const value = Number.parseFloat(normalised);
+  return Number.isFinite(value) ? value : 0;
+}
+
+function formatAmount(value: number): string {
+  return `${value.toFixed(2).replace(".", ",")} €`;
+}
+
+function statusBadge(status: TxStatus) {
+  if (status === "completed") return <Badge tone="positive">Réussi</Badge>;
+  if (status === "failed") {
+    return (
+      <Badge tone="danger">
+        <ArrowDownRight className="size-3" /> Échec
+      </Badge>
+    );
+  }
+  return <Badge tone="warning">En attente</Badge>;
+}
+
+export default function AdminFinance() {
+  const [rows, setRows] = useDemoRows<Transaction>(STORAGE_KEY, SEED);
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState("all");
+  const [page, setPage] = useState(0);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+
+  useEffect(() => {
+    setPage(0);
+  }, [search, status]);
+
+  const filtered = useMemo(
+    () =>
+      rows.filter((row) => {
+        const query = search.trim().toLowerCase();
+        if (query && !`${row.id} ${row.user} ${row.method}`.toLowerCase().includes(query)) {
+          return false;
+        }
+        if (status !== "all" && row.status !== status) return false;
+        return true;
+      }),
+    [rows, search, status],
   );
+
+  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const safePage = Math.min(page, pageCount - 1);
+  const visible = filtered.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE);
+  const rangeStart = filtered.length === 0 ? 0 : safePage * PAGE_SIZE + 1;
+  const rangeEnd = safePage * PAGE_SIZE + visible.length;
+
+  const refunded = rows.filter((row) => row.type === "Remboursement").length;
+  const pending = rows.filter((row) => row.status === "pending").length;
+  const failed = rows.filter((row) => row.status === "failed").length;
+
+  function nextTxId(): string {
+    const highest = rows.reduce((max, row) => {
+      const match = /^tx_(\d+)$/.exec(row.id);
+      return match ? Math.max(max, Number(match[1])) : max;
+    }, 2_283);
+    return `tx_${highest + 1}`;
+  }
+
+  function retry(row: Transaction) {
+    setRows((current) =>
+      current.map((item) =>
+        item.id === row.id ? { ...item, status: "completed" as TxStatus } : item,
+      ),
+    );
+    setToast(`Paiement ${row.id} relancé et accepté.`);
+  }
+
+  function refund(row: Transaction) {
+    const amount = parseAmount(row.amount);
+    const value = amount < 0 ? -amount : amount;
+    const refundRow: Transaction = {
+      id: nextTxId(),
+      user: row.user,
+      type: "Remboursement",
+      amount: formatAmount(-value),
+      status: "completed",
+      date: new Date().toISOString().slice(0, 10),
+      method: row.method,
+    };
+    setRows((current) => [refundRow, ...current]);
+    setPage(0);
+    setToast(`Remboursement de ${formatAmount(value)} enregistré (${row.user}).`);
+  }
+
+  function handleExport() {
+    const ok = exportCsv(
+      `duoplay-comptable-${new Date().toISOString().slice(0, 10)}.csv`,
+      [
+        { key: "id", label: "Transaction" },
+        { key: "user", label: "Client" },
+        { key: "type", label: "Type" },
+        { key: "amount", label: "Montant" },
+        { key: "method", label: "Moyen" },
+        { key: "status", label: "Statut" },
+        { key: "date", label: "Date" },
+      ],
+      filtered.map((row) => ({ ...row, date: formatDate(row.date) })),
+    );
+    setToast(
+      ok
+        ? `${filtered.length} transaction(s) exportée(s).`
+        : "Aucune transaction à exporter avec ces filtres.",
+    );
+  }
 
   return (
     <div className="ad-enter">
@@ -41,11 +197,22 @@ export default function AdminFinance() {
         subtitle="Paiements, abonnements et remboursements. Aucune donnée bancaire complète n'est stockée dans DuoPlay."
         actions={
           <>
-            <button className="ad-btn ad-btn-outline">
+            <DemoPill />
+            <button
+              type="button"
+              className="ad-btn ad-btn-outline"
+              onClick={handleExport}
+            >
               <Download className="size-4" strokeWidth={1.9} />
               Export comptable
             </button>
-            <button className="ad-btn ad-btn-wine">Enregistrer un remboursement</button>
+            <button
+              type="button"
+              className="ad-btn ad-btn-primary"
+              onClick={() => setDialogOpen(true)}
+            >
+              Enregistrer un remboursement
+            </button>
           </>
         }
       />
@@ -54,7 +221,12 @@ export default function AdminFinance() {
         <StatTile label="Revenus du mois" value="45 678 €" delta="+9,3 %" tone="positive" />
         <StatTile label="MRR" value="38 420 €" delta="+4,1 %" tone="positive" />
         <StatTile label="Abonnements actifs" value="12 340" delta="+112" tone="plum" />
-        <StatTile label="Remboursements" value="234 €" delta="4 dossiers" tone="warning" />
+        <StatTile
+          label="Remboursements"
+          value={String(refunded)}
+          delta={`${pending} en attente · ${failed} échec(s)`}
+          tone="warning"
+        />
       </div>
 
       <div className="mb-4 grid grid-cols-1 gap-4 xl:grid-cols-12">
@@ -114,19 +286,43 @@ export default function AdminFinance() {
 
       <TableCard
         title="Transactions récentes"
-        subtitle={`${rows.length} transaction(s)`}
-        action={
-          <div className="relative min-w-[200px]">
-            <Search className="pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2 ad-faint" />
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="ID ou utilisateur…"
-              className="ad-input h-9 ad-pl-9 text-[12.5px]"
-            />
-          </div>
+        subtitle={`${filtered.length} transaction(s) sur ${rows.length}`}
+        toolbar={
+          <>
+            <div className="relative min-w-[220px] flex-1">
+              <Search className="pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2 ad-faint" />
+              <input
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="ID, client ou moyen de paiement…"
+                className="ad-input h-9 ad-pl-9 text-[12.5px]"
+                aria-label="Rechercher une transaction"
+              />
+            </div>
+            <select
+              value={status}
+              onChange={(event) => setStatus(event.target.value)}
+              className="ad-select h-9 text-[12.5px]"
+              aria-label="Filtrer par statut"
+            >
+              <option value="all">Tous les statuts</option>
+              <option value="completed">Réussi</option>
+              <option value="pending">En attente</option>
+              <option value="failed">Échec</option>
+            </select>
+          </>
         }
-        footer={<span>Les remboursements supérieurs à 100 € exigent une double validation.</span>}
+        footer={
+          <DemoPagination
+            page={safePage}
+            pageCount={pageCount}
+            rangeStart={rangeStart}
+            rangeEnd={rangeEnd}
+            total={filtered.length}
+            onPage={setPage}
+            note="Les remboursements supérieurs à 100 € exigent une double validation."
+          />
+        }
       >
         <table className="ad-table">
           <thead>
@@ -138,35 +334,105 @@ export default function AdminFinance() {
               <th>Moyen</th>
               <th>Statut</th>
               <th>Date</th>
+              <th className="text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {rows.map((t) => (
-              <tr key={t.id}>
-                <td className="font-mono text-[11.5px] ad-faint">{t.id}</td>
-                <td className="text-[12.5px] font-medium ad-ink">{t.user}</td>
-                <td className="text-[12.5px]">{t.type}</td>
-                <td className={`text-[12.5px] font-semibold ${t.amount.startsWith("-") ? "ad-danger" : "ad-ink"}`}>
-                  {t.amount}
+            {visible.length === 0 && (
+              <tr>
+                <td colSpan={8} className="py-10 text-center text-[12.5px] ad-muted">
+                  Aucune transaction ne correspond à ces critères.
                 </td>
-                <td className="text-[12px] ad-muted">{t.method}</td>
-                <td>
-                  {t.status === "completed" ? (
-                    <Badge tone="positive">Réussi</Badge>
-                  ) : t.status === "failed" ? (
-                    <Badge tone="danger">
-                      <ArrowDownRight className="size-3" /> Échec
-                    </Badge>
-                  ) : (
-                    <Badge tone="warning">En attente</Badge>
-                  )}
+              </tr>
+            )}
+            {visible.map((row) => (
+              <tr key={row.id}>
+                <td className="font-mono text-[11.5px] ad-faint">{row.id}</td>
+                <td className="text-[12.5px] font-medium ad-ink">{row.user}</td>
+                <td className="text-[12.5px]">{row.type}</td>
+                <td className={`text-[12.5px] font-semibold ${row.amount.startsWith("-") ? "ad-danger" : "ad-ink"}`}>
+                  {row.amount}
                 </td>
-                <td className="text-[12px] ad-muted">{t.date}</td>
+                <td className="text-[12px] ad-muted">{row.method}</td>
+                <td>{statusBadge(row.status)}</td>
+                <td className="text-[12px] ad-muted">{formatDate(row.date)}</td>
+                <td className="text-right">
+                  <RowMenu
+                    label={row.id}
+                    items={[
+                      {
+                        label: "Voir le reçu",
+                        icon: <FileText className="size-3.5" />,
+                        onSelect: () =>
+                          setToast(`Reçu ${row.id} · ${row.amount} · ${formatDate(row.date)}`),
+                      },
+                      ...(row.status === "completed"
+                        ? [
+                            {
+                              label: "Rembourser",
+                              icon: <Undo2 className="size-3.5" />,
+                              tone: "danger" as const,
+                              confirm: `Rembourser ${row.amount} à ${row.user} ? Un remboursement sera ajouté à la liste.`,
+                              onSelect: () => refund(row),
+                            },
+                          ]
+                        : [
+                            {
+                              label: "Relancer le paiement",
+                              icon: <RefreshCw className="size-3.5" />,
+                              onSelect: () => retry(row),
+                            },
+                          ]),
+                    ]}
+                  />
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </TableCard>
+
+      <DemoToast message={toast} onClose={() => setToast(null)} />
+
+      {dialogOpen && (
+        <DemoCreateDialog
+          title="Enregistrer un remboursement"
+          description="Le remboursement est ajouté à cette démonstration, dans ce navigateur."
+          submitLabel="Enregistrer"
+          fields={[
+            { key: "user", label: "Client", required: true, placeholder: "Camille R." },
+            { key: "amount", label: "Montant (€)", type: "number", required: true, placeholder: "9.99", half: true },
+            {
+              key: "method",
+              label: "Moyen de remboursement",
+              options: ["Visa •• 4021", "Mastercard •• 8812", "SEPA", "Apple Pay"],
+              half: true,
+            },
+            { key: "reason", label: "Motif", type: "textarea", placeholder: "Demande du client" },
+          ]}
+          onClose={() => setDialogOpen(false)}
+          onSubmit={(values) => {
+            const amount = Math.abs(Number.parseFloat(values.amount.replace(",", ".")));
+            if (!Number.isFinite(amount) || amount <= 0) {
+              setToast("Montant invalide : le remboursement n’a pas été enregistré.");
+              return;
+            }
+            const row: Transaction = {
+              id: nextTxId(),
+              user: values.user,
+              type: "Remboursement",
+              amount: formatAmount(-amount),
+              status: "completed",
+              date: new Date().toISOString().slice(0, 10),
+              method: values.method,
+            };
+            setRows((current) => [row, ...current]);
+            setPage(0);
+            setDialogOpen(false);
+            setToast(`Remboursement de ${formatAmount(amount)} enregistré (${values.user}).`);
+          }}
+        />
+      )}
     </div>
   );
 }

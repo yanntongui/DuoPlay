@@ -30,9 +30,24 @@
 - **Base de données**: Convex (tables `users`, `profiles`, `couples`, `auditLogs`…)
 - **Sécurité**: RBAC (`lib/admin/permissions.ts`), journal d'audit (à câbler), double validation
 
-> ⚠️ **État actuel** : les écrans de la console affichent des **données de démonstration** codées en dur ; ils ne lisent pas encore Convex. L'authentification, elle, est réelle.
+> ⚠️ **État actuel** : la console lit des **données de démonstration**, pas Convex. L'authentification, elle, est réelle.
 >
-> Exception : la page **Utilisateurs** est réellement interactive — création, suspension/réactivation, suppression, export CSV, filtres et pagination. Les modifications sont enregistrées dans le `localStorage` du navigateur (`duoplay.admin.users.v1`), pas en base : elles ne sont donc ni partagées entre administrateurs, ni persistées après effacement des données du site.
+> **Écrans réellement interactifs** — les actions modifient la liste, les totaux suivent, et l'état est conservé dans le `localStorage` du navigateur (une clé `duoplay.admin.*` par écran) :
+>
+> - **Utilisateurs** (`duoplay.admin.users.v1`) : créer, voir, copier l'identifiant, suspendre/réactiver, supprimer, filtrer, exporter, paginer.
+> - **Couples** (`duoplay.admin.couples.v1`) : resynchroniser (ligne ou global), suspendre/réactiver, dissocier, exporter, paginer.
+> - **Finance** (`duoplay.admin.finance.v1` + `plans.v1`) : enregistrer un remboursement, relancer un paiement, exporter le comptable, modifier les tarifs des plans.
+> - **Support** (`duoplay.admin.support.v1`) : prendre un ticket, le résoudre, le rouvrir, exporter, créer une macro de réponse.
+> - **Modération** (`duoplay.admin.moderation.v1`) : file prioritaire, prise en charge, clôture, escalade, exporter, ajouter une règle.
+> - **Expériences** (`…experiences.v1`) : créer, importer, dupliquer, publier, réviser, supprimer, exporter.
+> - **Cartes** (`…cards.v1`) : créer une carte, importer un paquet, dupliquer, publier, réviser, supprimer.
+> - **Dés** (`…dice.v1`) : créer, dupliquer, publier, réviser, supprimer, exporter.
+> - **Parcours** (`…journeys.v1`) : créer, partir d'un modèle, dupliquer, publier, réviser, supprimer.
+> - **Offres** (`…offers.v1` + `plans.v1`) : créer/pauser/supprimer un code promo, éditer un plan, historique des remises.
+> - **Segments** (`…segments.v1`) : créer un segment, composer des conditions, dupliquer, cibler, exporter.
+> - **Incidents** (`…incidents.v1`) : déclarer, mettre à jour la chronologie, clôturer, rouvrir, post-mortems, exporter.
+>
+> Les autres écrans (Analytics, Audit, Monitoring, Tests A/B, Feature Flags, Paramètres, Campagnes, RGPD, Rapports, Journal IA) restent **statiques** : graphiques et formulaires de démonstration, sans action persistée. Les modifications ci-dessus ne sont **ni partagées entre administrateurs, ni persistées en base** ; vider les données du site remet les jeux de départ.
 
 ## 2. Structure de Navigation
 
