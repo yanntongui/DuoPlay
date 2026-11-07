@@ -31,6 +31,8 @@
 - **Sécurité**: RBAC (`lib/admin/permissions.ts`), journal d'audit (à câbler), double validation
 
 > ⚠️ **État actuel** : les écrans de la console affichent des **données de démonstration** codées en dur ; ils ne lisent pas encore Convex. L'authentification, elle, est réelle.
+>
+> Exception : la page **Utilisateurs** est réellement interactive — création, suspension/réactivation, suppression, export CSV, filtres et pagination. Les modifications sont enregistrées dans le `localStorage` du navigateur (`duoplay.admin.users.v1`), pas en base : elles ne sont donc ni partagées entre administrateurs, ni persistées après effacement des données du site.
 
 ## 2. Structure de Navigation
 
